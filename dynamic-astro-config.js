@@ -4,7 +4,7 @@ import react from '@astrojs/react';
 // application.  No changes made here will be reflected in the deployed 
 // site.
 
-export default {
+export const dynamicConfig = {
   integrations: [react()],
   site: 'https://AVAnnotate.github.io',
   base: 'my-repo/dist',
