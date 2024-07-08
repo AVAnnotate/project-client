@@ -1,17 +1,17 @@
 import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
 import type { IIIFAnnotationItem, IIIFAnnotationPage } from '@ty/iiif.ts';
 import { Node } from 'slate';
+import { it } from 'node:test';
 
 const commandLineArgs = require('command-line-args');
 const fs = require('fs');
 
 const createAnnotationPage = (
   fileName: string,
-  outputDir: string,
-  project: ProjectFile,
   pagesURL: string,
   targetCanvas: string,
-  id: string
+  id: string,
+  manifestId: string
 ) => {
   // Read in the file
   // All annotation pages are assumed to be in ./annotations
@@ -53,10 +53,36 @@ const createAnnotationPage = (
         source: {
           id: targetCanvas,
           type: 'Canvas',
+          partOf: [
+            {
+              id: manifestId,
+              type: 'Manifest',
+            },
+          ],
         },
+        selector: annotation.end_time
+          ? {
+              type: 'RangeSelector',
+              t: `${annotation.start_time},${annotation.end_time}`,
+            }
+          : {
+              type: 'PointSelector',
+              t: `${annotation.start_time}`,
+            },
       },
     };
-    annotation.tag;
+
+    annotation.tags.forEach((tag) => {
+      item.body.push({
+        type: 'TextualBody',
+        value: `${tag.category}:${tag.tag}`,
+        format: 'text/plain',
+        motivation: 'tagging',
+      });
+    });
+
     output.items.push(item);
   });
+
+  return output;
 };
