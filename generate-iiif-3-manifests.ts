@@ -121,7 +121,9 @@ export const createManifest = (
 
   let canvasCount = 1;
   fs.readdirSync(`${dataDir}/events/`).forEach((file) => {
-    const eventData: EventFile = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const eventData: EventFile = JSON.parse(
+      fs.readFileSync(`${dataDir}/events/${file}`, 'utf8')
+    );
 
     const eventId = `${siteURL}/${snakeCase(
       eventData.label
