@@ -130,7 +130,7 @@ export const createManifest = (
     )}/canvas-${canvasCount}/canvas`;
 
     let pageCount = 1;
-    eventData.audiovisual_files.forEach((avFile) => {
+    for (const [_key, avFile] of Object.entries(eventData.audiovisual_files)) {
       const type = mime.lookup(avFile.file_url);
       const event: IIIFCanvas = {
         id: eventId,
@@ -192,8 +192,7 @@ export const createManifest = (
 
       output.items.push(event);
       pageCount++;
-    });
-
+    }
     canvasCount++;
   });
 
