@@ -3,15 +3,21 @@
 // @ts-ignore
 const allJsons = await Astro.glob('../../manifests/*.json');
 
-const json = allJsons.find((j) => {
-  const path = j.id.split('/');
-  if (path.length > 0) {
-    const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
-    return id === Astro.params.id;
-  }
+export async function getStaticPaths() {
+  return allJsons.map((j) => {
+    const path = j.id.split('/');
+    if (path.length > 0) {
+      const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
+      return {
+        params: { id },
+        props: { json: j },
+      };
+    }
+  });
+}
 
-  return false;
-});
+const { id } = Astro.params;
+const { json } = Astro.props;
 ---
 
 <>
