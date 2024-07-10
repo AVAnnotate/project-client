@@ -1,7 +1,7 @@
 ---
-const json = await Astro.glob('../../manifests/manifest.json');
+import json from '../../manifests/manifest.json';
 ---
 
 <>
-  {json && json.length > 0 && JSON.stringify(json[0])}
+  {json && JSON.stringify(json, null, 2)}
 </>
