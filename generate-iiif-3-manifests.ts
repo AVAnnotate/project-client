@@ -98,7 +98,7 @@ export const createAnnotationPage = (
           });
         });
 
-        output.items!.push(item);
+        output!.items!.push(item);
       });
     }
   });
