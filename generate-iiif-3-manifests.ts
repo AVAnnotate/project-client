@@ -160,9 +160,9 @@ export const createManifest = (
       );
 
       writeFileSync(
-        `./client/public/${snakeCase(
+        `./client/manifests/${snakeCase(
           eventData.label
-        )}-canvas${canvasCount}-${pageCount}`,
+        )}-canvas${canvasCount}-${pageCount}.json`,
         JSON.stringify(anno)
       );
 
@@ -206,7 +206,7 @@ export const createManifest = (
     canvasCount++;
   });
 
-  writeFileSync('./client/public/mainfest', JSON.stringify(output));
+  writeFileSync('./client/manifests/manifest.json', JSON.stringify(output));
 };
 
 const optionDefinitions = [
