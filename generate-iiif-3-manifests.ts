@@ -13,88 +13,98 @@ import commandLineArgs from 'command-line-args';
 
 export const createAnnotationPage = (
   dataPath: string,
-  fileName: string,
   pagesURL: string,
+  eventUUID: string,
   targetCanvas: string,
   id: string,
   manifestId: string
 ) => {
-  // Read in the file
-  // All annotation pages are assumed to be in ./annotations
-  const annotationData: AnnotationFile = JSON.parse(
-    fs.readFileSync(`${dataPath}/annotations/${fileName}`, 'utf8')
-  );
+  // Iterate all annotations and look for this event
+  fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
+    // Read in the file
+    // All annotation pages are assumed to be in ./annotations
+    const annotationData: AnnotationFile = JSON.parse(
+      fs.readFileSync(`${dataPath}/annotations/${file}`, 'utf8')
+    );
 
-  // Read in the matching Event file
-  // All Event files are assumed to be in ./events
-  const eventData: EventFile = JSON.parse(
-    fs.readFileSync(
-      `${dataPath}/events/${annotationData.event_id}.json`,
-      'utf8'
-    )
-  );
+    // Read in the matching Event file
+    // All Event files are assumed to be in ./events
+    const eventData: EventFile = JSON.parse(
+      fs.readFileSync(
+        `${dataPath}/events/${annotationData.event_id}.json`,
+        'utf8'
+      )
+    );
 
-  const output: IIIFAnnotationPage = {
-    '@context': 'http://iiif.io/api/presentation/3/context.json',
-    id: `${pagesURL}/manifests/${snakeCase(eventData.label)}`,
-    type: 'AnnotationPage',
-    label: {
-      en: [eventData.label],
-    },
-    items: [],
-  };
-
-  annotationData.annotations.forEach((annotation) => {
-    const item: IIIFAnnotationItem = {
-      '@context': 'http://www.w3.org/ns/anno.jsonld',
-      type: 'Annotation',
-      id: id,
-      motivation: ['commenting', 'tagging'],
-      body: [
-        {
-          type: 'TextualBody',
-          value: annotation.annotation.map((n) => Node.string(n)).join('\n'),
-          format: 'text/plain',
-          motivation: 'commenting',
+    if (annotationData.event_id === eventUUID) {
+      const output: IIIFAnnotationPage = {
+        '@context': 'http://iiif.io/api/presentation/3/context.json',
+        id: `${pagesURL}/manifests/${snakeCase(eventData.label)}`,
+        type: 'AnnotationPage',
+        label: {
+          en: [eventData.label],
         },
-      ],
-      target: {
-        source: {
-          id: targetCanvas,
-          type: 'Canvas',
-          partOf: [
+        items: [],
+      };
+
+      annotationData.annotations.forEach((annotation) => {
+        const item: IIIFAnnotationItem = {
+          '@context': 'http://www.w3.org/ns/anno.jsonld',
+          type: 'Annotation',
+          id: id,
+          motivation: ['commenting', 'tagging'],
+          body: [
             {
-              id: manifestId,
-              type: 'Manifest',
+              type: 'TextualBody',
+              value: annotation.annotation
+                .map((n) => Node.string(n))
+                .join('\n'),
+              format: 'text/plain',
+              motivation: 'commenting',
             },
           ],
-        },
-        selector:
-          annotation.end_time && annotation.end_time !== annotation.start_time
-            ? {
-                type: 'RangeSelector',
-                t: `${annotation.start_time},${annotation.end_time}`,
-              }
-            : {
-                type: 'PointSelector',
-                t: `${annotation.start_time}`,
-              },
-      },
-    };
+          target: {
+            source: {
+              id: targetCanvas,
+              type: 'Canvas',
+              partOf: [
+                {
+                  id: manifestId,
+                  type: 'Manifest',
+                },
+              ],
+            },
+            selector:
+              annotation.end_time &&
+              annotation.end_time !== annotation.start_time
+                ? {
+                    type: 'RangeSelector',
+                    t: `${annotation.start_time},${annotation.end_time}`,
+                  }
+                : {
+                    type: 'PointSelector',
+                    t: `${annotation.start_time}`,
+                  },
+          },
+        };
 
-    annotation.tags.forEach((tag) => {
-      item.body.push({
-        type: 'TextualBody',
-        value: `${tag.category}:${tag.tag}`,
-        format: 'text/plain',
-        motivation: 'tagging',
+        annotation.tags.forEach((tag) => {
+          item.body.push({
+            type: 'TextualBody',
+            value: `${tag.category}:${tag.tag}`,
+            format: 'text/plain',
+            motivation: 'tagging',
+          });
+        });
+
+        output.items!.push(item);
       });
-    });
 
-    output.items!.push(item);
+      return output;
+    }
   });
 
-  return output;
+  return null;
 };
 
 export const createManifest = (
@@ -130,7 +140,7 @@ export const createManifest = (
     )}/canvas-${canvasCount}/canvas`;
 
     let pageCount = 1;
-    for (const [_key, avFile] of Object.entries(eventData.audiovisual_files)) {
+    for (const [key, avFile] of Object.entries(eventData.audiovisual_files)) {
       const type = mime.lookup(avFile.file_url);
       const event: IIIFCanvas = {
         id: eventId,
@@ -142,8 +152,8 @@ export const createManifest = (
 
       const anno = createAnnotationPage(
         dataDir,
-        file,
         siteURL,
+        key,
         eventId,
         `${eventId}/page${pageCount}`,
         `${siteURL}/manifests.json`
