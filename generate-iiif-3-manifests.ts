@@ -159,49 +159,51 @@ export const createManifest = (
         `${siteURL}/manifests.json`
       );
 
-      writeFileSync(
-        `./client/src/content/manifests/${snakeCase(
-          eventData.label
-        )}-canvas${canvasCount}-${pageCount}.json`,
-        JSON.stringify(anno)
-      );
+      if (anno) {
+        writeFileSync(
+          `./client/src/content/manifests/${snakeCase(
+            eventData.label
+          )}-canvas${canvasCount}-${pageCount}.json`,
+          JSON.stringify(anno)
+        );
 
-      event.annotations.push({
-        type: 'AnnotationPage',
-        id: `${siteURL}/manifests/${snakeCase(
-          eventData.label
-        )}-canvas${canvasCount}-${pageCount}.json`,
-        label: { en: ['Annotations'] },
-      });
+        event.annotations.push({
+          type: 'AnnotationPage',
+          id: `${siteURL}/manifests/${snakeCase(
+            eventData.label
+          )}-canvas${canvasCount}-${pageCount}.json`,
+          label: { en: ['Annotations'] },
+        });
 
-      event.items.push({
-        id: `${siteURL}/${snakeCase(
-          eventData.label
-        )}-canvas${canvasCount}/paintings`,
-        type: 'AnnotationPage',
-        items: [
-          {
-            id: `${siteURL}/${snakeCase(
-              eventData.label
-            )}-canvas${canvasCount}/paintings`,
-            type: 'Annotation',
-            motivation: 'painting',
-            body: [
-              {
-                id: avFile.file_url,
-                type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                format: type ? type : 'unknown',
-              },
-            ],
-            target: `${siteURL}/${snakeCase(
-              eventData.label
-            )}-canvas${canvasCount}`,
-          },
-        ],
-      });
+        event.items.push({
+          id: `${siteURL}/${snakeCase(
+            eventData.label
+          )}-canvas${canvasCount}/paintings`,
+          type: 'AnnotationPage',
+          items: [
+            {
+              id: `${siteURL}/${snakeCase(
+                eventData.label
+              )}-canvas${canvasCount}/paintings`,
+              type: 'Annotation',
+              motivation: 'painting',
+              body: [
+                {
+                  id: avFile.file_url,
+                  type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                  format: type ? type : 'unknown',
+                },
+              ],
+              target: `${siteURL}/${snakeCase(
+                eventData.label
+              )}-canvas${canvasCount}`,
+            },
+          ],
+        });
 
-      output.items.push(event);
-      pageCount++;
+        output.items.push(event);
+        pageCount++;
+      }
     }
     canvasCount++;
   });
