@@ -1,4 +1,4 @@
-import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
+import type { AnnotationFile, EventFile } from '@ty/index.ts';
 import type {
   IIIFAnnotationItem,
   IIIFAnnotationPage,

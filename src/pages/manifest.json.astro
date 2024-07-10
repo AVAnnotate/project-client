@@ -1,0 +1,7 @@
+---
+const json = await Astro.glob('../../manifests/manifest.json');
+---
+
+<>
+  {json && json.length > 0 && json[0]}
+</>
