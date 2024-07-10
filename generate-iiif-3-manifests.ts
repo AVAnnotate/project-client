@@ -19,6 +19,7 @@ export const createAnnotationPage = (
   id: string,
   manifestId: string
 ) => {
+  let output: IIIFAnnotationPage | null = null;
   // Iterate all annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     // Read in the file
@@ -37,7 +38,7 @@ export const createAnnotationPage = (
     );
 
     if (annotationData.event_id === eventUUID) {
-      const output: IIIFAnnotationPage = {
+      output = {
         '@context': 'http://iiif.io/api/presentation/3/context.json',
         id: `${pagesURL}/manifests/${snakeCase(eventData.label)}`,
         type: 'AnnotationPage',
@@ -99,12 +100,10 @@ export const createAnnotationPage = (
 
         output.items!.push(item);
       });
-
-      return output;
     }
   });
 
-  return null;
+  return output;
 };
 
 export const createManifest = (
@@ -140,7 +139,7 @@ export const createManifest = (
     )}/canvas-${canvasCount}/canvas`;
 
     let pageCount = 1;
-    for (const [key, avFile] of Object.entries(eventData.audiovisual_files)) {
+    for (const [_key, avFile] of Object.entries(eventData.audiovisual_files)) {
       const type = mime.lookup(avFile.file_url);
       const event: IIIFCanvas = {
         id: eventId,
@@ -153,7 +152,7 @@ export const createManifest = (
       const anno = createAnnotationPage(
         dataDir,
         siteURL,
-        key,
+        file.replace(/\.[^/.]+$/, ''),
         eventId,
         `${eventId}/page${pageCount}`,
         `${siteURL}/manifests.json`
