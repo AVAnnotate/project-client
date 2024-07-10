@@ -7,9 +7,15 @@ export async function getStaticPaths() {
     const path = j.data.id.split('/');
     if (path.length > 0) {
       const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
+      console.log('    ID: ', id);
       return {
         params: { id },
         props: { json: j.data },
+      };
+    } else {
+      return {
+        params: { id: 'unknown' },
+        props: { json: {} },
       };
     }
   });
