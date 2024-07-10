@@ -1,7 +1,17 @@
 ---
 // This files is generated dynamically
 // @ts-ignore
-import json from `../../manifests/${Astro.params.id}.json``;
+const allJsons = await Astro.glob('../../manifests/*.json');
+
+const json = allJsons.find((j) => {
+  const path = j.id.split('/');
+  if (path.length > 0) {
+    const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
+    return id === Astro.params.id;
+  }
+
+  return false;
+});
 ---
 
 <>
