@@ -1,6 +1,6 @@
----
 // @ts-ignore
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+import type { APIRoute } from 'astro';
 
 export async function getStaticPaths() {
   const paths: any[] = [];
@@ -23,9 +23,8 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { json } = Astro.props;
----
-
-<>
-  {json && JSON.stringify(json, null, 2)}
-</>
+export const GET: APIRoute = async ({ params }) => {
+  const id = params.id;
+  const data = await getEntry('manifests', id as string);
+  return new Response(JSON.stringify(data));
+};
