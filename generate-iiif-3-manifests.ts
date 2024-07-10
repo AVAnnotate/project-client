@@ -159,13 +159,6 @@ export const createManifest = (
         `${siteURL}/manifests.json`
       );
 
-      console.log(
-        `*** Created file ${snakeCase(
-          eventData.label
-        )}-canvas${canvasCount}-${pageCount}.json:`
-      );
-
-      console.log(JSON.stringify(anno, null, 2));
       writeFileSync(
         `./client/src/content/manifests/${snakeCase(
           eventData.label
