@@ -160,7 +160,7 @@ export const createManifest = (
       );
 
       writeFileSync(
-        `./public/${snakeCase(
+        `./client/public/${snakeCase(
           eventData.label
         )}-canvas${canvasCount}-${pageCount}`,
         JSON.stringify(anno)
