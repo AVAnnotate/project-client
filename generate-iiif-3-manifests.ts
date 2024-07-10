@@ -206,7 +206,7 @@ export const createManifest = (
     canvasCount++;
   });
 
-  writeFileSync('./public/mainfest', JSON.stringify(output));
+  writeFileSync('./client/public/mainfest', JSON.stringify(output));
 };
 
 const optionDefinitions = [
