@@ -9,6 +9,7 @@ import { Node } from 'slate';
 import fs, { writeFileSync } from 'fs';
 import { snakeCase } from 'snake-case';
 import mime from 'mime-types';
+import commandLineArgs from 'command-line-args';
 
 export const createAnnotationPage = (
   dataPath: string,
@@ -197,13 +198,13 @@ export const createManifest = (
   writeFileSync('./public/mainfest', JSON.stringify(output));
 };
 
-// const out = createAnnotationPage(
-//   '/Users/lorinjameson/Work/AVAnnotate/rebecca/data',
-//   '3f1ccdbe-ee0c-4099-a278-f2567d1ef44e.json',
-//   'http://test-site',
-//   'http://test-site/manifests/canvas/p1',
-//   'http://test-site/manifests/canvas/p1/page1',
-//   'http://test-site/manifests/manifest.json'
-// );
+const optionDefinitions = [
+  { name: 'dir', alias: 'd', type: String },
+  { name: 'label', alias: 'l', type: String },
+  { name: 'url', alias: 'u', type: String },
+  { name: 'title', alias: 't', type: String },
+];
 
-// fs.writeFileSync('./test-page.json', JSON.stringify(out, null, 2));
+const options = commandLineArgs(optionDefinitions);
+
+createManifest(options.dir, options.label, options.url, options.title);

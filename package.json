@@ -13,12 +13,14 @@
     "@astrojs/check": "^0.7.0",
     "@astrojs/react": "^3.3.4",
     "astro": "^4.8.6",
+    "command-line-args": "^6.0.0",
     "mime-types": "^2.1.35",
     "slate": "^0.103.0",
     "snake-case": "^4.0.0",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@types/command-line-args": "^5.2.3",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20.14.9",
     "@types/slate": "^0.47.15",
