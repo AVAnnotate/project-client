@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
+    "esModuleInterop": true,
     "paths": {
       "@apps/*": ["src/apps/*"],
       "@branding/*": ["src/branding/*"],

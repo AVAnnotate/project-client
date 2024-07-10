@@ -1,12 +1,17 @@
 import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
-import type { IIIFAnnotationItem, IIIFAnnotationPage } from '@ty/iiif.ts';
+import type {
+  IIIFAnnotationItem,
+  IIIFAnnotationPage,
+  IIIFCanvas,
+  IIIFPresentationManifest,
+} from '@ty/iiif.ts';
 import { Node } from 'slate';
-import { it } from 'node:test';
+import fs, { writeFileSync } from 'fs';
+import { snakeCase } from 'snake-case';
+import mime from 'mime-types';
 
-const commandLineArgs = require('command-line-args');
-const fs = require('fs');
-
-const createAnnotationPage = (
+export const createAnnotationPage = (
+  dataPath: string,
   fileName: string,
   pagesURL: string,
   targetCanvas: string,
@@ -16,18 +21,21 @@ const createAnnotationPage = (
   // Read in the file
   // All annotation pages are assumed to be in ./annotations
   const annotationData: AnnotationFile = JSON.parse(
-    fs.readFileSync(`./annotations/${fileName}`, 'utf8')
+    fs.readFileSync(`${dataPath}/annotations/${fileName}`, 'utf8')
   );
 
   // Read in the matching Event file
   // All Event files are assumed to be in ./events
   const eventData: EventFile = JSON.parse(
-    fs.readFileSync(`./events/${annotationData.event_id}.json`, 'utf8')
+    fs.readFileSync(
+      `${dataPath}/events/${annotationData.event_id}.json`,
+      'utf8'
+    )
   );
 
   const output: IIIFAnnotationPage = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
-    id: `${pagesURL}/manifests/${eventData.label}`,
+    id: `${pagesURL}/manifests/${snakeCase(eventData.label)}`,
     type: 'AnnotationPage',
     label: {
       en: [eventData.label],
@@ -60,15 +68,16 @@ const createAnnotationPage = (
             },
           ],
         },
-        selector: annotation.end_time
-          ? {
-              type: 'RangeSelector',
-              t: `${annotation.start_time},${annotation.end_time}`,
-            }
-          : {
-              type: 'PointSelector',
-              t: `${annotation.start_time}`,
-            },
+        selector:
+          annotation.end_time && annotation.end_time !== annotation.start_time
+            ? {
+                type: 'RangeSelector',
+                t: `${annotation.start_time},${annotation.end_time}`,
+              }
+            : {
+                type: 'PointSelector',
+                t: `${annotation.start_time}`,
+              },
       },
     };
 
@@ -81,8 +90,120 @@ const createAnnotationPage = (
       });
     });
 
-    output.items.push(item);
+    output.items!.push(item);
   });
 
   return output;
 };
+
+export const createManifest = (
+  dataDir: string,
+  label: string,
+  siteURL: string,
+  title: string
+) => {
+  const output: IIIFPresentationManifest = {
+    '@context': 'http://iiif.io/api/presentation/3/context.json',
+    id: `${siteURL}/manifest.json`,
+    type: 'Manifest',
+    label: { en: [label] },
+    homepage: [
+      {
+        id: siteURL,
+        type: 'Text',
+        label: { en: [title] },
+        format: 'text/html',
+      },
+    ],
+    items: [],
+  };
+
+  let canvasCount = 1;
+  fs.readdirSync(`${dataDir}/events/`).forEach((file) => {
+    const eventData: EventFile = JSON.parse(fs.readFileSync(file, 'utf8'));
+
+    const eventId = `${siteURL}/${snakeCase(
+      eventData.label
+    )}/canvas-${canvasCount}/canvas`;
+
+    let pageCount = 1;
+    eventData.audiovisual_files.forEach((avFile) => {
+      const type = mime.lookup(avFile.file_url);
+      const event: IIIFCanvas = {
+        id: eventId,
+        type: 'Canvas',
+        duration: avFile.duration,
+        annotations: [],
+        items: [],
+      };
+
+      const anno = createAnnotationPage(
+        dataDir,
+        file,
+        siteURL,
+        eventId,
+        `${eventId}/page${pageCount}`,
+        `${siteURL}/manifests.json`
+      );
+
+      writeFileSync(
+        `./public/${snakeCase(
+          eventData.label
+        )}-canvas${canvasCount}-${pageCount}`,
+        JSON.stringify(anno)
+      );
+
+      event.annotations.push({
+        type: 'AnnotationPage',
+        id: `${siteURL}/${snakeCase(
+          eventData.label
+        )}-canvas${canvasCount}-${pageCount}`,
+        label: { en: ['Annotations'] },
+      });
+
+      event.items.push({
+        id: `${siteURL}/${snakeCase(
+          eventData.label
+        )}-canvas${canvasCount}/paintings`,
+        type: 'AnnotationPage',
+        items: [
+          {
+            id: `${siteURL}/${snakeCase(
+              eventData.label
+            )}-canvas${canvasCount}/paintings`,
+            type: 'Annotation',
+            motivation: 'painting',
+            body: [
+              {
+                id: avFile.file_url,
+                type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                format: type ? type : 'unknown',
+              },
+            ],
+            target: `${siteURL}/${snakeCase(
+              eventData.label
+            )}-canvas${canvasCount}`,
+          },
+        ],
+      });
+
+      output.items.push(event);
+      pageCount++;
+    });
+
+    canvasCount++;
+  });
+
+  writeFileSync('./public/mainfest', JSON.stringify(output));
+};
+
+// const out = createAnnotationPage(
+//   '/Users/lorinjameson/Work/AVAnnotate/rebecca/data',
+//   '3f1ccdbe-ee0c-4099-a278-f2567d1ef44e.json',
+//   'http://test-site',
+//   'http://test-site/manifests/canvas/p1',
+//   'http://test-site/manifests/canvas/p1/page1',
+//   'http://test-site/manifests/manifest.json'
+// );
+
+// fs.writeFileSync('./test-page.json', JSON.stringify(out, null, 2));

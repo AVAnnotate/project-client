@@ -13,8 +13,8 @@ export interface IIIFResource {
   type: string;
   language?: string;
   format?: string;
-  value: string;
-  motivation: string;
+  value?: string;
+  motivation?: string;
 }
 
 export interface IIIFAnnotationTarget {
@@ -30,12 +30,30 @@ export interface IIIFAnnotationTarget {
 }
 export interface IIIFAnnotationItem extends IIIFClass {
   motivation: string | string[];
-  '@context': string;
+  '@context'?: string;
   body: IIIFResource[];
-  target: IIIFAnnotationTarget;
+  target: IIIFAnnotationTarget | string;
 }
 
 export interface IIIFAnnotationPage extends IIIFClass {
   '@context'?: string | string[];
-  items: IIIFAnnotationItem[];
+  items?: IIIFAnnotationItem[];
+}
+
+export interface IIIFHomepage extends IIIFClass {
+  format: string;
+}
+
+export interface IIIFProvider extends IIIFClass {}
+
+export interface IIIFCanvas extends IIIFClass {
+  duration: number;
+  annotations: IIIFAnnotationPage[];
+  items: IIIFAnnotationPage[];
+}
+export interface IIIFPresentationManifest extends IIIFClass {
+  '@context': string;
+  homepage: IIIFHomepage[];
+  provider?: IIIFProvider[];
+  items: IIIFCanvas[];
 }
