@@ -15,6 +15,7 @@ export const createAnnotationPage = (
   dataPath: string,
   pagesURL: string,
   eventUUID: string,
+  pageId: string,
   targetCanvas: string,
   id: string,
   manifestId: string
@@ -40,7 +41,7 @@ export const createAnnotationPage = (
     if (annotationData.event_id === eventUUID) {
       output = {
         '@context': 'http://iiif.io/api/presentation/3/context.json',
-        id: `${pagesURL}/manifests/${snakeCase(eventData.label)}`,
+        id: pageId,
         type: 'AnnotationPage',
         label: {
           en: [eventData.label],
@@ -153,6 +154,9 @@ export const createManifest = (
         dataDir,
         siteURL,
         file.replace(/\.[^/.]+$/, ''),
+        `${siteURL}/${snakeCase(
+          eventData.label
+        )}-canvas${canvasCount}-${pageCount}.json`,
         eventId,
         `${eventId}/page${pageCount}`,
         `${siteURL}/manifests.json`
