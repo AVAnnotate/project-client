@@ -3,13 +3,13 @@ import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
   return await getCollection('manifests', (j) => {
-    console.log('j: ', j);
-    const path = j.default.id.split('/');
+    console.log('j: ', j.data);
+    const path = j.data.id.split('/');
     if (path.length > 0) {
       const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
       return {
         params: { id },
-        props: { json: j.default },
+        props: { json: j.data },
       };
     }
   });
