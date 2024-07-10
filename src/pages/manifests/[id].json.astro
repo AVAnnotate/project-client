@@ -1,9 +1,6 @@
 ---
-// This files is generated dynamically
-// @ts-ignore
-const allJsons = await Astro.glob('../../manifests/*.json');
-
 export async function getStaticPaths() {
+  const allJsons = await Astro.glob('../../manifests/*.json');
   return allJsons.map((j) => {
     const path = j.id.split('/');
     if (path.length > 0) {
