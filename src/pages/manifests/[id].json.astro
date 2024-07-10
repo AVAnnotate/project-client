@@ -2,7 +2,7 @@
 export async function getStaticPaths() {
   const allJsons = await Astro.glob('../../../manifests/*.json');
   return allJsons.map((j) => {
-    console.log('j: ', j);
+    console.log('j: ', JSON.parse(j));
     const path = j.default.id.split('/');
     if (path.length > 0) {
       const id = path[path.length - 1].replace(/\.[^/.]+$/, '');
