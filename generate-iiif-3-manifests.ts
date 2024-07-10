@@ -13,7 +13,7 @@ import commandLineArgs from 'command-line-args';
 
 export const createAnnotationPage = (
   dataPath: string,
-  pagesURL: string,
+  _pagesURL: string,
   eventUUID: string,
   pageId: string,
   targetCanvas: string,
@@ -154,7 +154,7 @@ export const createManifest = (
         dataDir,
         siteURL,
         file.replace(/\.[^/.]+$/, ''),
-        `${siteURL}/${snakeCase(
+        `${siteURL}/manifests/${snakeCase(
           eventData.label
         )}-canvas${canvasCount}-${pageCount}.json`,
         eventId,
