@@ -168,9 +168,9 @@ export const createManifest = (
 
       event.annotations.push({
         type: 'AnnotationPage',
-        id: `${siteURL}/${snakeCase(
+        id: `${siteURL}/manifests/${snakeCase(
           eventData.label
-        )}-canvas${canvasCount}-${pageCount}`,
+        )}-canvas${canvasCount}-${pageCount}.json`,
         label: { en: ['Annotations'] },
       });
 
