@@ -111,7 +111,8 @@ export const createManifest = (
   dataDir: string,
   label: string,
   siteURL: string,
-  title: string
+  title: string,
+  allowSubPages: boolean
 ) => {
   const output: IIIFPresentationManifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
@@ -163,20 +164,24 @@ export const createManifest = (
       );
 
       if (anno) {
-        writeFileSync(
-          `./client/src/content/manifests/${snakeCase(
-            eventData.label
-          )}-canvas${canvasCount}-${pageCount}.json`,
-          JSON.stringify(anno)
-        );
+        if (allowSubPages) {
+          writeFileSync(
+            `./client/src/content/manifests/${snakeCase(
+              eventData.label
+            )}-canvas${canvasCount}-${pageCount}.json`,
+            JSON.stringify(anno)
+          );
 
-        event.annotations.push({
-          type: 'AnnotationPage',
-          id: `${siteURL}/manifests/${snakeCase(
-            eventData.label
-          )}-canvas${canvasCount}-${pageCount}.json`,
-          label: { en: ['Annotations'] },
-        });
+          event.annotations.push({
+            type: 'AnnotationPage',
+            id: `${siteURL}/manifests/${snakeCase(
+              eventData.label
+            )}-canvas${canvasCount}-${pageCount}.json`,
+            label: { en: ['Annotations'] },
+          });
+        } else {
+          event.annotations.push(anno);
+        }
 
         event.items.push({
           id: `${siteURL}/${snakeCase(
@@ -222,8 +227,15 @@ const optionDefinitions = [
   { name: 'label', alias: 'l', type: String },
   { name: 'url', alias: 'u', type: String },
   { name: 'title', alias: 't', type: String },
+  { name: 'subPages', alias: 's', type: Boolean },
 ];
 
 const options = commandLineArgs(optionDefinitions);
 
-createManifest(options.dir, options.label, options.url, options.title);
+createManifest(
+  options.dir,
+  options.label,
+  options.url,
+  options.title,
+  options.subPages
+);
