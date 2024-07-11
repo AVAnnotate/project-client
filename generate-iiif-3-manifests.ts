@@ -112,7 +112,7 @@ export const createManifest = (
   label: string,
   siteURL: string,
   title: string,
-  allowSubPages: boolean
+  allowSubPages: string
 ) => {
   const output: IIIFPresentationManifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
@@ -164,7 +164,7 @@ export const createManifest = (
       );
 
       if (anno) {
-        if (allowSubPages) {
+        if (allowSubPages === 'true' || allowSubPages === 'TRUE') {
           writeFileSync(
             `./client/src/content/manifests/${snakeCase(
               eventData.label
@@ -227,7 +227,7 @@ const optionDefinitions = [
   { name: 'label', alias: 'l', type: String },
   { name: 'url', alias: 'u', type: String },
   { name: 'title', alias: 't', type: String },
-  { name: 'subPages', alias: 's', type: Boolean },
+  { name: 'subPages', alias: 's', type: String },
 ];
 
 const options = commandLineArgs(optionDefinitions);
