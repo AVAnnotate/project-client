@@ -95,7 +95,7 @@ export const createAnnotationPage = (
             type: 'TextualBody',
             value: `${tag.category}:${tag.tag}`,
             format: 'text/plain',
-            motivation: 'tagging',
+            purpose: 'tagging',
           });
         });
 

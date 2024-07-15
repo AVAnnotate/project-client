@@ -15,6 +15,7 @@ export interface IIIFResource {
   format?: string;
   value?: string;
   motivation?: string;
+  purpose?: string;
 }
 
 export interface IIIFAnnotationTarget {
