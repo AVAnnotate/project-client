@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import dynamic from './dynamic-astro-config.js';
+import { dynamicConfig } from './dynamic-astro-config.js';
 
 // We are utilizing a dynamic astro config in this 
 // template.  When the template is used to create 
@@ -7,6 +7,5 @@ import dynamic from './dynamic-astro-config.js';
 // the dynamic configuration will be updated to reflect 
 // the new project
 
-
 // https://astro.build/config
-export default defineConfig(dynamic); // Do not change!
+export default defineConfig(dynamicConfig); // Do not change!
