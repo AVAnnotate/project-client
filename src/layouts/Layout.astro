@@ -3,15 +3,16 @@ import '../style/main.css';
 import '@fontsource-variable/open-sans';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import projectData from "../../data/project.json";
 
 interface Props {
-  title: string;
-  projectName: string;
-  projectBy: string;
+  title?: string;
+  projectName?: string;
+  projectBy?: string;
 }
 // Supports weights 300-800
 
-const { title, projectName, projectBy } = Astro.props;
+const { title = projectData.project.title, projectName = projectData.project.title, projectBy = projectData.project.creator } = Astro.props;
 ---
 
 <!doctype html>

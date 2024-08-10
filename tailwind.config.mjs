@@ -9,7 +9,9 @@ export default {
 			colors: {
 				secondary: '#303F49',
 				gray: {
-					100: '#F6F6F6'
+					100: '#F6F6F6',
+					200: '#E5E5E5',
+					500: '#737373'
 				},
 				black: '#0A0A0A'
 			},
