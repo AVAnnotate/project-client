@@ -1,0 +1,127 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import projectData from "../../../data/project.json";
+import Container from "../../components/Container.astro";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { dynamicConfig } from '../../../dynamic-astro-config';
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const baseUrl = dynamicConfig.base;
+const crumbs = [
+    {
+        label: 'Home',
+        link: `/${baseUrl}`
+    },
+    {
+        label: 'Index',
+        link:   `/${baseUrl}/tags`
+    },
+    {
+        label: 'Tag Groups'
+    }
+];
+
+const tags = projectData.project.tags;
+const annotations = await Astro.glob('../../../data/annotations/*.json');
+const events = import.meta.glob('../../../data/events/*.json');
+let eventsWithAnnotations = annotations.map((page) => (
+    page.default
+));
+//a slightly overly elaborate way to retrieve the proper label for the event, necessary since the annotation file doesn't contain it so we need to go looking in the event files
+for (let i=0; i<eventsWithAnnotations.length; i++) {
+    const eventKey = Object.keys(events).find((key) => (key.includes(eventsWithAnnotations[i].event_id)));
+    if (eventKey) {
+        const event: any = await events[eventKey]();
+        if (event) {
+            eventsWithAnnotations[i]['event_label'] = event.label;
+        }
+    }
+}
+const detectTag = (tag: { tag: string; category: string }, ann: { tag: string; category: string }[]) => {
+    const lowerCaseAnn = ann.map((t) => ({
+        tag: t.tag.toLowerCase(),
+        category: t.category.toLowerCase()
+    }));
+    const lowerCaseTag = {
+        tag: tag.tag.toLowerCase(),
+        category: tag.category.toLowerCase()
+    };
+    return !!lowerCaseAnn.find((t) => (t.tag == lowerCaseTag.tag)); //should also match the category but for now the data is bugged so all the categories are speaker
+}
+const getTagCount = (tag: { tag: string, category: string }) => {
+    let count = 0;
+    annotations.forEach((page) => {
+        const pageAnnotations = page.default.annotations;
+        pageAnnotations.forEach((ann) => {
+            if (detectTag(tag, ann.tags)) {
+                count = count + 1;
+            }
+        })
+    });
+    return count;
+};
+let tagData = {};
+tags.tagGroups.forEach((group) => {
+    tagData[group.category] = {
+        color: group.color,
+        tags: []
+    }
+});
+tags.tags.forEach((tag) => {
+    const count = getTagCount(tag);
+    tagData[tag.category].tags.push({
+        tag: tag.tag,
+        count: count
+    });
+});
+
+---
+
+<Layout title={`Tag Detail - ${projectData.project.title}`}>
+    <div class="w-full bg-white h-[50px] font-inter">
+        <Breadcrumbs crumbs={crumbs} />
+    </div>
+    <Container className="py-12 flex flex-col gap-8 font-inter">
+        <h1>Tag Groups used in Events</h1>
+        <div class="flex flex-row gap-2">
+            {
+                Object.keys(tagData).map((cat) => ( 
+                    <div class='rounded-full flex flex-row justify-between px-4 py-2 gap-4 hover:scale-105 transition' style={{ backgroundColor: tagData[cat].color}}>
+                        <span class="font-semibold">{ cat }</span>
+                    </div>
+                ))
+            }
+        </div>
+        {
+            Object.keys(tagData).map((cat) => ( 
+                <>            
+                    {
+                        tagData[cat].tags.length ? ( 
+                            <div class="w-full py-6 flex flex-col gap-6">
+                                <h3 class="text-lg">{ cat }</h3>
+                                {
+                                    eventsWithAnnotations.map((event) => ( 
+                                        <div class="flex flex-col gap-4">
+                                            <p>
+                                                { event.event_label }
+                                            </p>
+                                            <div class="flex flex-row overflow-x-auto w-full h-[50px] gap-1">
+                                                {
+                                                    event.annotations.map((ann) => {
+                                                        const tags = ann.tags.filter((tag) => (tag.category.toLowerCase() == cat.toLowerCase()));
+                                                        return ( 
+                                                        <div class="h-[42px] w-3 flex-shrink-0" style={{ backgroundColor: tags.length ? tagData[cat].color : 'black'}} />
+                                                    )})
+                                                }
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        ) : null
+                    }
+                </>
+            ))
+        }
+    </Container>
+</Layout>

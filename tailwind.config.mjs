@@ -4,7 +4,8 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Open Sans Variable', 'sans-serif']
+				sans: ['Open Sans Variable', 'sans-serif'],
+				inter: ['Inter Variable', 'sans-serif']
 			},
 			colors: {
 				secondary: '#303F49',

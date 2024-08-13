@@ -1,6 +1,7 @@
 ---
 import '../style/main.css';
 import '@fontsource-variable/open-sans';
+import '@fontsource-variable/inter';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import projectData from "../../data/project.json";
@@ -27,8 +28,7 @@ const { title = projectData.project.title, projectName = projectData.project.tit
     	<!-- google font links -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <title>{title}</title>
   </head>
   <body class="bg-gray-100 3xl:bg-black flex h-full flex-col 3xl:max-w-screen-3xl mx-auto" transition:animate="initial">
