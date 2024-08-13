@@ -1,6 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "exclude": ["**/*.astro"],
+  // "exclude": ["**/*.astro"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",
@@ -13,6 +13,7 @@
       "@branding/*": ["src/branding/*"],
       "@backend/*": ["src/backend/*"],
       "@components/*": ["src/components/*"],
+      "@data/*": ["data/*"],
       "@i18n": ["src/i18n/index.ts"],
       "@layouts/*": ["src/layouts/*"],
       "@themes/*": ["src/themes/*"],
