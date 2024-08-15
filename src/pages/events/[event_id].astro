@@ -32,6 +32,7 @@ if (!events) {
     return Astro.redirect('/')
 }
 
+//right now I'm setting this up to handle either a string of a single event or an array of event IDs
 const thisEventKeys = typeof events == 'string' ? [Object.keys(eventImport).find((event) => (event.includes(events)))] : Object.keys(eventImport).filter((event) => events.findIndex((e: string) => event.includes(e)) > -1);
 console.log(thisEventKeys, events, eventImport);
 
