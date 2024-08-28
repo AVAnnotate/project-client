@@ -3,12 +3,26 @@ import Layout from "../layouts/Layout.astro";
 // import projectData from "@data/project.json";
 import projectData from "@data/project.json";
 import Container from "../components/Container.astro";
+import { dynamicConfig } from "dynamic-astro-config";
 const project = projectData.project;
+
+const baseUrl = dynamicConfig.base;
+
 ---
 
 <Layout title={project.title} projectName={project.title} projectBy={project.creator}>
   <Container className="py-12 flex flex-col gap-6">
     <h1>{project.title}</h1>
     <h2>{project.description}</h2>
+    <div class="py-12 flex flex-col gap-2">
+      <a href={`/${baseUrl}/tags`}>Index</a>
+      {
+        Object.keys(projectData.pages).filter((page) => (projectData.pages[page as keyof typeof projectData.pages].autogenerate.type == 'event')).sort((a,b) => (projectData.pageOrder.indexOf(a) - projectData.pageOrder.indexOf(b))).map((page) => ( 
+          <a href={`/${baseUrl}/events/${page}`}>
+            { projectData.pages[page as keyof typeof projectData.pages].title }
+          </a>
+        ))
+      }
+    </div>
   </Container>
 </Layout>
