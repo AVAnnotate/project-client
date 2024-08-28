@@ -2,30 +2,15 @@
 import RichText from '../components/RichText.astro';
 
 const richText = [
-  { type: 'paragraph', children: [{ text: 'eqweqwsq' }] },
   {
-    type: 'grid',
-    layout: [2, 4],
+    type: 'paragraph',
     children: [
-      {
-        type: 'column',
-        children: [{ type: 'paragraph', children: [{ text: 'sqsqsqsqsq' }] }],
-      },
-      {
-        type: 'column',
-        children: [
-          { type: 'paragraph', children: [{ text: '' }] },
-          {
-            type: 'image',
-            url: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Cat_March_2010-1a.jpg',
-            children: [{ text: '' }],
-          },
-          { type: 'paragraph', children: [{ text: '' }] },
-        ],
-      },
+      { text: 'My ', underline: true },
+      { text: 'cool ', bold: true, underline: true },
+      { text: 'project', underline: true },
+      { text: '  is about...' },
     ],
   },
-  { type: 'paragraph', children: [{ text: 'sq' }] },
 ];
 ---
 

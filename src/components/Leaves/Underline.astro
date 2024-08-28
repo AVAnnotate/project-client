@@ -1,0 +1,13 @@
+---
+const { leaf } = Astro.props;
+---
+
+{
+  leaf.underline ? (
+    <u>
+      <slot />
+    </u>
+  ) : (
+    <slot />
+  )
+}
