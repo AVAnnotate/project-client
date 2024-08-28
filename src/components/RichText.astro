@@ -1,0 +1,23 @@
+---
+import { Node, Text } from 'slate';
+import RichTextElement from './RichTextElement.astro';
+
+const { nodes } = Astro.props;
+
+const serialize = (node: Node) => {
+  if (Text.isText(node)) {
+    return node.text;
+  }
+
+  if (node.children) {
+    const children = node.children.map((node) => serialize(node)).join('');
+    // astro seems confused on the line below
+    return <RichTextElement element={node}>{children}</RichTextElement>;
+  } else {
+    // also here
+    return <RichTextElement element={node} />;
+  }
+};
+---
+
+{nodes.map((node) => serialize(node))}

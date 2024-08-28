@@ -1,0 +1,61 @@
+---
+import RichText from '../components/RichText.astro';
+
+const richText = [
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'event',
+    uuid: '1c9cbc1e-123e-4da4-a6a1-fb15afdddba5',
+    includes: ['annotations', 'media', 'label', 'description'],
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'event-comparison',
+    includes: ['annotations'],
+    event1: {
+      uuid: '1c9cbc1e-123e-4da4-a6a1-fb15afdddba5',
+      start: 50,
+      end: 10800,
+    },
+    event2: {
+      uuid: '4a39c0af-ea7c-4b27-9c7e-bf6e0e56cd64',
+      start: 2400,
+      end: 2403,
+    },
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'image',
+    url: 'https://wallpapercave.com/wp/wp2114656.jpg',
+    size: 'thumbnail',
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'image',
+    url: 'https://wallpapercave.com/wp/wp2114656.jpg',
+    size: 'medium',
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'image',
+    url: 'https://wallpapercave.com/wp/wp2114656.jpg',
+    size: 'large',
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+  { type: 'paragraph', children: [{ text: '' }] },
+  {
+    type: 'image',
+    url: 'https://wallpapercave.com/wp/wp2114656.jpg',
+    size: 'full',
+    children: [{ text: '' }],
+  },
+  { type: 'paragraph', children: [{ text: '' }] },
+];
+---
+
+<RichText nodes={richText} />
