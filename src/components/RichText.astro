@@ -5,23 +5,23 @@ import RichTextElement from './RichTextElement.astro';
 const { nodes } = Astro.props;
 ---
 
-{
-  nodes.map((node: Node) => {
-    const serialize = (node2: Node) => {
-      if (Text.isText(node2)) {
-        return node2.text;
-      }
+<div>
+  {
+    nodes.map((node: Node) => {
+      const serialize = (node2: Node) => {
+        if (Text.isText(node2)) {
+          return node2.text;
+        }
 
-      if (node2.children) {
-        const children = node2.children.map((n) => serialize(n)).join('');
-        // astro seems confused on the line below
-        return <RichTextElement element={node2}>{children}</RichTextElement>;
-      } else {
-        // also here
-        return <RichTextElement element={node2} />;
-      }
-    };
+        if (node2.children) {
+          const children = node2.children.map((n) => serialize(n));
+          return <RichTextElement element={node2}>{children}</RichTextElement>;
+        } else {
+          return <RichTextElement element={node2} />;
+        }
+      };
 
-    return serialize(node);
-  })
-}
+      return serialize(node);
+    })
+  }
+</div>
