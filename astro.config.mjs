@@ -7,5 +7,7 @@ import { dynamicConfig } from './dynamic-astro-config.js';
 // the dynamic configuration will be updated to reflect 
 // the new project
 
+import react from "@astrojs/react";
+
 // https://astro.build/config
 export default defineConfig(dynamicConfig); // Do not change!

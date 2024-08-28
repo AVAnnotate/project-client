@@ -4,8 +4,7 @@ import projectData from '@data/project.json';
 import { dynamicConfig } from "dynamic-astro-config";
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
-import ReactPlayer from "react-player/lazy";
-import React from 'react';
+import Player from "@components/Player";
 
 const baseUrl = dynamicConfig.base;
 
@@ -83,7 +82,7 @@ const pageAnnotations = annotationsResponse.filter((ann) => (events.includes(ann
                                 const url: string = event.audiovisual_files[file].file_url;
                                 return ( 
                                     <div class="flex flex-col gap-4">
-                                        <ReactPlayer url={['https://www.youtube.com/watch?v=LXb3EKWsInQ']} client:only="react" />
+                                        <Player url={url} client:only="react" />
                                         <div class="border border-collapse border-black">
                                             {
                                                 pageAnnotations.find((ann) => (ann.source_id == file))?.annotations.map((ann: any) => ( 
