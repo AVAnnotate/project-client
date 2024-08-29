@@ -1,0 +1,40 @@
+---
+import { Node, Text } from 'slate';
+import RichTextElement from './RichTextElement.astro';
+import RichTextLeaf from './RichTextLeaf.astro';
+
+const { nodes } = Astro.props;
+---
+
+<div>
+  {
+    nodes.map((node: Node) => {
+      const serialize = (node2: Node) => {
+        if (Text.isText(node2)) {
+          return (
+            <RichTextLeaf attributes={{ ...node2 }} leaf={node2}>
+              {node2.text}
+            </RichTextLeaf>
+          );
+        }
+
+        if (node2.children) {
+          const children = node2.children.map((n) => serialize(n));
+          return (
+            <RichTextLeaf leaf={node2}>
+              <RichTextElement element={node2}>{children}</RichTextElement>
+            </RichTextLeaf>
+          );
+        } else {
+          return (
+            <RichTextLeaf leaf={node2}>
+              <RichTextElement element={node2} />
+            </RichTextLeaf>
+          );
+        }
+      };
+
+      return serialize(node);
+    })
+  }
+</div>

@@ -1,0 +1,13 @@
+---
+const { leaf } = Astro.props;
+---
+
+{
+  leaf.italic ? (
+    <a href={leaf.link} target='_blank' rel='noopener noreferrer'>
+      <slot />
+    </a>
+  ) : (
+    <slot />
+  )
+}

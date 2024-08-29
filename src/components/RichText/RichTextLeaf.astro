@@ -1,0 +1,30 @@
+---
+import Bold from './Leaves/Bold.astro';
+import Code from './Leaves/Code.astro';
+import Color from './Leaves/Color.astro';
+import Highlight from './Leaves/Highlight.astro';
+import Italic from './Leaves/Italic.astro';
+import LinkText from './Leaves/Link.astro';
+import Strikethrough from './Leaves/Strikethrough.astro';
+import Underline from './Leaves/Underline.astro';
+
+const { leaf } = Astro.props;
+---
+
+<Bold leaf={leaf}>
+  <Code leaf={leaf}>
+    <Color leaf={leaf}>
+      <Highlight leaf={leaf}>
+        <Italic leaf={leaf}>
+          <LinkText leaf={leaf}>
+            <Strikethrough leaf={leaf}>
+              <Underline leaf={leaf}>
+                <slot />
+              </Underline>
+            </Strikethrough>
+          </LinkText>
+        </Italic>
+      </Highlight>
+    </Color>
+  </Code>
+</Bold>

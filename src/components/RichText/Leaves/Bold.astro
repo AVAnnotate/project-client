@@ -1,0 +1,13 @@
+---
+const { leaf } = Astro.props;
+---
+
+{
+  leaf.bold ? (
+    <strong>
+      <slot />
+    </strong>
+  ) : (
+    <slot />
+  )
+}

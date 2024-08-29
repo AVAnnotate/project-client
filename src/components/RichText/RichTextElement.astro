@@ -1,0 +1,84 @@
+---
+const { attributes, element } = Astro.props;
+---
+
+{
+  (() => {
+    const style = { textAlign: element.align };
+
+    switch (element.type) {
+      case 'block-quote':
+        return (
+          <blockquote style={style} {...attributes}>
+            <slot />
+          </blockquote>
+        );
+      case 'bulleted-list':
+        return (
+          <ul style={style} {...attributes}>
+            <slot />
+          </ul>
+        );
+      case 'heading-one':
+        return (
+          <h1 style={style} {...attributes}>
+            <slot />
+          </h1>
+        );
+      case 'heading-two':
+        return (
+          <h2 style={style} {...attributes}>
+            <slot />
+          </h2>
+        );
+      case 'list-item':
+        return (
+          <li style={style} {...attributes}>
+            <slot />
+          </li>
+        );
+      case 'numbered-list':
+        return (
+          <ol style={style} {...attributes}>
+            <slot />
+          </ol>
+        );
+      case 'image':
+        return (
+          <div {...attributes} style={style}>
+            <img src={element.url} class={`slate-img-${element.size}`} />
+            <slot />
+          </div>
+        );
+      case 'grid':
+        return (
+          <div
+            className='slate-grid'
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `${element.layout[0]}fr ${element.layout[1]}fr`,
+            }}
+            {...attributes}
+          >
+            <slot />
+          </div>
+        );
+      case 'column':
+        return (
+          <div className='slate-column' {...attributes}>
+            <slot />
+          </div>
+        );
+      case 'event':
+      // todo
+      case 'event-comparison':
+      // todo
+      default:
+        return (
+          <p style={style} {...attributes}>
+            <slot />
+          </p>
+        );
+    }
+  })()
+}

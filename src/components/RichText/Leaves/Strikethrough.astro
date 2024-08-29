@@ -1,0 +1,13 @@
+---
+const { leaf } = Astro.props;
+---
+
+{
+  leaf.strikethrough ? (
+    <s>
+      <slot />
+    </s>
+  ) : (
+    <slot />
+  )
+}
