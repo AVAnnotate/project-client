@@ -1,27 +1,53 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from '../layouts/Layout.astro';
 // import projectData from "@data/project.json";
-import projectData from "@data/project.json";
-import Container from "../components/Container.astro";
-import { dynamicConfig } from "dynamic-astro-config";
+import projectData from '@data/project.json';
+import Container from '../components/Container.astro';
+import { dynamicConfig } from 'dynamic-astro-config';
+import pageOrder from '@data/pages/order.json';
+
 const project = projectData.project;
 
 const baseUrl = dynamicConfig.base;
 
+//need to get pages from the /pages folder
+const pageResponse = import.meta.glob('@data/pages/*.json');
+
+let pageData: any = {};
+
+for (let i = 0; i < pageOrder.length; i++) {
+  const thisPage = Object.keys(pageResponse).find((key) =>
+    key.includes(pageOrder[i])
+  );
+  if (thisPage) {
+    const thisPageData: any = await pageResponse[thisPage]();
+    pageData[pageOrder[i]] = thisPageData.default;
+  }
+}
 ---
 
-<Layout title={project.title} projectName={project.title} projectBy={project.creator}>
-  <Container className="py-12 flex flex-col gap-6">
+<Layout
+  title={project.title}
+  projectName={project.title}
+  projectBy={project.creator}
+>
+  <Container className='py-12 flex flex-col gap-6'>
     <h1>{project.title}</h1>
     <h2>{project.description}</h2>
-    <div class="py-12 flex flex-col gap-2">
+    <div class='py-12 flex flex-col gap-2'>
       <a href={`/${baseUrl}/tags`}>Index</a>
       {
-        Object.keys(projectData.pages).filter((page) => (projectData.pages[page as keyof typeof projectData.pages].autogenerate.type == 'event')).sort((a,b) => (projectData.pageOrder.indexOf(a) - projectData.pageOrder.indexOf(b))).map((page) => ( 
-          <a href={`/${baseUrl}/events/${page}`}>
-            { projectData.pages[page as keyof typeof projectData.pages].title }
-          </a>
-        ))
+        Object.keys(pageData)
+          .filter(
+            (page) =>
+              pageData[page as keyof typeof pageData].autogenerate.type ==
+              'event'
+          )
+          .map((page) => (
+            <a href={`/${baseUrl}/events/${page}`}>
+              {pageData[page as keyof typeof pageData].title}
+            </a>
+          ))
       }
     </div>
   </Container>
