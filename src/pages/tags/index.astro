@@ -47,13 +47,13 @@ const getTagCount = (tag: { tag: string; category: string }) => {
   return count;
 };
 let tagData: any = {};
-tags.tagGroups.forEach((group) => {
+tags.tagGroups.forEach((group: { category: string; color: string }) => {
   tagData[group.category] = {
     color: group.color,
     tags: [],
   };
 });
-tags.tags.forEach((tag) => {
+tags.tags.forEach((tag: { tag: string; category: string }) => {
   const count = getTagCount(tag);
   tagData[tag.category].tags.push({
     tag: tag.tag,
