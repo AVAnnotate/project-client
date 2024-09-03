@@ -5,8 +5,11 @@ import Layout from '@layouts/Layout.astro';
 import Container from '@components/Container.astro';
 import Player from '@components/Player';
 import pageOrder from '@data/pages/order.json';
+import projectData from '@data/project.json';
 
-const baseUrl = dynamicConfig.base;
+const baseUrl = import.meta.env.PROD
+  ? projectData.project.slug
+  : dynamicConfig.base;
 
 export const getStaticPaths = (() => {
   return pageOrder.map((page) => ({
