@@ -1,0 +1,115 @@
+---
+import type { GetStaticPaths } from "astro";
+import projectData from '@data/project.json';
+import { dynamicConfig } from "dynamic-astro-config";
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import Player from "@components/Player";
+
+const baseUrl = dynamicConfig.base;
+
+export const getStaticPaths = (() => {
+    const eventPages = Object.keys(projectData.pages).filter((page) => (projectData.pages[page as keyof typeof projectData.pages].autogenerate.enabled && projectData.pages[page as keyof typeof projectData.pages].autogenerate.type == 'event'));
+    return eventPages.map((page) => ( 
+        {
+            params: { page_id: page }
+        }
+    ));
+}) satisfies GetStaticPaths;
+
+const { page_id } = Astro.params;
+
+if (!page_id) {
+    return Astro.redirect('/');
+}
+
+const pages = import.meta.glob('@data/pages/*.json');
+const eventImport = import.meta.glob('@data/events/*.json');
+const thisPageKey = Object.keys(pages).find((page) => (page.includes(page_id)));
+if (!thisPageKey) {
+    return Astro.redirect('/')
+}
+const thisPage: any = await pages[thisPageKey]();
+
+const events = thisPage.default.autogenerate.type_id;
+
+if (!events) {
+    console.log('No events listed')
+    return Astro.redirect('/')
+}
+
+//right now I'm setting this up to handle either a string of a single event or an array of event IDs
+const thisEventKeys = typeof events == 'string' ? [Object.keys(eventImport).find((event) => (event.includes(events)))] : Object.keys(eventImport).filter((event) => events.findIndex((e: string) => event.includes(e)) > -1);
+console.log(thisEventKeys, events, eventImport);
+
+if (!thisEventKeys || !thisEventKeys.length) {
+    return Astro.redirect(`/${baseUrl}`);
+}
+//get event info
+let allEvents: any = {};
+
+for (let i=0; i < thisEventKeys.length; i++) {
+    const current = thisEventKeys[i];
+    if (current) {
+        const currentDetail: any = await eventImport[current]();
+        allEvents[current] = currentDetail?.default;
+    }
+}
+ console.log(allEvents);
+
+//get annotation info
+
+const annotationsResponse = await Astro.glob('@data/annotations/*.json');
+
+const pageAnnotations = annotationsResponse.filter((ann) => (events.includes(ann.default.event_id))).map((ann) => (ann.default));
+
+
+
+---
+
+<Layout title={thisPage.default.title}>
+    <Container className="py-16">
+        {
+            Object.values(allEvents).map((event: any) => {
+                console.log(event.audiovisual_files)
+                return ( 
+                    <div>
+                        <h1>
+                            { event.label }
+                        </h1>
+                        {
+                            Object.keys(event.audiovisual_files).map((file: string) => {
+                                const url: string = event.audiovisual_files[file].file_url;
+                                return ( 
+                                    <div class="flex flex-col gap-4">
+                                        <Player url={url} client:only="react" />
+                                        <div class="border border-collapse border-black">
+                                            {
+                                                pageAnnotations.find((ann) => (ann.source_id == file))?.annotations.map((ann: any) => ( 
+                                                    <div class="flex flex-row justify-between p-4 border-t border-b border-t-black border-b-black">
+                                                        <p>
+                                                            {`${ann.start_time}-${ann.end_time}`}
+                                                        </p>
+                                                        <div class="flex flex-col gap-2">
+                                                            {
+                                                                ann.tags?.map((tag: any) => ( 
+                                                                    <p>
+                                                                        {`${tag.category}: ${tag.tag}`}
+                                                                    </p>
+                                                                ))
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                )
+            })
+        }
+    </Container>
+</Layout>

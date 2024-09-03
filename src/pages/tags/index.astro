@@ -1,0 +1,93 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import projectData from "@data/project.json";
+import Container from "../../components/Container.astro";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { dynamicConfig } from '../../../dynamic-astro-config';
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const baseUrl = dynamicConfig.base;
+const crumbs = [
+    {
+        label: 'Home',
+        link: `/${baseUrl}`
+    },
+    {
+        label: 'Index'
+    }
+];
+
+const tags = projectData.project.tags;
+const annotations = await Astro.glob('@data/annotations/*.json');
+const detectTag = (tag: { tag: string; category: string }, ann: { tag: string; category: string }[]) => {
+    const lowerCaseAnn = ann.map((t) => ({
+        tag: t.tag.toLowerCase(),
+        category: t.category.toLowerCase()
+    }));
+    const lowerCaseTag = {
+        tag: tag.tag.toLowerCase(),
+        category: tag.category.toLowerCase()
+    };
+    return !!lowerCaseAnn.find((t) => (t.tag == lowerCaseTag.tag)); //should also match the category but for now the data is bugged so all the categories are speaker
+}
+const getTagCount = (tag: { tag: string, category: string }) => {
+    let count = 0;
+    annotations.forEach((page) => {
+        const pageAnnotations = page.default.annotations;
+        pageAnnotations.forEach((ann: any) => {
+            if (detectTag(tag, ann.tags)) {
+                count = count + 1;
+            }
+        })
+    });
+    return count;
+};
+let tagData: any = {};
+tags.tagGroups.forEach((group) => {
+    tagData[group.category] = {
+        color: group.color,
+        tags: []
+    }
+});
+tags.tags.forEach((tag) => {
+    const count = getTagCount(tag);
+    tagData[tag.category].tags.push({
+        tag: tag.tag,
+        count: count
+    });
+});
+
+---
+
+<Layout title={`Tag Index - ${projectData.project.title}`}>
+    <div class="w-full bg-white h-[50px]">
+        <Breadcrumbs crumbs={crumbs} />
+    </div>
+    <Container className="py-12 flex flex-col gap-8">
+        <h1>Index</h1>
+        {
+            Object.keys(tagData).map((cat) => ( 
+                <>            
+                    {
+                        tagData[cat].tags.length ? ( 
+                            <div class="w-full bg-white border border-gray-200 py-6 flex flex-col gap-6">
+                                <h3 class="px-6">{ cat }</h3>
+                                <div class="h-[1px] bg-gray-200 w-full" />
+                                <div class="px-6 flex flex-row flex-wrap gap-2">
+                                    {
+                                        tagData[cat].tags.map((tag: any) => ( 
+                                            tag.count ? <div class='rounded-full flex flex-row justify-between px-4 py-2 gap-4 hover:scale-105 transition' style={{ backgroundColor: tagData[cat].color}}>
+                                                <span class="font-semibold">{ tag.tag }</span>
+                                                <span>{ tag.count }</span>
+                                            </div> : null
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                        ) : null
+                    }
+                </>
+            ))
+        }
+    </Container>
+</Layout>
