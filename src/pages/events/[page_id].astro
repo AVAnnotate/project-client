@@ -62,12 +62,16 @@ for (let i = 0; i < thisEventKeys.length; i++) {
 }
 
 //get annotation info
+let pageAnnotations: any[] = [];
+//check whether there actually are any annotation files
+const annotationFiles = import.meta.glob('@data/annotations/*.json');
+if (Object.keys(annotationFiles).length) {
+  const annotationsResponse = await Astro.glob('@data/annotations/*.json');
 
-const annotationsResponse = await Astro.glob('@data/annotations/*.json');
-
-const pageAnnotations = annotationsResponse
-  .filter((ann) => events.includes(ann.default.event_id))
-  .map((ann) => ann.default);
+  pageAnnotations = annotationsResponse
+    .filter((ann) => events.includes(ann.default.event_id))
+    .map((ann) => ann.default);
+}
 ---
 
 <Layout title={thisPage.default.title}>

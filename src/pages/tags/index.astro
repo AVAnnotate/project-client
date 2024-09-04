@@ -19,6 +19,13 @@ const crumbs = [
 ];
 
 const tags = projectData.project.tags;
+
+//check whether there actually are any annotation files
+const annotationFiles = import.meta.glob('@data/annotations/*.json');
+if (!Object.keys(annotationFiles).length) {
+  return Astro.redirect(`/${baseUrl}`);
+}
+
 const annotations = await Astro.glob('@data/annotations/*.json');
 const detectTag = (
   tag: { tag: string; category: string },
