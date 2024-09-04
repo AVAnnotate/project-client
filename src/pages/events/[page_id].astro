@@ -6,8 +6,7 @@ import Container from '@components/Container.astro';
 import Player from '@components/Player';
 import pageOrder from '@data/pages/order.json';
 import RichText from '@components/RichText/index.astro';
-
-const baseUrl = dynamicConfig.base;
+import projectData from '@data/project.json';
 
 export const getStaticPaths = (() => {
   return pageOrder.map((page) => ({
