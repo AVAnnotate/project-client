@@ -2,7 +2,7 @@
 import { default as _ReactPlayer } from 'react-player';
 import t from '../i18n/translations.json';
 import type { ReactPlayerProps } from 'react-player/types/lib';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import '../style/player.css';
 import { Button } from '@radix-ui/themes';
 import {

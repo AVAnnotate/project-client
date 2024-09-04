@@ -17,15 +17,19 @@ export const getStaticPaths = (() => {
 
 const { page_id } = Astro.params;
 
+const baseUrl = import.meta.env.PROD
+  ? projectData.project.slug
+  : dynamicConfig.base;
+
 if (!page_id) {
-  return Astro.redirect('/');
+  return Astro.redirect(`/${baseUrl}`);
 }
 
 const pages = import.meta.glob('@data/pages/*.json');
 const eventImport = import.meta.glob('@data/events/*.json');
 const thisPageKey = Object.keys(pages).find((page) => page.includes(page_id));
 if (!thisPageKey) {
-  return Astro.redirect('/');
+  return Astro.redirect(`/${baseUrl}`);
 }
 const thisPage: any = await pages[thisPageKey]();
 
@@ -33,7 +37,7 @@ const events = thisPage.default.autogenerate.type_id;
 
 if (!events) {
   console.log('No events listed');
-  return Astro.redirect('/');
+  return Astro.redirect(`/${baseUrl}`);
 }
 
 //right now I'm setting this up to handle either a string of a single event or an array of event IDs
@@ -43,7 +47,6 @@ const thisEventKeys =
     : Object.keys(eventImport).filter(
         (event) => events.findIndex((e: string) => event.includes(e)) > -1
       );
-console.log(thisEventKeys, events, eventImport);
 
 if (!thisEventKeys || !thisEventKeys.length) {
   return Astro.redirect(`/${baseUrl}`);
@@ -58,7 +61,6 @@ for (let i = 0; i < thisEventKeys.length; i++) {
     allEvents[current] = currentDetail?.default;
   }
 }
-console.log(allEvents);
 
 //get annotation info
 

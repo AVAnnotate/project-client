@@ -8,7 +8,9 @@ import pageOrder from '@data/pages/order.json';
 
 const project = projectData.project;
 
-const baseUrl = dynamicConfig.base;
+const baseUrl = import.meta.env.PROD
+  ? projectData.project.slug
+  : dynamicConfig.base;
 
 //need to get pages from the /pages folder
 const pageResponse = import.meta.glob('@data/pages/*.json');
