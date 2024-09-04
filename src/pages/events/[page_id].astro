@@ -81,43 +81,51 @@ if (Object.keys(annotationFiles).length) {
         return (
           <div>
             <h1>{event.label}</h1>
-            {Object.keys(event.audiovisual_files).map((file: string) => {
-              const url: string = event.audiovisual_files[file].file_url;
-              return (
-                <div class='flex flex-col gap-4'>
-                  <Player url={url} client:only='react' />
-                  <div class='border border-collapse border-black'>
-                    {pageAnnotations
-                      .find((ann) => ann.source_id == file)
-                      ?.annotations.map((ann: any) => {
-                        return (
-                          <div class='flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'>
-                            <div class='flex flex-col gap-2'>
-                              <p class='w-[10%]'>
-                                {`${ann.start_time}-${ann.end_time}`}
-                              </p>
-                              <button
-                                class='playAnnotation'
-                                data-start={ann.start_time}
-                              >
-                                Play
-                              </button>
+            {Object.keys(event.audiovisual_files).map(
+              (file: string, idx: number) => {
+                const url: string = event.audiovisual_files[file].file_url;
+                const playerId: string = `player${idx.toString()}`;
+                return (
+                  <div
+                    class='mediaContainer flex flex-col gap-4'
+                    data-player-id={playerId}
+                    data-player-url={url}
+                  >
+                    <Player url={url} id={playerId} client:only='react' />
+                    <div class='border border-collapse border-black'>
+                      {pageAnnotations
+                        .find((ann) => ann.source_id == file)
+                        ?.annotations.map((ann: any) => {
+                          return (
+                            <div class='flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'>
+                              <div class='flex flex-col gap-2'>
+                                <p class='w-[10%]'>
+                                  {`${ann.start_time}-${ann.end_time}`}
+                                </p>
+                                <button
+                                  class='playAnnotation'
+                                  data-start={ann.start_time}
+                                  data-player-id={playerId}
+                                >
+                                  Play
+                                </button>
+                              </div>
+                              <div class='w-[65%]'>
+                                <RichText nodes={ann.annotation} />
+                              </div>
+                              <div class='flex flex-col gap-2 w-1/4'>
+                                {ann.tags?.map((tag: any) => (
+                                  <p>{`${tag.category}: ${tag.tag}`}</p>
+                                ))}
+                              </div>
                             </div>
-                            <div class='w-[65%]'>
-                              <RichText nodes={ann.annotation} />
-                            </div>
-                            <div class='flex flex-col gap-2 w-1/4'>
-                              {ann.tags?.map((tag: any) => (
-                                <p>{`${tag.category}: ${tag.tag}`}</p>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
         );
       })
@@ -126,15 +134,42 @@ if (Object.keys(annotationFiles).length) {
 </Layout>
 
 <script>
-  import { $position, $isPlaying, $seekTo } from 'src/store.js';
+  import { $pagePlayersState } from 'src/store.ts';
+  //initially, reset the loaded players to none
+  $pagePlayersState.set({});
+  const players = document.getElementsByClassName('mediaContainer');
+  for (let i = 0; i < players.length; i++) {
+    const thisNode = players[i];
+    if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
+      $pagePlayersState.setKey(thisNode.dataset.playerId, {
+        id: thisNode.dataset.playerUrl || '',
+        position: 0,
+        seekTo: 0,
+        isPlaying: false,
+        autoScroll: true,
+        hideTags: false,
+        currentAnnotation: 0,
+        searchQuery: '',
+        activeFilters: [],
+      });
+    }
+  }
   const annotationNodes = document.getElementsByClassName('playAnnotation');
   for (let i = 0; i < annotationNodes.length; i++) {
     const thisNode = annotationNodes[i];
-    if (thisNode instanceof HTMLElement && thisNode.dataset.start) {
+    if (
+      thisNode instanceof HTMLElement &&
+      thisNode.dataset.start &&
+      thisNode.dataset.playerId
+    ) {
       thisNode.addEventListener('click', () => {
-        $position.set(Number(thisNode.dataset.start));
-        $seekTo.set(Number(thisNode.dataset.start));
-        $isPlaying.set(true);
+        const playerId = thisNode.dataset.playerId || 'null';
+        $pagePlayersState.setKey(playerId, {
+          ...$pagePlayersState.get()[playerId],
+          position: Number(thisNode.dataset.start),
+          seekTo: Number(thisNode.dataset.start),
+          isPlaying: true,
+        });
       });
     }
   }
