@@ -14,6 +14,8 @@ import {
 import { CopyIcon } from '@radix-ui/react-icons';
 import * as Slider from '@radix-ui/react-slider';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { $position, $isPlaying, $seekTo } from '../store.js';
+import { useStore } from '@nanostores/react';
 
 interface Props {
   url: string;
@@ -45,13 +47,16 @@ const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
 const Player: React.FC<Props> = (props) => {
   // total length of recording, in seconds
   const [duration, setDuration] = useState(0);
-
+  
   const [muted, setMuted] = useState(false);
-
+  
   // seconds played so far
-  const [position, setPosition] = useState(0);
+  const position = useStore($position);
+  //const [position, setPosition] = useState(0);
 
-  const [playing, setPlaying] = useState(false);
+  //const [playing, setPlaying] = useState(false);
+  const playing = useStore($isPlaying);
+  const seekTo = useStore($seekTo);
 
   // store the player itself in state instead of a ref
   // because there's something weird in their packaging
@@ -70,8 +75,14 @@ const Player: React.FC<Props> = (props) => {
   }, [props.position]);
 
   useEffect(() => {
+    if (player) {
+      player.seekTo(seekTo);
+    }
+  }, [seekTo]);
+
+  useEffect(() => {
     if (props.playing) {
-      setPlaying(props.playing);
+      $isPlaying.set(props.playing);
     }
   }, [props.playing]);
 
@@ -111,7 +122,7 @@ const Player: React.FC<Props> = (props) => {
         onProgress={(data) => {
           // don't move the point if the user is currently dragging it
           if (!seeking) {
-            setPosition(data.playedSeconds);
+            $position.set(data.playedSeconds);
           }
         }}
         onReady={(player) => setPlayer(player)}
@@ -124,7 +135,7 @@ const Player: React.FC<Props> = (props) => {
         <div className='content'>
           <Button
             className='audio-button unstyled'
-            onClick={() => setPlaying(!playing)}
+            onClick={() => $isPlaying.set(!playing)}
           >
             {playing ? <PauseFill color='black' /> : <PlayFill color='black' />}
           </Button>
@@ -141,7 +152,7 @@ const Player: React.FC<Props> = (props) => {
               max={0.999999999}
               onValueChange={(val) => {
                 setSeeking(true);
-                setPosition(val[0] * duration);
+                $position.set(val[0] * duration);
               }}
               onValueCommit={onSeek}
               step={0.0001}

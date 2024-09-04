@@ -89,15 +89,20 @@ if (Object.keys(annotationFiles).length) {
                   <div class='border border-collapse border-black'>
                     {pageAnnotations
                       .find((ann) => ann.source_id == file)
-                      ?.annotations.map((ann: any, idx: number) => {
-                        if (idx == 0) {
-                          console.log(ann);
-                        }
+                      ?.annotations.map((ann: any) => {
                         return (
                           <div class='flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'>
-                            <p class='w-[10%]'>
-                              {`${ann.start_time}-${ann.end_time}`}
-                            </p>
+                            <div class='flex flex-col gap-2'>
+                              <p class='w-[10%]'>
+                                {`${ann.start_time}-${ann.end_time}`}
+                              </p>
+                              <button
+                                class='playAnnotation'
+                                data-start={ann.start_time}
+                              >
+                                Play
+                              </button>
+                            </div>
                             <div class='w-[65%]'>
                               <RichText nodes={ann.annotation} />
                             </div>
@@ -119,3 +124,18 @@ if (Object.keys(annotationFiles).length) {
     }
   </Container>
 </Layout>
+
+<script>
+  import { $position, $isPlaying, $seekTo } from 'src/store.js';
+  const annotationNodes = document.getElementsByClassName('playAnnotation');
+  for (let i = 0; i < annotationNodes.length; i++) {
+    const thisNode = annotationNodes[i];
+    if (thisNode instanceof HTMLElement && thisNode.dataset.start) {
+      thisNode.addEventListener('click', () => {
+        $position.set(Number(thisNode.dataset.start));
+        $seekTo.set(Number(thisNode.dataset.start));
+        $isPlaying.set(true);
+      });
+    }
+  }
+</script>
