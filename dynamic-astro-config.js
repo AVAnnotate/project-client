@@ -8,5 +8,5 @@ import tailwind from "@astrojs/tailwind";
 export const dynamicConfig = {
   integrations: [react(), tailwind()],
   site: 'https://AVAnnotate.github.io',
-  base: 'my-repo/dist',
+  base: '/dist',
 }
