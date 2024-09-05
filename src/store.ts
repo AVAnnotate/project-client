@@ -10,7 +10,9 @@ export interface annotationState {
     currentAnnotation?: number;
     searchQuery?: string;
     activeFilters?: any[];
+    annotationStarts?: {start: number, end: number}[];
 }
 
 //keeps track of all players on the loaded page
 export const $pagePlayersState = deepMap<{ [key: string]: annotationState }>({});
+
