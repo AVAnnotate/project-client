@@ -10,5 +10,5 @@ import project from '../data/project.json'
 export const dynamicConfig = {
   integrations: [react(), tailwind()],
   site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
-  base: '/'
+  base: import.meta.env.PROD ? `${project.project.slug}` : '/'
 }
