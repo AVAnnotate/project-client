@@ -5,8 +5,10 @@ import tailwind from "@astrojs/tailwind";
 // application. No changes made here to the `site` or `base` fields will be reflected in the deployed 
 // site.
 
+import project from '../data/project.json'
+
 export const dynamicConfig = {
   integrations: [react(), tailwind()],
-  site: 'https://AVAnnotate.github.io',
+  site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
   base: '/'
 }
