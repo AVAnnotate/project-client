@@ -1,5 +1,9 @@
 ---
 import RichText from '@components/RichText/index.astro';
+import { formatTimestamp } from '../utils/player';
+import { PlayCircleIcon } from '@heroicons/react/24/outline';
+import projectData from '@data/project.json';
+import TagPill from './tags/TagPill.astro';
 
 export interface Props {
   playerId: string;
@@ -7,6 +11,9 @@ export interface Props {
 }
 
 const { playerId, annotations } = Astro.props;
+
+const tagGroups: { category: string; color: string }[] =
+  projectData.project.tags.tagGroups;
 ---
 
 <div
@@ -21,24 +28,30 @@ const { playerId, annotations } = Astro.props;
           data-start={ann.start_time}
           data-end={ann.end_time}
         >
-          <div class='flex flex-col gap-2'>
-            <p class='w-[10%]'>{`${ann.start_time}-${ann.end_time}`}</p>
+          <div class='flex flex-row gap-2 w-[10%] items-start'>
             <button
               class='playAnnotation'
               data-start={ann.start_time}
               data-end={ann.end_time}
               data-player-id={playerId}
             >
-              Play
+              <PlayCircleIcon className='h-6 w-6' />
             </button>
+            <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
           </div>
-          <div class='w-[65%]'>
+          <div class='w-[90%] flex flex-col gap-4'>
             <RichText nodes={ann.annotation} />
-          </div>
-          <div class='flex flex-col gap-2 w-1/4'>
-            {ann.tags?.map((tag: any) => (
-              <p>{`${tag.category}: ${tag.tag}`}</p>
-            ))}
+            <div class='flex flex-row gap-4'>
+              {ann.tags?.map((tag: any) => {
+                const group = tagGroups.find(
+                  (group) =>
+                    group.category.toLowerCase() == tag.category.toLowerCase()
+                );
+                return (
+                  <TagPill tag={tag.tag} color={group ? group.color : '#FFF'} />
+                );
+              })}
+            </div>
           </div>
         </div>
       );
