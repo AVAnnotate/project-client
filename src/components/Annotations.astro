@@ -4,6 +4,8 @@ import { formatTimestamp } from '../utils/player';
 import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import projectData from '@data/project.json';
 import TagPill from './tags/TagPill.astro';
+import AutoscrollSwitch from '@components/AutoscrollSwitch';
+import HideTagsSwitch from '@components/HideTagsSwitch';
 
 export interface Props {
   playerId: string;
@@ -14,55 +16,86 @@ const { playerId, annotations } = Astro.props;
 
 const tagGroups: { category: string; color: string }[] =
   projectData.project.tags.tagGroups;
+
+let allTags: { [key: string]: string[] } = {};
+if (annotations && annotations.length) {
+  annotations.forEach((ann) => {
+    if (ann.tags && ann.tags.length) {
+      ann.tags.forEach((tag: { category: string; tag: string }) => {
+        allTags[tag.category] ||= [];
+        if (!allTags[tag.category].includes(tag.tag)) {
+          allTags[tag.category].push(tag.tag);
+          allTags[tag.category].sort();
+        }
+      });
+    }
+  });
+}
 ---
 
-<div
-  class='border border-collapse border-black relative overflow-y-scroll max-h-[80dvh]'
-  id={playerId}
->
-  {
-    annotations.map((ann: any) => {
-      return (
-        <div
-          class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
-          data-start={ann.start_time}
-          data-end={ann.end_time}
-        >
-          <div class='flex flex-row gap-2 w-[10%] items-start'>
-            <button
-              class='playAnnotation'
-              data-start={ann.start_time}
-              data-end={ann.end_time}
-              data-player-id={playerId}
-            >
-              <PlayCircleIcon className='h-6 w-6' />
-            </button>
-            <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
-          </div>
-          <div class='w-[90%] flex flex-col gap-4'>
-            <RichText nodes={ann.annotation} />
-            <div class='flex flex-row gap-4'>
-              {ann.tags?.map((tag: any) => {
-                const group = tagGroups.find(
-                  (group) =>
-                    group.category.toLowerCase() == tag.category.toLowerCase()
-                );
-                return (
-                  <TagPill tag={tag.tag} color={group ? group.color : '#FFF'} />
-                );
-              })}
+<div class='flex flex-col'>
+  <div class='flex flex-row w-full justify-between items-center py-4'>
+    <h3 class='font-bold text-lg'>Annotations</h3>
+    <div class='flex flex-row gap-8'>
+      <AutoscrollSwitch playerId={playerId} client:only='react' />
+      <HideTagsSwitch playerId={playerId} client:only='react' />
+    </div>
+  </div>
+  <div
+    class='border border-collapse border-black relative overflow-y-scroll max-h-[80dvh]'
+    id={playerId}
+  >
+    {
+      annotations.map((ann: any) => {
+        return (
+          <div
+            class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
+            data-start={ann.start_time}
+            data-end={ann.end_time}
+          >
+            <div class='flex flex-row gap-2 w-[10%] items-start'>
+              <button
+                class='playAnnotation'
+                data-start={ann.start_time}
+                data-end={ann.end_time}
+                data-player-id={playerId}
+              >
+                <PlayCircleIcon className='h-6 w-6' />
+              </button>
+              <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
+            </div>
+            <div class='w-[90%] flex flex-col gap-4'>
+              <RichText nodes={ann.annotation} />
+              <div
+                class='flex flex-row gap-4 annotationTags'
+                data-player-id={playerId}
+              >
+                {ann.tags?.map((tag: any) => {
+                  const group = tagGroups.find(
+                    (group) =>
+                      group.category.toLowerCase() == tag.category.toLowerCase()
+                  );
+                  return (
+                    <TagPill
+                      tag={tag.tag}
+                      color={group ? group.color : '#FFF'}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      );
-    })
-  }
+        );
+      })
+    }
+  </div>
 </div>
 
 <script>
   import { $pagePlayersState } from 'src/store.ts';
   const annotationPlayNodes = document.getElementsByClassName('playAnnotation');
   const annotationNodes = document.getElementsByClassName('annotationNode');
+  const annotationTagNodes = document.getElementsByClassName('annotationTags');
   for (let i = 0; i < annotationPlayNodes.length; i++) {
     const thisNode = annotationPlayNodes[i];
     if (
@@ -94,10 +127,12 @@ const tagGroups: { category: string; color: string }[] =
     }
   }
 
+  const activeBackground = 'bg-red-50';
+
   $pagePlayersState.listen((state, oldState, changed) => {
     if (
       changed &&
-      Math.floor(state[changed].position * 1000) % 7 == 0 && //this is just meant to get it firing at a reasonable interval
+      Math.floor(state[changed].position * 1000) % 7 == 0 && //this is just meant to get it firing at a reasonable interval...should find a less random way
       state[changed].autoScroll
     ) {
       const startTimes = state[changed].annotationStarts;
@@ -109,11 +144,34 @@ const tagGroups: { category: string; color: string }[] =
       if (typeof current == 'number' && current >= 0) {
         const activeNode = annotationNodes[current];
         activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        activeNode.classList.add('bg-red-50');
+        activeNode.classList.add(activeBackground);
         for (let i = 0; i < annotationNodes.length; i++) {
           if (i != current) {
-            annotationNodes[i].classList.remove('bg-red-50');
+            annotationNodes[i].classList.remove(activeBackground);
           }
+        }
+      }
+    } else if (
+      changed &&
+      !state[changed].autoScroll &&
+      oldState[changed].autoScroll
+    ) {
+      //remove the current annotation indicator to avoid confusion
+      for (let i = 0; i < annotationNodes.length; i++) {
+        annotationNodes[i].classList.remove(activeBackground);
+      }
+    }
+    //show or hide tags if necessary
+    if (changed && state[changed].hideTags != oldState[changed].hideTags) {
+      if (state[changed].hideTags) {
+        for (let i = 0; i < annotationTagNodes.length; i++) {
+          annotationTagNodes[i].classList.remove('flex');
+          annotationTagNodes[i].classList.add('hidden');
+        }
+      } else {
+        for (let i = 0; i < annotationTagNodes.length; i++) {
+          annotationTagNodes[i].classList.remove('hidden');
+          annotationTagNodes[i].classList.add('flex');
         }
       }
     }

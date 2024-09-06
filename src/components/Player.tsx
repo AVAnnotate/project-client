@@ -120,7 +120,7 @@ const Player: React.FC<Props> = (props) => {
         width={0}
         height={0}
       />
-      <div className='player-control-panel'>
+      <div className='player-control-panel !bg-gray-200'>
         <div className='content'>
           <Button
             className='audio-button unstyled'
@@ -159,7 +159,7 @@ const Player: React.FC<Props> = (props) => {
               step={0.0001}
               value={[thisPlayerState.position / duration]}
             >
-              <Slider.Track className='seek-bar-slider-track'>
+              <Slider.Track className='seek-bar-slider-track !bg-gray-400'>
                 <Slider.Range className='seek-bar-slider-range' />
               </Slider.Track>
               <Slider.Thumb className='seek-bar-slider-thumb' />
@@ -176,7 +176,10 @@ const Player: React.FC<Props> = (props) => {
                     <CopyIcon />
                   </Button>
                 </Tooltip.Trigger>
-                <Tooltip.Content className='tooltip-content' side='bottom'>
+                <Tooltip.Content
+                  className='tooltip-content !bg-gray-200'
+                  side='bottom'
+                >
                   {t['Copy timestamp']}
                 </Tooltip.Content>
               </Tooltip.Root>

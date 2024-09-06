@@ -82,7 +82,7 @@ if (Object.keys(annotationFiles).length) {
       Object.values(allEvents).map((event: any) => {
         return (
           <div>
-            <h1>{event.label}</h1>
+            <h1 class='pb-6'>{event.label}</h1>
             {Object.keys(event.audiovisual_files).map((file: string) => {
               const url: string = event.audiovisual_files[file].file_url;
               const annotations = pageAnnotations
