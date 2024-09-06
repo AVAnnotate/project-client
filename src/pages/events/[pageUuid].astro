@@ -3,22 +3,24 @@ import type { GetStaticPaths } from 'astro';
 import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
 import Container from '@components/Container.astro';
-import Player from '@components/Player';
-import projectData from '@data/project.json';
-import { getCollection } from 'astro:content';
-import { getEntry } from 'astro:content';
+import RichText from '@components/RichText/index.astro';
+import PlayerWithAnnotations from '@components/PlayerWithAnnotations.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.project.slug
+  ? projectData.data.project.slug
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {
-  const pages = await getCollection('pages');
-  const eventPages = pages.filter(
-    (p) => p.id !== 'order' && p.data.autogenerate.enabled
+  // filter out custom pages
+  const pages = await getCollection(
+    'pages',
+    (page) => page.id !== 'order' && page.data.autogenerate.enabled
   );
 
-  return eventPages.map((page) => ({
+  return pages.map((page) => ({
     params: { pageUuid: page.id },
   }));
 }) satisfies GetStaticPaths;
@@ -31,48 +33,53 @@ if (!pageUuid) {
 
 const page = await getEntry('pages', pageUuid);
 
-const event = await getEntry('events', page.data.autogenerate.type_id);
+const typeId: string | string[] | undefined = page.data.autogenerate.type_id;
 
-if (!event) {
+if (!typeId) {
+  console.log('No events listed');
   return Astro.redirect(`/${baseUrl}`);
 }
+const associatedEvents = await getCollection('events', (ev) =>
+  typeof typeId === 'string' ? ev.id === typeId : typeId.includes(ev.id)
+);
 
 const annotationData = await getCollection('annotations');
-const annotations = annotationData.filter(
-  (ad) => ad.data.event_id === event.id
+
+const annotations = annotationData.filter((ad) =>
+  Array.isArray(typeId)
+    ? typeId.includes(ad.data.event_id)
+    : ad.data.event_id === typeId
 );
+
+console.log(associatedEvents[0]);
 ---
 
 <Layout title={page.data.title}>
   <Container className='py-16'>
-    <div>
-      <h1>{event.label}</h1>
-      {
-        Object.keys(event.data.audiovisual_files).map((file: string) => {
-          const url: string = event.data.audiovisual_files[file].file_url;
-          return (
-            <div class='flex flex-col gap-4'>
-              <Player url={url} client:only='react' />
-              {annotations.length > 0 ? (
-                <div class='border border-collapse border-black'>
-                  {annotations
-                    .find((ann: any) => ann.data.source_id == file)
-                    ?.data.annotations.map((ann: any) => (
-                      <div class='flex flex-row justify-between p-4 border-t border-b border-t-black border-b-black'>
-                        <p>{`${ann.start_time}-${ann.end_time}`}</p>
-                        <div class='flex flex-col gap-2'>
-                          {ann.tags?.map((tag: any) => (
-                            <p>{`${tag.category}: ${tag.tag}`}</p>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ) : null}
-            </div>
-          );
-        })
-      }
-    </div>
+    {
+      associatedEvents.map((event: any) => {
+        return (
+          <div class='flex flex-col gap-6'>
+            <h1>{event.data.label}</h1>
+            <RichText nodes={event.data.description} />
+            {Object.keys(event.data.audiovisual_files).map((file: string) => {
+              const url: string = event.data.audiovisual_files[file].file_url;
+              const annotationsToShow = annotations
+                .find((ann) => ann.data.source_id == file)
+                ?.data.annotations.sort(
+                  (a: any, b: any) => a.start_time - b.start_time
+                );
+              return (
+                <PlayerWithAnnotations
+                  file={file}
+                  annotations={annotationsToShow}
+                  url={url}
+                />
+              );
+            })}
+          </div>
+        );
+      })
+    }
   </Container>
 </Layout>
