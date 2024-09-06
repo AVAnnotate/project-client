@@ -43,6 +43,7 @@
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20.14.9",
     "@types/slate": "^0.47.15",
-    "tsx": "^4.16.2"
+    "tsx": "^4.16.2",
+    "eslint": "^9.9.1"
   }
 }
