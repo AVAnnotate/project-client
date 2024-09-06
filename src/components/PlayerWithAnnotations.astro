@@ -1,0 +1,25 @@
+---
+import Annotations from './AnnotationUI/Annotations.astro';
+import Player from './Player';
+
+export interface Props {
+  file: string;
+  url: string;
+  annotations?: any[];
+}
+
+const { file, url, annotations } = Astro.props;
+---
+
+<div
+  class='mediaContainer flex flex-col gap-4'
+  data-player-id={file}
+  data-player-url={url}
+>
+  <Player url={url} id={file} client:only='react' />
+  {
+    annotations ? (
+      <Annotations playerId={file} annotations={annotations} />
+    ) : null
+  }
+</div>

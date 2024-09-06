@@ -4,6 +4,7 @@ import projectData from '@data/project.json';
 import Container from '../../components/Container.astro';
 import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TagPill from '@components/tags/TagPill.astro';
 
 const baseUrl = import.meta.env.PROD
   ? projectData.project.slug
@@ -85,13 +86,11 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
               <div class='px-6 flex flex-row flex-wrap gap-2'>
                 {tagData[cat].tags.map((tag: any) =>
                   tag.count ? (
-                    <div
-                      class='rounded-full flex flex-row justify-between px-4 py-2 gap-4 hover:scale-105 transition'
-                      style={{ backgroundColor: tagData[cat].color }}
-                    >
-                      <span class='font-semibold'>{tag.tag}</span>
-                      <span>{tag.count}</span>
-                    </div>
+                    <TagPill
+                      color={tagData[cat].color}
+                      tag={tag.tag}
+                      count={tag.count}
+                    />
                   ) : null
                 )}
               </div>

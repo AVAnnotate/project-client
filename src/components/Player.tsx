@@ -14,6 +14,9 @@ import {
 import { CopyIcon } from '@radix-ui/react-icons';
 import * as Slider from '@radix-ui/react-slider';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { $pagePlayersState } from '../store.ts';
+import { useStore } from '@nanostores/react';
+import { formatTimestamp } from '../utils/player.ts';
 
 interface Props {
   url: string;
@@ -21,24 +24,8 @@ interface Props {
   // player from a parent component
   playing?: boolean;
   position?: number;
+  id: string;
 }
-
-const formatTimestamp = (seconds: number, includeMs = true) => {
-    const date = new Date(seconds * 1000);
-    const hh = date.getUTCHours().toString().padStart(2, '0');
-    const mm = date.getUTCMinutes().toString().padStart(2, '0');
-    const ss = date.getUTCSeconds().toString().padStart(2, '0');
-    let ms;
-  
-    let str = `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
-  
-    if (includeMs) {
-      ms = date.getUTCMilliseconds().toString().padStart(3, '0');
-      str = `${str}:${ms}`;
-    }
-  
-    return str;
-  };
 
 const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
 
@@ -48,10 +35,11 @@ const Player: React.FC<Props> = (props) => {
 
   const [muted, setMuted] = useState(false);
 
-  // seconds played so far
-  const [position, setPosition] = useState(0);
-
-  const [playing, setPlaying] = useState(false);
+  const pagePlayers = useStore($pagePlayersState);
+  const thisPlayerState = useMemo(
+    () => pagePlayers[props.id],
+    [pagePlayers[props.id], props.id]
+  );
 
   // store the player itself in state instead of a ref
   // because there's something weird in their packaging
@@ -70,14 +58,23 @@ const Player: React.FC<Props> = (props) => {
   }, [props.position]);
 
   useEffect(() => {
+    if (player) {
+      player.seekTo(thisPlayerState.seekTo);
+    }
+  }, [thisPlayerState.seekTo]);
+
+  useEffect(() => {
     if (props.playing) {
-      setPlaying(props.playing);
+      $pagePlayersState.setKey(props.id, {
+        ...thisPlayerState,
+        isPlaying: props.playing,
+      });
     }
   }, [props.playing]);
 
   const formattedPosition = useMemo(
-    () => formatTimestamp(position),
-    [position]
+    () => formatTimestamp(thisPlayerState.position),
+    [thisPlayerState.position]
   );
 
   const formattedDuration = useMemo(
@@ -104,14 +101,17 @@ const Player: React.FC<Props> = (props) => {
       {/* the player doesn't have any UI when playing audio files, so let's keep it 0x0 */}
       {/* when we add video support, we'll need to conditionally set the width/height */}
       <ReactPlayer
-        playing={playing}
-        played={position / duration || 0}
+        playing={thisPlayerState.isPlaying}
+        played={thisPlayerState.position / duration || 0}
         muted={muted}
         onDuration={(dur) => setDuration(dur)}
         onProgress={(data) => {
           // don't move the point if the user is currently dragging it
           if (!seeking) {
-            setPosition(data.playedSeconds);
+            $pagePlayersState.setKey(props.id, {
+              ...thisPlayerState,
+              position: data.playedSeconds,
+            });
           }
         }}
         onReady={(player) => setPlayer(player)}
@@ -120,13 +120,22 @@ const Player: React.FC<Props> = (props) => {
         width={0}
         height={0}
       />
-      <div className='player-control-panel'>
+      <div className='player-control-panel !bg-gray-200'>
         <div className='content'>
           <Button
             className='audio-button unstyled'
-            onClick={() => setPlaying(!playing)}
+            onClick={() => {
+              $pagePlayersState.setKey(props.id, {
+                ...thisPlayerState,
+                isPlaying: !thisPlayerState.isPlaying,
+              });
+            }}
           >
-            {playing ? <PauseFill color='black' /> : <PlayFill color='black' />}
+            {thisPlayerState.isPlaying ? (
+              <PauseFill color='black' />
+            ) : (
+              <PlayFill color='black' />
+            )}
           </Button>
           <div className='position-label'>
             <span className='timestamp position'>{formattedPosition}</span>
@@ -141,13 +150,16 @@ const Player: React.FC<Props> = (props) => {
               max={0.999999999}
               onValueChange={(val) => {
                 setSeeking(true);
-                setPosition(val[0] * duration);
+                $pagePlayersState.setKey(props.id, {
+                  ...thisPlayerState,
+                  position: val[0] * duration,
+                });
               }}
               onValueCommit={onSeek}
               step={0.0001}
-              value={[position / duration]}
+              value={[thisPlayerState.position / duration]}
             >
-              <Slider.Track className='seek-bar-slider-track'>
+              <Slider.Track className='seek-bar-slider-track !bg-gray-400'>
                 <Slider.Range className='seek-bar-slider-range' />
               </Slider.Track>
               <Slider.Thumb className='seek-bar-slider-thumb' />
@@ -164,7 +176,10 @@ const Player: React.FC<Props> = (props) => {
                     <CopyIcon />
                   </Button>
                 </Tooltip.Trigger>
-                <Tooltip.Content className='tooltip-content' side='bottom'>
+                <Tooltip.Content
+                  className='tooltip-content !bg-gray-200'
+                  side='bottom'
+                >
                   {t['Copy timestamp']}
                 </Tooltip.Content>
               </Tooltip.Root>

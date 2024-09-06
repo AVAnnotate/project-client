@@ -1,0 +1,17 @@
+---
+export interface Props {
+  color: string;
+  tag: string;
+  count?: string;
+}
+
+const { color, tag, count } = Astro.props;
+---
+
+<div
+  class='rounded-full flex flex-row justify-center px-4 py-2 gap-4 cursor-default'
+  style={{ backgroundColor: color }}
+>
+  <span class='font-semibold'>{tag}</span>
+  {count ? <span>{count}</span> : null}
+</div>
