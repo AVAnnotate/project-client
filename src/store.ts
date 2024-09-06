@@ -10,7 +10,7 @@ export interface annotationState {
     currentAnnotation?: number;
     searchQuery?: string;
     activeFilters?: any[];
-    annotationStarts?: {start: number, end: number}[];
+    annotationStarts?: {start: number, end?: number}[];
 }
 
 //keeps track of all players on the loaded page

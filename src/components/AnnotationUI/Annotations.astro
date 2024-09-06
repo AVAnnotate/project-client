@@ -1,11 +1,11 @@
 ---
 import RichText from '@components/RichText/index.astro';
-import { formatTimestamp } from '../utils/player';
+import { formatTimestamp } from '../../utils/player';
 import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import projectData from '@data/project.json';
-import TagPill from './tags/TagPill.astro';
-import AutoscrollSwitch from '@components/AutoscrollSwitch';
-import HideTagsSwitch from '@components/HideTagsSwitch';
+import TagPill from '@components/tags/TagPill.astro';
+import AutoscrollSwitch from '@components/AnnotationUI/AutoscrollSwitch';
+import HideTagsSwitch from '@components/AnnotationUI/HideTagsSwitch';
 
 export interface Props {
   playerId: string;
@@ -17,15 +17,21 @@ const { playerId, annotations } = Astro.props;
 const tagGroups: { category: string; color: string }[] =
   projectData.project.tags.tagGroups;
 
-let allTags: { [key: string]: string[] } = {};
+let allTags: { [key: string]: { tags: string[]; color: string } } = {};
 if (annotations && annotations.length) {
   annotations.forEach((ann) => {
     if (ann.tags && ann.tags.length) {
       ann.tags.forEach((tag: { category: string; tag: string }) => {
-        allTags[tag.category] ||= [];
-        if (!allTags[tag.category].includes(tag.tag)) {
-          allTags[tag.category].push(tag.tag);
-          allTags[tag.category].sort();
+        allTags[tag.category] ||= {
+          tags: [],
+          color:
+            tagGroups.find(
+              (grp) => grp.category.toLowerCase() == tag.category.toLowerCase()
+            )?.color || '#FFF',
+        };
+        if (!allTags[tag.category].tags.includes(tag.tag)) {
+          allTags[tag.category].tags.push(tag.tag);
+          allTags[tag.category].tags.sort();
         }
       });
     }
@@ -108,7 +114,11 @@ if (annotations && annotations.length) {
       if (annotationStartsNew) {
         annotationStartsNew.push({
           start: Math.floor(Number(thisNode.dataset.start)),
-          end: Math.floor(Number(thisNode.dataset.end)),
+          end:
+            Math.floor(Number(thisNode.dataset.end)) >
+            Math.floor(Number(thisNode.dataset.start))
+              ? Math.floor(Number(thisNode.dataset.end))
+              : undefined,
         });
         $pagePlayersState.setKey(thisNode.dataset.playerId, {
           ...$pagePlayersState.get()[thisNode.dataset.playerId],
@@ -136,11 +146,19 @@ if (annotations && annotations.length) {
       state[changed].autoScroll
     ) {
       const startTimes = state[changed].annotationStarts;
-      const current = startTimes?.findIndex(
-        (time) =>
-          time.start <= state[changed].position &&
-          time.end > state[changed].position
-      );
+      console.log(startTimes);
+      const current = startTimes?.findIndex((time, idx) => {
+        if (typeof time.end == 'number') {
+          return (
+            time.start <= state[changed].position &&
+            time.end > state[changed].position
+          );
+        }
+        return idx < startTimes.length - 1
+          ? time.start <= state[changed].position &&
+              startTimes[idx + 1].start > state[changed].position
+          : time.start <= state[changed].position;
+      });
       if (typeof current == 'number' && current >= 0) {
         const activeNode = annotationNodes[current];
         activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
