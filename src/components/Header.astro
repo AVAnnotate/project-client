@@ -1,10 +1,12 @@
 ---
 import { Bars3Icon } from '@heroicons/react/24/outline';
+import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
-import projectData from '@data/project.json';
+
+const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.project.slug
+  ? projectData.data.project.slug
   : dynamicConfig.base;
 export interface Props {
   projectName: string;

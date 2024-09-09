@@ -1,29 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// import projectData from "@data/project.json";
-import projectData from '@data/project.json';
 import Container from '../components/Container.astro';
 import { dynamicConfig } from 'dynamic-astro-config';
-import pageOrder from '@data/pages/order.json';
+import { getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 
-const project = projectData.project;
+const projectData = await getEntry('project', 'project');
+const pageOrder = await getEntry('pages', 'order')
+
+const project = projectData.data.project;
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.project.slug
+  ? projectData.data.project.slug
   : dynamicConfig.base;
 
-//need to get pages from the /pages folder
-const pageResponse = import.meta.glob('@data/pages/*.json');
+const pages = await getCollection('pages')
 
 let pageData: any = {};
 
-for (let i = 0; i < pageOrder.length; i++) {
-  const thisPage = Object.keys(pageResponse).find((key) =>
-    key.includes(pageOrder[i])
+for (let i = 0; i < pageOrder.data.length; i++) {
+  const thisPage = pages.find((p) =>
+    p.id.includes(pageOrder.data[i])
   );
+  console.log(thisPage)
   if (thisPage) {
-    const thisPageData: any = await pageResponse[thisPage]();
-    pageData[pageOrder[i]] = thisPageData.default;
+    const thisPageData: any = await getEntry('pages', thisPage.id);
+    pageData[pageOrder.data[i]] = thisPageData.data;
   }
 }
 ---

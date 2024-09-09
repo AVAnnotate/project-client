@@ -1,12 +1,15 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import projectData from '@data/project.json';
 import Container from '../../components/Container.astro';
 import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+
+const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.project.slug
+  ? projectData.data.project.slug
   : dynamicConfig.base;
 const crumbs = [
   {
@@ -22,25 +25,26 @@ const crumbs = [
   },
 ];
 
-const tags = projectData.project.tags;
+const tags = projectData.data.project.tags;
+
+const annotationSets = await getCollection('annotations')
 
 //check whether there actually are any annotation files
-const annotationFiles = import.meta.glob('@data/annotations/*.json');
-if (!Object.keys(annotationFiles).length) {
+if (!annotationSets.length) {
   return Astro.redirect(`/${baseUrl}`);
 }
-const annotations = await Astro.glob('@data/annotations/*.json');
-const events = import.meta.glob('@data/events/*.json');
-let eventsWithAnnotations = annotations.map((page) => page.default);
+
+const events = await getCollection('events');
+
 //a slightly overly elaborate way to retrieve the proper label for the event, necessary since the annotation file doesn't contain it so we need to go looking in the event files
-for (let i = 0; i < eventsWithAnnotations.length; i++) {
+for (let i = 0; i < annotationSets.length; i++) {
   const eventKey = Object.keys(events).find((key) =>
-    key.includes(eventsWithAnnotations[i].event_id)
+    key.includes(annotationSets[i].data.event_id)
   );
   if (eventKey) {
-    const event: any = await events[eventKey]();
+    const event: any = events.find(ev => ev.id === eventKey);
     if (event) {
-      eventsWithAnnotations[i]['event_label'] = event.label;
+      annotationSets[i].data['event_label'] = event.label;
     }
   }
 }
@@ -60,9 +64,9 @@ const detectTag = (
 };
 const getTagCount = (tag: { tag: string; category: string }) => {
   let count = 0;
-  annotations.forEach((page) => {
-    const pageAnnotations = page.default.annotations;
-    pageAnnotations.forEach((ann: any) => {
+  annotationSets.forEach((set) => {
+    const setAnnotations = set.data.annotations;
+    setAnnotations.forEach((ann: any) => {
       if (detectTag(tag, ann.tags)) {
         count = count + 1;
       }
@@ -86,7 +90,7 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
 });
 ---
 
-<Layout title={`Tag Detail - ${projectData.project.title}`}>
+<Layout title={`Tag Detail - ${projectData.data.project.title}`}>
   <div class='w-full bg-white h-[50px] font-inter'>
     <Breadcrumbs crumbs={crumbs} />
   </div>
@@ -110,11 +114,11 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
           {tagData[cat].tags.length ? (
             <div class='w-full py-6 flex flex-col gap-6'>
               <h3 class='text-lg'>{cat}</h3>
-              {eventsWithAnnotations.map((event) => (
+              {annotationSets.map((set) => (
                 <div class='flex flex-col gap-4'>
-                  <p>{event.event_label}</p>
+                  <p>{set.data.event_label}</p>
                   <div class='flex flex-row overflow-x-auto w-full h-[50px] gap-1'>
-                    {event.annotations.map((ann: any) => {
+                    {set.data.annotations.map((ann: any) => {
                       const tags = ann.tags.filter(
                         (tag: any) =>
                           tag.category.toLowerCase() == cat.toLowerCase()
