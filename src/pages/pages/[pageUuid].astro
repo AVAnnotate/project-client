@@ -1,0 +1,43 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { dynamicConfig } from 'dynamic-astro-config';
+import Layout from '@layouts/Layout.astro';
+import Container from '@components/Container.astro';
+import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
+import RichText from '../../components/RichText/index.astro';
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
+
+export const getStaticPaths = (async () => {
+  const pages = await getCollection('pages');
+  const eventPages = pages.filter(
+    (p) => p.id !== 'order' && !p.data.autogenerate.enabled
+  );
+
+  return eventPages.map((page) => ({
+    params: { pageUuid: page.id },
+  }));
+}) satisfies GetStaticPaths;
+
+const { pageUuid } = Astro.params;
+
+if (!pageUuid) {
+  return Astro.redirect(`/${baseUrl}`);
+}
+
+const page = await getEntry('pages', pageUuid);
+---
+
+<Layout title={page.data.title}>
+  <Container className='py-16'>
+    <div>
+      <h1>{page.data.title}</h1>
+      <RichText nodes={page.data.content} />
+    </div>
+  </Container>
+</Layout>

@@ -2,10 +2,12 @@
 import RichText from '@components/RichText/index.astro';
 import { formatTimestamp } from '../../utils/player';
 import { PlayCircleIcon } from '@heroicons/react/24/outline';
-import projectData from '@data/project.json';
 import TagPill from '@components/tags/TagPill.astro';
 import AutoscrollSwitch from '@components/AnnotationUI/AutoscrollSwitch';
 import HideTagsSwitch from '@components/AnnotationUI/HideTagsSwitch';
+import { getEntry } from 'astro:content';
+
+const projectData = await getEntry('project', 'project');
 
 export interface Props {
   playerId: string;
@@ -15,7 +17,7 @@ export interface Props {
 const { playerId, annotations } = Astro.props;
 
 const tagGroups: { category: string; color: string }[] =
-  projectData.project.tags.tagGroups;
+  projectData.data.project.tags.tagGroups;
 
 let allTags: { [key: string]: { tags: string[]; color: string } } = {};
 if (annotations && annotations.length) {

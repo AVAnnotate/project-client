@@ -13,7 +13,6 @@
       "@branding/*": ["src/branding/*"],
       "@backend/*": ["src/backend/*"],
       "@components/*": ["src/components/*"],
-      "@data/*": ["../data/*"],
       "@i18n": ["src/i18n/index.ts"],
       "@layouts/*": ["src/layouts/*"],
       "@themes/*": ["src/themes/*"],

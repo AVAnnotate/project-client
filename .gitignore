@@ -27,3 +27,5 @@ pnpm-debug.log*
 .vscode
 test-page.json
 
+src/content/*
+!src/content/config.ts
