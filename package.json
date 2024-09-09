@@ -6,7 +6,6 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
-    "build-prod": "cp -r ../data/* ./src/content && mkdir -p \"./src/content/project\" && mv ./src/content/project.json ./src/content/project/project.json && ls ./src/content/annotations && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
