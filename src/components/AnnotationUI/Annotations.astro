@@ -148,7 +148,6 @@ if (annotations && annotations.length) {
       state[changed].autoScroll
     ) {
       const startTimes = state[changed].annotationStarts;
-      console.log(startTimes);
       const current = startTimes?.findIndex((time, idx) => {
         if (typeof time.end == 'number') {
           return (

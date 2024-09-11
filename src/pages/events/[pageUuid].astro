@@ -50,8 +50,6 @@ const annotations = annotationData.filter((ad) =>
     ? typeId.includes(ad.data.event_id)
     : ad.data.event_id === typeId
 );
-
-console.log(associatedEvents[0]);
 ---
 
 <Layout title={page.data.title}>
@@ -77,6 +75,7 @@ console.log(associatedEvents[0]);
                 />
               );
             })}
+            <p>{event.data.citation}</p>
           </div>
         );
       })
