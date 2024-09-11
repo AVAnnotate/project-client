@@ -20,7 +20,6 @@ let pageData: any = {};
 
 for (let i = 0; i < pageOrder.data.length; i++) {
   const thisPage = pages.find((p) => p.id.includes(pageOrder.data[i]));
-  console.log(thisPage);
   if (thisPage) {
     const thisPageData: any = await getEntry('pages', thisPage.id);
     pageData[pageOrder.data[i]] = thisPageData.data;
