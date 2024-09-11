@@ -6,7 +6,7 @@ import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
 const projectData = await getEntry('project', 'project');
-const pageOrder = await getEntry('pages', 'order')
+const pageOrder = await getEntry('pages', 'order');
 
 const project = projectData.data.project;
 
@@ -14,15 +14,13 @@ const baseUrl = import.meta.env.PROD
   ? projectData.data.project.slug
   : dynamicConfig.base;
 
-const pages = await getCollection('pages')
+const pages = await getCollection('pages');
 
 let pageData: any = {};
 
 for (let i = 0; i < pageOrder.data.length; i++) {
-  const thisPage = pages.find((p) =>
-    p.id.includes(pageOrder.data[i])
-  );
-  console.log(thisPage)
+  const thisPage = pages.find((p) => p.id.includes(pageOrder.data[i]));
+  console.log(thisPage);
   if (thisPage) {
     const thisPageData: any = await getEntry('pages', thisPage.id);
     pageData[pageOrder.data[i]] = thisPageData.data;
@@ -39,7 +37,6 @@ for (let i = 0; i < pageOrder.data.length; i++) {
     <h1>{project.title}</h1>
     <h2>{project.description}</h2>
     <div class='py-12 flex flex-col gap-2'>
-      <a href={`/${baseUrl}/tags`}>Index</a>
       {
         Object.keys(pageData)
           .filter(
@@ -53,6 +50,7 @@ for (let i = 0; i < pageOrder.data.length; i++) {
             </a>
           ))
       }
+      <a href={`/${baseUrl}/tags`}>Index</a>
     </div>
   </Container>
 </Layout>
