@@ -27,7 +27,7 @@ const crumbs = [
 
 const tags = projectData.data.project.tags;
 
-const annotationSets = await getCollection('annotations')
+const annotationSets = await getCollection('annotations');
 
 //check whether there actually are any annotation files
 if (!annotationSets.length) {
@@ -38,14 +38,9 @@ const events = await getCollection('events');
 
 //a slightly overly elaborate way to retrieve the proper label for the event, necessary since the annotation file doesn't contain it so we need to go looking in the event files
 for (let i = 0; i < annotationSets.length; i++) {
-  const eventKey = Object.keys(events).find((key) =>
-    key.includes(annotationSets[i].data.event_id)
-  );
-  if (eventKey) {
-    const event: any = events.find(ev => ev.id === eventKey);
-    if (event) {
-      annotationSets[i].data['event_label'] = event.label;
-    }
+  const event = events.find((ev) => ev.id == annotationSets[i].data.event_id);
+  if (event) {
+    annotationSets[i].data['event_label'] = event.data.label;
   }
 }
 const detectTag = (
@@ -103,7 +98,9 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
             class='rounded-full flex flex-row justify-between px-4 py-2 gap-4 hover:scale-105 transition'
             style={{ backgroundColor: tagData[cat].color }}
           >
-            <span class='font-semibold'>{cat}</span>
+            <span class='font-semibold capitalize'>
+              {cat.replaceAll('_', '')}
+            </span>
           </div>
         ))
       }
@@ -113,7 +110,7 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
         <>
           {tagData[cat].tags.length ? (
             <div class='w-full py-6 flex flex-col gap-6'>
-              <h3 class='text-lg'>{cat}</h3>
+              <h3 class='text-lg capitalize'>{cat.replaceAll('_', '')}</h3>
               {annotationSets.map((set) => (
                 <div class='flex flex-col gap-4'>
                   <p>{set.data.event_label}</p>
