@@ -40,11 +40,13 @@ for (let i = 0; i < pageOrder.data.length; i++) {
         Object.keys(pageData)
           .filter(
             (page) =>
-              pageData[page as keyof typeof pageData].autogenerate.type ==
-              'event'
+              pageData[page as keyof typeof pageData].autogenerate.type !=
+              'home'
           )
           .map((page) => (
-            <a href={`/${baseUrl}/events/${page}`}>
+            <a
+              href={`/${baseUrl}/${pageData[page as keyof typeof pageData].autogenerate.enabled ? 'events' : 'pages'}/${page}`}
+            >
               {pageData[page as keyof typeof pageData].title}
             </a>
           ))
