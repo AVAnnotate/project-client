@@ -25,6 +25,7 @@ interface Props {
   playing?: boolean;
   position?: number;
   id: string;
+  sticky?: boolean;
 }
 
 const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
@@ -97,7 +98,7 @@ const Player: React.FC<Props> = (props) => {
   }, []);
 
   return (
-    <div>
+    <div className={`${props.sticky ? 'sticky top-2' : ''}`}>
       {/* the player doesn't have any UI when playing audio files, so let's keep it 0x0 */}
       {/* when we add video support, we'll need to conditionally set the width/height */}
       <ReactPlayer
