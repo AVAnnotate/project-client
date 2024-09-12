@@ -6,17 +6,18 @@ export interface Props {
   file: string;
   url: string;
   annotations?: any[];
+  sticky?: boolean;
 }
 
-const { file, url, annotations } = Astro.props;
+const { file, url, annotations, sticky = false } = Astro.props;
 ---
 
 <div
-  class='mediaContainer flex flex-col gap-4'
+  class={`mediaContainer flex flex-col gap-4${sticky ? ' sticky top-0' : ''}`}
   data-player-id={file}
   data-player-url={url}
 >
-  <Player url={url} id={file} client:only='react' />
+  <Player url={url} id={file} client:only='react' sticky={sticky} />
   {
     annotations ? (
       <Annotations playerId={file} annotations={annotations} />
