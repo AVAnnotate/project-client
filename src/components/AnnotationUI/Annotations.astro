@@ -5,7 +5,9 @@ import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import TagPill from '@components/tags/TagPill.astro';
 import AutoscrollSwitch from '@components/AnnotationUI/AutoscrollSwitch';
 import HideTagsSwitch from '@components/AnnotationUI/HideTagsSwitch';
+import TextSearch from '@components/AnnotationUI/TextSearch';
 import { getEntry } from 'astro:content';
+import TagFilter from './TagFilter';
 
 const projectData = await getEntry('project', 'project');
 
@@ -44,9 +46,11 @@ if (annotations && annotations.length) {
 <div class='flex flex-col'>
   <div class='flex flex-row w-full justify-between items-center py-4'>
     <h3 class='font-bold text-lg'>Annotations</h3>
-    <div class='flex flex-row gap-8'>
+    <div class='flex flex-row gap-8 items-center'>
       <AutoscrollSwitch playerId={playerId} client:only='react' />
       <HideTagsSwitch playerId={playerId} client:only='react' />
+      <TextSearch playerId={playerId} client:only='react' />
+      <TagFilter playerId={playerId} tags={allTags} />
     </div>
   </div>
   <div
@@ -60,6 +64,7 @@ if (annotations && annotations.length) {
             class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
             data-start={ann.start_time}
             data-end={ann.end_time}
+            data-tags={JSON.stringify(ann.tags)}
           >
             <div class='flex flex-row gap-2 w-[10%] items-start'>
               <button
@@ -139,13 +144,12 @@ if (annotations && annotations.length) {
     }
   }
 
-  const activeBackground = 'bg-red-50';
+  const activeBackground = 'bg-blue-hover';
 
   $pagePlayersState.listen((state, oldState, changed) => {
     if (
       changed &&
-      Math.floor(state[changed].position * 1000) % 7 == 0 && //this is just meant to get it firing at a reasonable interval...should find a less random way
-      state[changed].autoScroll
+      Math.floor(state[changed].position * 1000) % 7 == 0 //this is just meant to get it firing at a reasonable interval...should find a less random way
     ) {
       const startTimes = state[changed].annotationStarts;
       const current = startTimes?.findIndex((time, idx) => {
@@ -162,22 +166,15 @@ if (annotations && annotations.length) {
       });
       if (typeof current == 'number' && current >= 0) {
         const activeNode = annotationNodes[current];
-        activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (state[changed].autoScroll) {
+          activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
         activeNode.classList.add(activeBackground);
         for (let i = 0; i < annotationNodes.length; i++) {
           if (i != current) {
             annotationNodes[i].classList.remove(activeBackground);
           }
         }
-      }
-    } else if (
-      changed &&
-      !state[changed].autoScroll &&
-      oldState[changed].autoScroll
-    ) {
-      //remove the current annotation indicator to avoid confusion
-      for (let i = 0; i < annotationNodes.length; i++) {
-        annotationNodes[i].classList.remove(activeBackground);
       }
     }
     //show or hide tags if necessary
@@ -191,6 +188,65 @@ if (annotations && annotations.length) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
           annotationTagNodes[i].classList.remove('hidden');
           annotationTagNodes[i].classList.add('flex');
+        }
+      }
+    }
+    //filter on text and tags
+    if (
+      changed &&
+      (state[changed].searchQuery != oldState[changed].searchQuery ||
+        state[changed].activeFilters != oldState[changed].activeFilters)
+    ) {
+      for (let i = 0; i < annotationNodes.length; i++) {
+        const thisNode = annotationNodes[i];
+        const text = thisNode.textContent;
+        let tags: any[] = [];
+        if (thisNode instanceof HTMLElement && thisNode.dataset.tags) {
+          tags = JSON.parse(thisNode.dataset.tags);
+        }
+        if (
+          (!state[changed].searchQuery || state[changed].searchQuery == '') &&
+          (!state[changed].activeFilters ||
+            !state[changed].activeFilters.length)
+        ) {
+          thisNode.classList.remove('hidden');
+          thisNode.classList.add('flex');
+          continue;
+        } else if (
+          state[changed].searchQuery?.length &&
+          !text
+            ?.toLowerCase()
+            .includes(state[changed].searchQuery.toLowerCase())
+        ) {
+          thisNode.classList.add('hidden');
+          thisNode.classList.remove('flex');
+          continue;
+        } else if (state[changed].activeFilters?.length) {
+          let show = false;
+          for (let j = 0; j < state[changed].activeFilters.length; j++) {
+            const tag = state[changed].activeFilters[i];
+            if (
+              tags.find(
+                (t) =>
+                  t.category.toLowerCase() == tag.category.toLowerCase() &&
+                  t.tag.toLowerCase() == tag.tag.toLowerCase()
+              )
+            ) {
+              show = true;
+              break;
+            }
+          }
+          if (show) {
+            thisNode.classList.remove('hidden');
+            thisNode.classList.add('flex');
+          } else {
+            thisNode.classList.remove('flex');
+            thisNode.classList.add('hidden');
+          }
+        } else {
+          //we can only get here if there's a text filter but no tag filters and the node is a match for the text query, so it should be shown
+          thisNode.classList.remove('hidden');
+          thisNode.classList.add('flex');
         }
       }
     }
