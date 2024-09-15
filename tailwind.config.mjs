@@ -8,6 +8,7 @@ export default {
         inter: ['Inter Variable', 'sans-serif'],
       },
       colors: {
+        primary: '#015F86',
         secondary: '#303F49',
         gray: {
           100: '#F6F6F6',
