@@ -14,9 +14,10 @@ const projectData = await getEntry('project', 'project');
 export interface Props {
   playerId: string;
   annotations: any[];
+  sticky?: boolean;
 }
 
-const { playerId, annotations } = Astro.props;
+const { playerId, annotations, sticky = false } = Astro.props;
 
 const tagGroups: { category: string; color: string }[] =
   projectData.data.project.tags.tagGroups;
@@ -44,7 +45,9 @@ if (annotations && annotations.length) {
 ---
 
 <div class='flex flex-col'>
-  <div class='flex flex-row w-full justify-between items-center py-4'>
+  <div
+    class={`flex flex-row w-full justify-between items-center py-4${sticky ? ' sticky top-14' : ''}`}
+  >
     <h3 class='font-bold text-lg'>Annotations</h3>
     <div class='flex flex-row gap-8 items-center'>
       <AutoscrollSwitch playerId={playerId} client:only='react' />
@@ -53,54 +56,57 @@ if (annotations && annotations.length) {
       <TagFilter playerId={playerId} tags={allTags} />
     </div>
   </div>
-  <div
-    class='border border-collapse border-black relative overflow-y-scroll max-h-[80dvh]'
-    id={playerId}
-  >
-    {
-      annotations.map((ann: any) => {
-        return (
-          <div
-            class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
-            data-start={ann.start_time}
-            data-end={ann.end_time}
-            data-tags={JSON.stringify(ann.tags)}
-          >
-            <div class='flex flex-row gap-2 w-[10%] items-start'>
-              <button
-                class='playAnnotation'
-                data-start={ann.start_time}
-                data-end={ann.end_time}
-                data-player-id={playerId}
-              >
-                <PlayCircleIcon className='h-6 w-6' />
-              </button>
-              <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
-            </div>
-            <div class='w-[90%] flex flex-col gap-4'>
-              <RichText nodes={ann.annotation} />
-              <div
-                class='flex flex-row gap-4 annotationTags'
-                data-player-id={playerId}
-              >
-                {ann.tags?.map((tag: any) => {
-                  const group = tagGroups.find(
-                    (group) =>
-                      group.category.toLowerCase() == tag.category.toLowerCase()
-                  );
-                  return (
-                    <TagPill
-                      tag={tag.tag}
-                      color={group ? group.color : '#FFF'}
-                    />
-                  );
-                })}
+  <div class='sticky top-[300px] overflow-y-visible w-full'>
+    <div
+      class={`border border-collapse border-black overflow-y-scroll max-h-[calc(100dvh_-260px)] relative`}
+      id={playerId}
+    >
+      {
+        annotations.map((ann: any) => {
+          return (
+            <div
+              class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
+              data-start={ann.start_time}
+              data-end={ann.end_time}
+              data-tags={JSON.stringify(ann.tags)}
+            >
+              <div class='flex flex-row gap-2 w-[10%] items-start'>
+                <button
+                  class='playAnnotation'
+                  data-start={ann.start_time}
+                  data-end={ann.end_time}
+                  data-player-id={playerId}
+                >
+                  <PlayCircleIcon className='h-6 w-6' />
+                </button>
+                <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
+              </div>
+              <div class='w-[90%] flex flex-col gap-4'>
+                <RichText nodes={ann.annotation} />
+                <div
+                  class='flex flex-row gap-4 annotationTags'
+                  data-player-id={playerId}
+                >
+                  {ann.tags?.map((tag: any) => {
+                    const group = tagGroups.find(
+                      (group) =>
+                        group.category.toLowerCase() ==
+                        tag.category.toLowerCase()
+                    );
+                    return (
+                      <TagPill
+                        tag={tag.tag}
+                        color={group ? group.color : '#FFF'}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })
-    }
+          );
+        })
+      }
+    </div>
   </div>
 </div>
 
