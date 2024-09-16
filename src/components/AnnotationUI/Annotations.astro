@@ -214,6 +214,7 @@ if (annotations && annotations.length) {
         if (
           (!state[changed].searchQuery || state[changed].searchQuery == '') &&
           (!state[changed].activeFilters ||
+            // @ts-ignore
             !state[changed]!.activeFilters.length)
         ) {
           thisNode.classList.remove('hidden');
@@ -223,6 +224,7 @@ if (annotations && annotations.length) {
           state[changed].searchQuery?.length &&
           !text
             ?.toLowerCase()
+            // @ts-ignore
             .includes(state[changed]!.searchQuery.toLowerCase())
         ) {
           thisNode.classList.add('hidden');
@@ -230,7 +232,9 @@ if (annotations && annotations.length) {
           continue;
         } else if (state[changed].activeFilters?.length) {
           let show = false;
+          // @ts-ignore
           for (let j = 0; j < state[changed]!.activeFilters.length; j++) {
+            // @ts-ignore
             const tag = state[changed]!.activeFilters[j];
             if (
               tags.find(
