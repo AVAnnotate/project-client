@@ -21,6 +21,7 @@ export interface Props {
 const { playerId, annotations, sticky = false, type } = Astro.props;
 
 const tagGroups: { category: string; color: string }[] =
+  // @ts-ignore
   projectData.data.project.tags.tagGroups;
 
 let allTags: { [key: string]: { tags: string[]; color: string } } = {};
@@ -231,7 +232,8 @@ if (annotations && annotations.length) {
         if (
           (!state[changed].searchQuery || state[changed].searchQuery == '') &&
           (!state[changed].activeFilters ||
-            !state[changed].activeFilters.length)
+            // @ts-ignore
+            !state[changed]!.activeFilters.length)
         ) {
           thisNode.classList.remove('hidden');
           thisNode.classList.add('flex');
@@ -240,15 +242,18 @@ if (annotations && annotations.length) {
           state[changed].searchQuery?.length &&
           !text
             ?.toLowerCase()
-            .includes(state[changed].searchQuery.toLowerCase())
+            // @ts-ignore
+            .includes(state[changed]!.searchQuery.toLowerCase())
         ) {
           thisNode.classList.add('hidden');
           thisNode.classList.remove('flex');
           continue;
         } else if (state[changed].activeFilters?.length) {
           let show = false;
-          for (let j = 0; j < state[changed].activeFilters.length; j++) {
-            const tag = state[changed].activeFilters[j];
+          // @ts-ignore
+          for (let j = 0; j < state[changed]!.activeFilters.length; j++) {
+            // @ts-ignore
+            const tag = state[changed]!.activeFilters[j];
             if (
               tags.find(
                 (t) =>
