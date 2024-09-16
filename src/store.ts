@@ -9,7 +9,7 @@ export interface annotationState {
     hideTags?: boolean;
     currentAnnotation?: number;
     searchQuery?: string;
-    activeFilters?: any[];
+    activeFilters?: { category: string, tag: string }[];
     annotationStarts?: {start: number, end?: number}[];
 }
 
