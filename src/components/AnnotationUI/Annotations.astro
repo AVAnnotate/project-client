@@ -28,16 +28,16 @@ if (annotations && annotations.length) {
   annotations.forEach((ann) => {
     if (ann.tags && ann.tags.length) {
       ann.tags.forEach((tag: { category: string; tag: string }) => {
-        allTags[tag.category] ||= {
+        const cat = tag.category.toLowerCase();
+        allTags[cat] ||= {
           tags: [],
           color:
-            tagGroups.find(
-              (grp) => grp.category.toLowerCase() == tag.category.toLowerCase()
-            )?.color || '#FFF',
+            tagGroups.find((grp) => grp.category.toLowerCase() == cat)?.color ||
+            '#FFF',
         };
-        if (!allTags[tag.category].tags.includes(tag.tag)) {
-          allTags[tag.category].tags.push(tag.tag);
-          allTags[tag.category].tags.sort();
+        if (!allTags[cat].tags.includes(tag.tag)) {
+          allTags[cat].tags.push(tag.tag);
+          allTags[cat].tags.sort();
         }
       });
     }
