@@ -7,20 +7,26 @@ export interface Props {
   url: string;
   annotations?: any[];
   sticky?: boolean;
+  type: 'Audio' | 'Video';
 }
 
-const { file, url, annotations, sticky = false } = Astro.props;
+const { file, url, annotations, sticky = false, type } = Astro.props;
 ---
 
 <div
-  class={`mediaContainer flex flex-col gap-4${sticky ? ' sticky top-0' : ''}`}
+  class={`mediaContainer flex flex-col gap-4${sticky ? ' sticky top-0' : ''}${type == 'Audio' ? '' : ' lg:flex-row lg:gap-x-4'}`}
   data-player-id={file}
   data-player-url={url}
 >
-  <Player url={url} id={file} client:only='react' sticky={sticky} />
+  <Player url={url} id={file} client:only='react' sticky={sticky} type={type} />
   {
     annotations ? (
-      <Annotations playerId={file} annotations={annotations} sticky={sticky} />
+      <Annotations
+        playerId={file}
+        annotations={annotations}
+        sticky={sticky}
+        type={type}
+      />
     ) : null
   }
 </div>
