@@ -34,7 +34,6 @@ const TagFilter = (props: TagFilterProps) => {
     )
       ? current.filter((t) => t.category != tag.category || t.tag != tag.tag)
       : [...current, tag];
-    console.log(updated);
     $pagePlayersState.setKey(playerId, {
       ...thisPlayer,
       activeFilters: updated,
@@ -46,7 +45,6 @@ const TagFilter = (props: TagFilterProps) => {
       thisPlayer.activeFilters?.filter(
         (tag) => tag.category.toLowerCase() == category.toLowerCase()
       ) || [];
-    console.log(current.length, tags[category].tags.length);
     if (current.length == tags[category].tags.length) {
       //in this case, everything in the category is already checked, and we want to uncheck them
       $pagePlayersState.setKey(playerId, {
