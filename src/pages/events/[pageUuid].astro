@@ -73,11 +73,7 @@ const annotations = annotationData.filter((ad) =>
                   annotations={annotationsToShow}
                   url={url}
                   sticky
-                  type={
-                    event.data.item_type.toLowerCase() == 'video'
-                      ? 'Video'
-                      : 'Audio'
-                  }
+                  type={event.data.item_type}
                 />
               );
             })}
