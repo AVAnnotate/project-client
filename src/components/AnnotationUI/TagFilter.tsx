@@ -58,7 +58,9 @@ const TagFilter = (props: TagFilterProps) => {
         category: category,
         tag: tag,
       }));
-      const active = thisPlayer.activeFilters || [];
+      const active = thisPlayer.activeFilters
+        ? [...thisPlayer.activeFilters]
+        : [];
       allCategoryTags.forEach((tag) => {
         if (
           active.findIndex(
@@ -113,7 +115,7 @@ const TagFilter = (props: TagFilterProps) => {
           categories.map((cat, idx) => (
             <>
               {idx > 0 ? (
-                <div className='h-[2px] bg-gray-500 rounded-full w-full py-2' />
+                <div className='h-[1px] bg-gray-500 rounded-full w-full my-3' />
               ) : null}
               <div className='flex flex-col gap-2' key={idx}>
                 <div className='flex flex-row gap-3 py-1'>
