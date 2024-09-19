@@ -1,9 +1,13 @@
 ---
-const { attributes, element } = Astro.props;
+import EventDisplay from '@components/EventDisplay.astro';
+import PlayerWithAnnotations from '@components/PlayerWithAnnotations.astro';
+import { getCollection } from 'astro:content';
+
+const { attributes, element, eventIds } = Astro.props;
 ---
 
 {
-  (() => {
+  (async () => {
     const style = { textAlign: element.align };
 
     switch (element.type) {
@@ -70,6 +74,12 @@ const { attributes, element } = Astro.props;
           </div>
         );
       case 'event':
+        return (
+          <EventDisplay
+            includes={element.includes}
+            pageUuid={element.pageUuid}
+          />
+        );
       // todo
       case 'event-comparison':
       // todo

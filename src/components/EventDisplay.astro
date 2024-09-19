@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import PlayerWithAnnotations from './PlayerWithAnnotations.astro';
+import RichText from './RichText/index.astro';
+import type { Includes } from '@ty/slate';
+
+export interface Props {
+  sticky?: boolean;
+  eventUuid: string | string[];
+  end?: number;
+  start?: number;
+  includes?: Includes[];
+}
+
+const {
+  eventUuid,
+  // include everything by default
+  includes = ['media', 'annotations', 'label', 'description'],
+  start,
+  end,
+  sticky,
+} = Astro.props;
+
+const associatedEvents = await getCollection('events', (ev) =>
+  Array.isArray(eventUuid) ? eventUuid.includes(ev.id) : ev.id === eventUuid
+);
+
+const annotationData = await getCollection('annotations');
+
+const annotations = annotationData.filter((ad) =>
+  Array.isArray(eventUuid)
+    ? eventUuid.includes(ad.data.event_id)
+    : ad.data.event_id === eventUuid
+);
+---
+
+{
+  associatedEvents.map((event: any) => {
+    return (
+      <div class='flex flex-col gap-6'>
+        <h1>{event.data.label}</h1>
+        <RichText nodes={event.data.description} />
+        {Object.keys(event.data.audiovisual_files).map((file: string) => {
+          const url: string = event.data.audiovisual_files[file].file_url;
+          const annotationsToShow = annotations
+            .find((ann) => ann.data.source_id == file)
+            ?.data.annotations.sort(
+              (a: any, b: any) => a.start_time - b.start_time
+            );
+          return (
+            <PlayerWithAnnotations
+              file={file}
+              annotations={annotationsToShow}
+              url={url}
+              sticky
+            />
+          );
+        })}
+        <p>{event.data.citation}</p>
+      </div>
+    );
+  })
+}

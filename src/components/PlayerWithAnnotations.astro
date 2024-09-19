@@ -2,14 +2,7 @@
 import Annotations from './AnnotationUI/Annotations.astro';
 import Player from './Player';
 
-export interface Props {
-  file: string;
-  url: string;
-  annotations?: any[];
-  sticky?: boolean;
-}
-
-const { file, url, annotations, sticky = false } = Astro.props;
+const { sticky = true, file, url, annotations } = Astro.props;
 ---
 
 <div

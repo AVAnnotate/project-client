@@ -6,6 +6,7 @@ import Container from '@components/Container.astro';
 import { getCollection } from 'astro:content';
 import { getEntry } from 'astro:content';
 import RichText from '../../components/RichText/index.astro';
+import { getPage, getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
 
@@ -14,10 +15,7 @@ const baseUrl = import.meta.env.PROD
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {
-  const pages = await getCollection('pages');
-  const eventPages = pages.filter(
-    (p) => p.id !== 'order' && !p.data.autogenerate.enabled
-  );
+  const eventPages = await getPages((p) => !p.data.autogenerate.enabled);
 
   return eventPages.map((page) => ({
     params: { pageUuid: page.id },
@@ -30,7 +28,7 @@ if (!pageUuid) {
   return Astro.redirect(`/${baseUrl}`);
 }
 
-const page = await getEntry('pages', pageUuid);
+const page = await getPage(pageUuid);
 ---
 
 <Layout title={page.data.title}>
