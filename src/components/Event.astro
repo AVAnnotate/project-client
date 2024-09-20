@@ -7,14 +7,14 @@ import Annotations from './AnnotationUI/Annotations.astro';
 
 export interface Props {
   sticky?: boolean;
-  eventUuid: string | string[];
+  uuid: string | string[];
   end?: number;
   start?: number;
   includes?: Includes[];
 }
 
 const {
-  eventUuid,
+  uuid,
   // include everything by default
   includes = ['media', 'annotations', 'label', 'description'],
   start,
@@ -23,15 +23,15 @@ const {
 } = Astro.props;
 
 const associatedEvents = await getCollection('events', (ev) =>
-  Array.isArray(eventUuid) ? eventUuid.includes(ev.id) : ev.id === eventUuid
+  Array.isArray(uuid) ? uuid.includes(ev.id) : ev.id === uuid
 );
 
 const annotationData = await getCollection('annotations');
 
 const annotations = annotationData.filter((ad) =>
-  Array.isArray(eventUuid)
-    ? eventUuid.includes(ad.data.event_id)
-    : ad.data.event_id === eventUuid
+  Array.isArray(uuid)
+    ? uuid.includes(ad.data.event_id)
+    : ad.data.event_id === uuid
 );
 ---
 

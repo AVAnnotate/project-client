@@ -1,5 +1,5 @@
 ---
-import EventDisplay from '@components/Event.astro';
+import Event from '@components/Event.astro';
 
 const { attributes, element } = Astro.props;
 ---
@@ -73,11 +73,11 @@ const { attributes, element } = Astro.props;
         );
       case 'event':
         return (
-          <EventDisplay
+          <Event
             end={element.end}
             start={element.start}
             includes={element.includes}
-            eventUuid={element.uuid}
+            uuid={element.uuid}
           />
         );
       // todo
