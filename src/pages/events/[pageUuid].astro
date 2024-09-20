@@ -4,7 +4,7 @@ import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
 import Container from '@components/Container.astro';
 import { getEntry } from 'astro:content';
-import EventDisplay from '@components/EventDisplay.astro';
+import EventDisplay from '@components/Event.astro';
 import { getPage, getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
@@ -38,32 +38,5 @@ if (!page.data.autogenerate.type_id) {
 <Layout title={page.data.title}>
   <Container className='py-16'>
     <EventDisplay eventUuid={page.data.autogenerate.type_id} />
-    <!-- {
-      associatedEvents.map((event: any) => {
-        return (
-          <div class='flex flex-col gap-6'>
-            <h1>{event.data.label}</h1>
-            <RichText nodes={event.data.description} />
-            {Object.keys(event.data.audiovisual_files).map((file: string) => {
-              const url: string = event.data.audiovisual_files[file].file_url;
-              const annotationsToShow = annotations
-                .find((ann) => ann.data.source_id == file)
-                ?.data.annotations.sort(
-                  (a: any, b: any) => a.start_time - b.start_time
-                );
-              return (
-                <PlayerWithAnnotations
-                  file={file}
-                  annotations={annotationsToShow}
-                  url={url}
-                  sticky
-                />
-              );
-            })}
-            <p>{event.data.citation}</p>
-          </div>
-        );
-      })
-    } -->
   </Container>
 </Layout>

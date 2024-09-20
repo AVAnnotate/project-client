@@ -41,13 +41,11 @@ const {
     <title>{title}</title>
   </head>
   <body
-    class='bg-gray-100 3xl:bg-black flex h-full flex-col 3xl:max-w-screen-3xl mx-auto'
+    class='3xl:bg-black flex h-full flex-col 3xl:max-w-screen-3xl mx-auto'
     transition:animate='initial'
   >
     <Header projectName={projectName} pages={[]} />
-    <main
-      class='bg-gray-100 min-h-[calc(100dvh_-160px)] max-w-screen-3xl text-black'
-    >
+    <main class='min-h-[calc(100dvh_-160px)] max-w-screen-3xl text-black'>
       <slot />
     </main>
     <Footer projectBy={projectBy} />

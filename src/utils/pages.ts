@@ -21,11 +21,11 @@ export const getPages = async (
   filterCallback?: (page: PageCollectionEntry) => boolean
 ) => {
   const results = await getCollection('pages', (page) => {
-    const matchesCallback = filterCallback
-      ? filterCallback(page as PageCollectionEntry)
-      : true;
+    if (page.id === 'order') {
+      return false;
+    }
 
-    return page.id !== 'order' && matchesCallback;
+    return filterCallback ? filterCallback(page as PageCollectionEntry) : true;
   });
 
   return results as PageCollectionEntry[];

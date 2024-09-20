@@ -1,9 +1,7 @@
 ---
-import EventDisplay from '@components/EventDisplay.astro';
-import PlayerWithAnnotations from '@components/PlayerWithAnnotations.astro';
-import { getCollection } from 'astro:content';
+import EventDisplay from '@components/Event.astro';
 
-const { attributes, element, eventIds } = Astro.props;
+const { attributes, element } = Astro.props;
 ---
 
 {
@@ -76,8 +74,10 @@ const { attributes, element, eventIds } = Astro.props;
       case 'event':
         return (
           <EventDisplay
+            end={element.end}
+            start={element.start}
             includes={element.includes}
-            pageUuid={element.pageUuid}
+            eventUuid={element.uuid}
           />
         );
       // todo
