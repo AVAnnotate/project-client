@@ -14,14 +14,14 @@ const eventCollection = defineCollection({
       z.string(),
       z.object({
         label: z.string(),
-        is_offline: z.boolean().optional(),
+        is_offline: z.boolean().nullish(),
         file_url: z.string(),
         duration: z.number(),
       })
     ),
     auto_generate_web_page: z.boolean(),
     description: slateNodeArray,
-    citation: z.string().optional(),
+    citation: z.string().nullish(),
     created_at: z.string(),
     created_by: z.string(),
     item_type: z.enum(['Audio', 'Video']),
@@ -44,13 +44,13 @@ const pageCollection = defineCollection({
       created_at: z.string(),
       created_by: z.string(),
       title: z.string(),
-      parent: z.string().optional(),
+      parent: z.string().nullish(),
       updated_at: z.string(),
       updated_by: z.string(),
       autogenerate: z.object({
         enabled: z.boolean(),
         type: z.string(),
-        type_id: z.string().optional(),
+        type_id: z.string().nullish(),
       }),
     })
     // this "or" statement prevents a schema error on order.json

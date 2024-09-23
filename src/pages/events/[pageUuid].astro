@@ -35,8 +35,8 @@ if (!page.data.autogenerate.type_id) {
 }
 ---
 
-<Layout title={page.data.title}>
+<Layout title={page.data.title} background='gray-100'>
   <Container className='py-16'>
-    <Event uuid={page.data.autogenerate.type_id} />
+    <Event sticky uuid={page.data.autogenerate.type_id} />
   </Container>
 </Layout>

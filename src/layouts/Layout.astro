@@ -9,13 +9,14 @@ import { getEntry } from 'astro:content';
 const projectData = await getEntry('project', 'project');
 
 interface Props {
+  background?: string;
   title?: string;
   projectName?: string;
   projectBy?: string;
 }
-// Supports weights 300-800
 
 const {
+  background,
   title = projectData.data.project.title,
   projectName = projectData.data.project.title,
   projectBy = projectData.data.project.creator,
@@ -40,12 +41,9 @@ const {
     />
     <title>{title}</title>
   </head>
-  <body
-    class='3xl:bg-black flex h-full flex-col 3xl:max-w-screen-3xl mx-auto'
-    transition:animate='initial'
-  >
+  <body class='flex h-full flex-col mx-auto' transition:animate='initial'>
     <Header projectName={projectName} pages={[]} />
-    <main class='min-h-[calc(100dvh_-160px)] max-w-screen-3xl text-black'>
+    <main class=`min-h-[calc(100dvh_-160px)] text-black bg-${background}`>
       <slot />
     </main>
     <Footer projectBy={projectBy} />
