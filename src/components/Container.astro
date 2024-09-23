@@ -2,11 +2,10 @@
 import clsx from 'clsx';
 
 const { className } = Astro.props;
-
 ---
 
 <div
-    class={clsx('mx-6 md:mx-24 xl:mx-32 2xl:mx-auto max-w-screen-xl', className)}
+  class={clsx('mx-6 md:mx-24 xl:mx-32 2xl:mx-auto max-w-screen-2xl', className)}
 >
-    <slot />
+  <slot />
 </div>
