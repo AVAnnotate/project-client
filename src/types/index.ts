@@ -107,3 +107,20 @@ export type AnnotationFile = {
 
   annotations: Annotation[];
 };
+
+export type AutoGenerate = {
+  enabled: boolean;
+  type: string;
+  type_id?: string;
+};
+
+export type Page = {
+  content: Node[];
+  created_at: string;
+  created_by: string;
+  title: string;
+  parent?: string;
+  updated_at: string;
+  updated_by: string;
+  autogenerate: AutoGenerate;
+};

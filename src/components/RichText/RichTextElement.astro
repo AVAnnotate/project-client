@@ -1,9 +1,24 @@
 ---
+import Event from '@components/Event.astro';
+
 const { attributes, element } = Astro.props;
+
+const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
+  switch (size) {
+    case 'thumbnail':
+      return 'max-w-40';
+    case 'medium':
+      return 'max-w-[400px]';
+    case 'large':
+      return 'max-w-[640px]';
+    case 'full':
+      return 'max-w-full';
+  }
+};
 ---
 
 {
-  (() => {
+  (async () => {
     const style = { textAlign: element.align };
 
     switch (element.type) {
@@ -46,7 +61,7 @@ const { attributes, element } = Astro.props;
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img src={element.url} class={`slate-img-${element.size}`} />
+            <img src={element.url} class={getImageClass(element.size)} />
             <slot />
           </div>
         );
@@ -70,6 +85,14 @@ const { attributes, element } = Astro.props;
           </div>
         );
       case 'event':
+        return (
+          <Event
+            end={element.end}
+            start={element.start}
+            includes={element.includes}
+            uuid={element.uuid}
+          />
+        );
       // todo
       case 'event-comparison':
       // todo
@@ -82,3 +105,8 @@ const { attributes, element } = Astro.props;
     }
   })()
 }
+<style>
+  p {
+    margin: 1em 0;
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import RichText from './RichText/index.astro';
+import type { Includes } from '@ty/slate';
+import Player from './Player';
+import Annotations from './AnnotationUI/Annotations.astro';
+
+export interface Props {
+  sticky?: boolean;
+  uuid: string | string[];
+  end?: number;
+  start?: number;
+  includes?: Includes[];
+}
+
+const {
+  uuid,
+  // include everything by default
+  includes = ['media', 'annotations', 'label', 'description'],
+  start,
+  end,
+  sticky,
+} = Astro.props;
+
+const associatedEvents = await getCollection('events', (ev) =>
+  Array.isArray(uuid) ? uuid.includes(ev.id) : ev.id === uuid
+);
+
+const annotationData = await getCollection('annotations');
+
+const annotations = annotationData.filter((ad) =>
+  Array.isArray(uuid)
+    ? uuid.includes(ad.data.event_id)
+    : ad.data.event_id === uuid
+);
+---
+
+{
+  associatedEvents.map((event: any) => {
+    return (
+      <div class='flex flex-col gap-6 bg-gray-100'>
+        {includes.includes('label') && <h1>{event.data.label}</h1>}
+        {includes.includes('description') && (
+          <RichText nodes={event.data.description} />
+        )}
+        {(includes.includes('annotations') || includes.includes('media')) &&
+          Object.keys(event.data.audiovisual_files).map((file: string) => {
+            const url: string = event.data.audiovisual_files[file].file_url;
+            const annotationsToShow = annotations
+              .find((ann) => ann.data.source_id === file)
+              ?.data.annotations.sort(
+                (a: any, b: any) => a.start_time - b.start_time
+              );
+
+            return (
+              <div
+                class={`mediaContainer flex flex-col gap-4${sticky ? ' sticky top-0' : ''}`}
+                data-player-id={file}
+                data-player-url={url}
+              >
+                {includes.includes('media') && (
+                  <Player
+                    url={url}
+                    id={file}
+                    client:only='react'
+                    sticky={sticky}
+                  />
+                )}
+                {includes.includes('annotations') && annotations && (
+                  <Annotations
+                    playerId={file}
+                    annotations={annotationsToShow}
+                    sticky={sticky}
+                  />
+                )}
+              </div>
+            );
+          })}
+        <p>{event.data.citation}</p>
+      </div>
+    );
+  })
+}

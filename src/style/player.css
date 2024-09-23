@@ -1,8 +1,7 @@
 .player-control-panel {
   height: 48px;
   width: 100%;
-  background-color: var(--gray-200);
-  border-radius: 100px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -36,30 +35,6 @@
   font-weight: 600;
 }
 
-.player-control-panel .tooltip-content {
-  border-radius: 4px;
-  padding: 5px 8px;
-  font-size: 14px;
-  color: #000;
-  background-color: white;
-  border: 1px solid var(--gray-200);
-  user-select: none;
-  box-shadow: 0px 2px 4px 0px #00000026;
-}
-
-.player-control-panel .content .copy-button {
-  height: 24px;
-  width: 24px;
-  padding: 2px;
-  border-radius: 50%;
-}
-
-.player-control-panel .content .copy-button svg {
-  color: black;
-  height: 18px;
-  width: 18px;
-}
-
 .player-control-panel .content .seek-bar {
   flex-grow: 1;
 }
@@ -75,7 +50,6 @@
 }
 
 .player-control-panel .content .seek-bar .seek-bar-slider-track {
-  background-color: var(--gray-400);
   position: relative;
   flex-grow: 1;
   border-radius: 9999px;
@@ -99,7 +73,6 @@
 
 .player-control-panel .content .seek-bar .seek-bar-slider-thumb:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--black-a8);
 }
 
 .player-control-panel .audio-button {
