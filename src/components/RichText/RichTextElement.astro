@@ -1,5 +1,5 @@
 ---
-import Event from '@components/Event.astro';
+import EventViewer from '@components/EventViewer/index.astro';
 
 const { attributes, element } = Astro.props;
 
@@ -86,14 +86,16 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       case 'event':
         return (
-          <Event
-            end={element.end}
-            start={element.start}
-            includes={element.includes}
-            uuid={element.uuid}
-          />
+          <div class='bg-gray-100 p-4'>
+            <EventViewer
+              end={element.end}
+              start={element.start}
+              includes={element.includes}
+              uuids={element.uuid}
+              embed
+            />
+          </div>
         );
-      // todo
       case 'event-comparison':
       // todo
       default:
@@ -107,6 +109,6 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
 }
 <style>
   p {
-    margin: 1em 0;
+    margin-bottom: 1em;
   }
 </style>

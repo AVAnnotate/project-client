@@ -1,110 +1,31 @@
 ---
-import RichText from '@components/RichText/index.astro';
-import { formatTimestamp } from '../../utils/player';
-import { PlayCircleIcon } from '@heroicons/react/24/outline';
-import TagPill from '@components/tags/TagPill.astro';
-import AutoscrollSwitch from '@components/AnnotationUI/AutoscrollSwitch';
-import HideTagsSwitch from '@components/AnnotationUI/HideTagsSwitch';
-import TextSearch from '@components/AnnotationUI/TextSearch';
-import { getEntry } from 'astro:content';
-import TagFilter from './TagFilter';
-
-const projectData = await getEntry('project', 'project');
+import { type CollectionEntry } from 'astro:content';
+import Annotation from './Annotation.astro';
 
 export interface Props {
   playerId: string;
-  annotations: any[];
-  sticky?: boolean;
+  annotationSet: CollectionEntry<'annotations'>;
+  type: 'Audio' | 'Video';
 }
 
-const { playerId, annotations, sticky = false } = Astro.props;
+const { playerId, annotationSet, type } = Astro.props;
 
-const tagGroups: { category: string; color: string }[] =
-  // @ts-ignore
-  projectData.data.project.tags.tagGroups;
-
-let allTags: { [key: string]: { tags: string[]; color: string } } = {};
-if (annotations && annotations.length) {
-  annotations.forEach((ann) => {
-    if (ann.tags && ann.tags.length) {
-      ann.tags.forEach((tag: { category: string; tag: string }) => {
-        const cat = tag.category.toLowerCase();
-        allTags[cat] ||= {
-          tags: [],
-          color:
-            tagGroups.find((grp) => grp.category.toLowerCase() == cat)?.color ||
-            '#FFF',
-        };
-        if (!allTags[cat].tags.includes(tag.tag)) {
-          allTags[cat].tags.push(tag.tag);
-          allTags[cat].tags.sort();
-        }
-      });
-    }
-  });
-}
+const sortedAnnotations = annotationSet.data.annotations.sort(
+  (a: any, b: any) => a.start_time - b.start_time
+);
 ---
 
-<div class='flex flex-col'>
+<div class={`flex flex-col`}>
   <div
-    class={`flex flex-row w-full justify-between items-center py-4${sticky ? ' sticky top-14' : ''}`}
+    class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
   >
-    <h3 class='font-bold text-lg'>Annotations</h3>
-    <div class='flex flex-row gap-8 items-center'>
-      <AutoscrollSwitch playerId={playerId} client:only='react' />
-      <HideTagsSwitch playerId={playerId} client:only='react' />
-      <TextSearch playerId={playerId} client:only='react' />
-      <TagFilter playerId={playerId} tags={allTags} client:only='react' />
-    </div>
-  </div>
-  <div class='sticky top-[300px] overflow-y-visible w-full'>
     <div
-      class={`border border-collapse border-black overflow-y-scroll max-h-[calc(100dvh_-260px)] relative`}
+      class={`${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
       id={playerId}
     >
       {
-        annotations.map((ann: any) => {
-          return (
-            <div
-              class='annotationNode flex flex-row justify-between gap-4 p-4 border-t border-b border-t-black border-b-black'
-              data-start={ann.start_time}
-              data-end={ann.end_time}
-              data-tags={JSON.stringify(ann.tags)}
-            >
-              <div class='flex flex-row gap-2 w-[10%] items-start'>
-                <button
-                  class='playAnnotation'
-                  data-start={ann.start_time}
-                  data-end={ann.end_time}
-                  data-player-id={playerId}
-                >
-                  <PlayCircleIcon className='h-6 w-6' />
-                </button>
-                <p class='w-[10%] font-semibold text-sm'>{`${formatTimestamp(ann.start_time, false)}-${formatTimestamp(ann.end_time, false)}`}</p>
-              </div>
-              <div class='w-[90%] flex flex-col gap-4'>
-                <RichText nodes={ann.annotation} />
-                <div
-                  class='flex flex-row gap-4 annotationTags'
-                  data-player-id={playerId}
-                >
-                  {ann.tags?.map((tag: any) => {
-                    const group = tagGroups.find(
-                      (group) =>
-                        group.category.toLowerCase() ==
-                        tag.category.toLowerCase()
-                    );
-                    return (
-                      <TagPill
-                        tag={tag.tag}
-                        color={group ? group.color : '#FFF'}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
+        sortedAnnotations.map((ann: any) => {
+          return <Annotation ann={ann} playerId={playerId} />;
         })
       }
     </div>
@@ -151,16 +72,16 @@ if (annotations && annotations.length) {
     }
   }
 
-  const activeBackground = 'bg-blue-hover';
+  const activeBackground = '!bg-blue-hover';
 
   $pagePlayersState.listen((state, oldState, changed) => {
     if (
       changed &&
-      Math.floor(state[changed].position * 1000) % 7 == 0 //this is just meant to get it firing at a reasonable interval...should find a less random way
+      Math.floor(state[changed].position * 1000) % 7 === 0 //this is just meant to get it firing at a reasonable interval...should find a less random way
     ) {
       const startTimes = state[changed].annotationStarts;
       const current = startTimes?.findIndex((time, idx) => {
-        if (typeof time.end == 'number') {
+        if (typeof time.end === 'number') {
           return (
             time.start <= state[changed].position &&
             time.end > state[changed].position
@@ -171,7 +92,7 @@ if (annotations && annotations.length) {
               startTimes[idx + 1].start > state[changed].position
           : time.start <= state[changed].position;
       });
-      if (typeof current == 'number' && current >= 0) {
+      if (typeof current === 'number' && current >= 0) {
         const activeNode = annotationNodes[current];
         if (state[changed].autoScroll) {
           activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -185,16 +106,16 @@ if (annotations && annotations.length) {
       }
     }
     //show or hide tags if necessary
-    if (changed && state[changed].hideTags != oldState[changed].hideTags) {
-      if (state[changed].hideTags) {
-        for (let i = 0; i < annotationTagNodes.length; i++) {
-          annotationTagNodes[i].classList.remove('flex');
-          annotationTagNodes[i].classList.add('hidden');
-        }
-      } else {
+    if (changed && state[changed].showTags != oldState[changed].showTags) {
+      if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
           annotationTagNodes[i].classList.remove('hidden');
           annotationTagNodes[i].classList.add('flex');
+        }
+      } else {
+        for (let i = 0; i < annotationTagNodes.length; i++) {
+          annotationTagNodes[i].classList.remove('flex');
+          annotationTagNodes[i].classList.add('hidden');
         }
       }
     }
@@ -212,7 +133,7 @@ if (annotations && annotations.length) {
           tags = JSON.parse(thisNode.dataset.tags);
         }
         if (
-          (!state[changed].searchQuery || state[changed].searchQuery == '') &&
+          (!state[changed].searchQuery || state[changed].searchQuery === '') &&
           (!state[changed].activeFilters ||
             // @ts-ignore
             !state[changed]!.activeFilters.length)
@@ -239,8 +160,8 @@ if (annotations && annotations.length) {
             if (
               tags.find(
                 (t) =>
-                  t.category.toLowerCase() == tag.category.toLowerCase() &&
-                  t.tag.toLowerCase() == tag.tag.toLowerCase()
+                  t.category.toLowerCase() === tag.category.toLowerCase() &&
+                  t.tag.toLowerCase() === tag.tag.toLowerCase()
               )
             ) {
               show = true;

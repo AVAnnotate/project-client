@@ -4,7 +4,21 @@ const slateNodeArray = z.array(z.any());
 
 const annotationCollection = defineCollection({
   type: 'data',
-  schema: z.any(),
+  schema: z.object({
+    event_id: z.string(),
+    source_id: z.string(),
+    set: z.string(),
+    annotations: z.array(z.object({
+      uuid: z.string(),
+      start_time: z.number(),
+      end_time: z.number(),
+      annotation: slateNodeArray,
+      tags: z.array(z.object({
+        category: z.string(),
+        tag: z.string()
+      }))
+    }))
+  }),
 });
 
 const eventCollection = defineCollection({
@@ -59,7 +73,44 @@ const pageCollection = defineCollection({
 
 const projectCollection = defineCollection({
   type: 'data',
-  schema: z.any(),
+  schema: z.object({
+    project: z.object({
+      github_org: z.string(),
+      title: z.string(),
+      description: z.string().nullish(),
+      language: z.string(),
+      slug: z.string(),
+      creator: z.string(),
+      authors: z.string(),
+      media_player: z.enum(['avannotate', 'universal', 'aviary']),
+      auto_populate_home_page: z.boolean(),
+      additional_users: z.array(z.object({
+        login_name: z.string(),
+        avatar_url: z.string(),
+        admin: z.boolean(),
+        name: z.string().nullish(),
+      })),
+      tags: z.object({
+        tagGroups: z.array(z.object({
+          category: z.string(),
+          color: z.string()
+        })),
+        tags: z.array(z.object({
+          category: z.string(),
+          tag: z.string()
+        }))
+      }),
+      created_at: z.string(),
+      updated_at: z.string()
+    }),
+    publish: z.object({
+      publish_pages_app: z.boolean(),
+      publish_sha: z.string(),
+      publish_iso_date: z.string()
+    }),
+    // not sure what goes in here
+    users: z.array(z.any())
+  }),
 });
 
 export const collections = {

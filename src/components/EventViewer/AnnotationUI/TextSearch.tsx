@@ -17,7 +17,7 @@ const TextSearch = (props: TextSearchProps) => {
     });
   };
   return (
-    <div className='flex flex-row rounded-lg border-none py-1.5 px-3 bg-white items-center gap-3'>
+    <div className='flex flex-row rounded-lg py-1.5 px-3 bg-white items-center gap-3 border-solid border border-gray-200'>
       <MagnifyingGlassIcon className='h-6 w-6' />
       <Input
         value={pagePlayers[playerId].searchQuery}
