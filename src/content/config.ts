@@ -20,7 +20,7 @@ const eventCollection = defineCollection({
       })
     ),
     auto_generate_web_page: z.boolean(),
-    description: slateNodeArray,
+    description: slateNodeArray.nullish(),
     citation: z.string().nullish(),
     created_at: z.string(),
     created_by: z.string(),
