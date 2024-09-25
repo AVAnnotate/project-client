@@ -132,85 +132,89 @@ export const createManifest = (
 
   let canvasCount = 1;
   fs.readdirSync(`${dataDir}/events/`).forEach((file) => {
-    const eventData: EventFile = JSON.parse(
-      fs.readFileSync(`${dataDir}/events/${file}`, 'utf8')
-    );
-
-    const eventId = `${siteURL}/${snakeCase(
-      eventData.label
-    )}/canvas-${canvasCount}/canvas`;
-
-    let pageCount = 1;
-    for (const [_key, avFile] of Object.entries(eventData.audiovisual_files)) {
-      const type = mime.lookup(avFile.file_url);
-      const event: IIIFCanvas = {
-        id: eventId,
-        type: 'Canvas',
-        duration: avFile.duration,
-        annotations: [],
-        items: [],
-      };
-
-      const anno = createAnnotationPage(
-        dataDir,
-        siteURL,
-        file.replace(/\.[^/.]+$/, ''),
-        `${siteURL}/manifests/${snakeCase(
-          eventData.label
-        )}-canvas${canvasCount}-${pageCount}.json`,
-        eventId,
-        `${eventId}/page${pageCount}`,
-        `${siteURL}/manifests.json`
+    if (file.endsWith('.json')) {
+      const eventData: EventFile = JSON.parse(
+        fs.readFileSync(`${dataDir}/events/${file}`, 'utf8')
       );
 
-      if (anno) {
-        if (allowSubPages === 'true' || allowSubPages === 'TRUE') {
-          writeFileSync(
-            `./client/src/content/manifests/${snakeCase(
-              eventData.label
-            )}-canvas${canvasCount}-${pageCount}.json`,
-            JSON.stringify(anno)
-          );
+      const eventId = `${siteURL}/${snakeCase(
+        eventData.label
+      )}/canvas-${canvasCount}/canvas`;
 
-          event.annotations.push({
-            type: 'AnnotationPage',
-            id: `${siteURL}/manifests/${snakeCase(
-              eventData.label
-            )}-canvas${canvasCount}-${pageCount}.json`,
-            label: { en: ['Annotations'] },
-          });
-        } else {
-          event.annotations.push(anno);
-        }
+      let pageCount = 1;
+      for (const [_key, avFile] of Object.entries(
+        eventData.audiovisual_files
+      )) {
+        const type = mime.lookup(avFile.file_url);
+        const event: IIIFCanvas = {
+          id: eventId,
+          type: 'Canvas',
+          duration: avFile.duration,
+          annotations: [],
+          items: [],
+        };
 
-        event.items.push({
-          id: `${siteURL}/${snakeCase(
+        const anno = createAnnotationPage(
+          dataDir,
+          siteURL,
+          file.replace(/\.[^/.]+$/, ''),
+          `${siteURL}/manifests/${snakeCase(
             eventData.label
-          )}-canvas${canvasCount}/paintings`,
-          type: 'AnnotationPage',
-          items: [
-            {
-              id: `${siteURL}/${snakeCase(
-                eventData.label
-              )}-canvas${canvasCount}/paintings`,
-              type: 'Annotation',
-              motivation: 'painting',
-              body: [
-                {
-                  id: avFile.file_url,
-                  type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                  format: type ? type : 'unknown',
-                },
-              ],
-              target: `${siteURL}/${snakeCase(
-                eventData.label
-              )}-canvas${canvasCount}`,
-            },
-          ],
-        });
+          )}-canvas${canvasCount}-${pageCount}.json`,
+          eventId,
+          `${eventId}/page${pageCount}`,
+          `${siteURL}/manifests.json`
+        );
 
-        output.items.push(event);
-        pageCount++;
+        if (anno) {
+          if (allowSubPages === 'true' || allowSubPages === 'TRUE') {
+            writeFileSync(
+              `./client/src/content/manifests/${snakeCase(
+                eventData.label
+              )}-canvas${canvasCount}-${pageCount}.json`,
+              JSON.stringify(anno)
+            );
+
+            event.annotations.push({
+              type: 'AnnotationPage',
+              id: `${siteURL}/manifests/${snakeCase(
+                eventData.label
+              )}-canvas${canvasCount}-${pageCount}.json`,
+              label: { en: ['Annotations'] },
+            });
+          } else {
+            event.annotations.push(anno);
+          }
+
+          event.items.push({
+            id: `${siteURL}/${snakeCase(
+              eventData.label
+            )}-canvas${canvasCount}/paintings`,
+            type: 'AnnotationPage',
+            items: [
+              {
+                id: `${siteURL}/${snakeCase(
+                  eventData.label
+                )}-canvas${canvasCount}/paintings`,
+                type: 'Annotation',
+                motivation: 'painting',
+                body: [
+                  {
+                    id: avFile.file_url,
+                    type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                    format: type ? type : 'unknown',
+                  },
+                ],
+                target: `${siteURL}/${snakeCase(
+                  eventData.label
+                )}-canvas${canvasCount}`,
+              },
+            ],
+          });
+
+          output.items.push(event);
+          pageCount++;
+        }
       }
     }
     canvasCount++;
