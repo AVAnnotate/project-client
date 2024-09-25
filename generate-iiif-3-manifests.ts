@@ -1,4 +1,4 @@
-import type { AnnotationFile, EventFile } from '@ty/index.ts';
+import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
 import type {
   IIIFAnnotationItem,
   IIIFAnnotationPage,
@@ -114,6 +114,9 @@ export const createManifest = (
   title: string,
   allowSubPages: string
 ) => {
+  const projectData: ProjectFile = JSON.parse(
+    fs.readFileSync('${dataDir}/project.json', 'utf8')
+  );
   const output: IIIFPresentationManifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
     id: `${siteURL}/manifest.json`,
@@ -125,6 +128,16 @@ export const createManifest = (
         type: 'Text',
         label: { en: [title] },
         format: 'text/html',
+      },
+    ],
+    metadata: [
+      {
+        label: { en: ['Description'] },
+        value: { en: [projectData.project.description || ''] },
+      },
+      {
+        label: { en: ['Language'] },
+        value: { en: ['English'] },
       },
     ],
     items: [],
