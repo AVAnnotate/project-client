@@ -115,7 +115,7 @@ export const createManifest = (
   allowSubPages: string
 ) => {
   const projectData: ProjectFile = JSON.parse(
-    fs.readFileSync('${dataDir}/project.json', 'utf8')
+    fs.readFileSync(`${dataDir}/project.json`, 'utf8')
   );
   const output: IIIFPresentationManifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
