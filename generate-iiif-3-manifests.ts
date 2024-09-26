@@ -109,9 +109,7 @@ export const createAnnotationPage = (
 
 export const createManifest = (
   dataDir: string,
-  label: string,
   siteURL: string,
-  title: string,
   allowSubPages: string
 ) => {
   const projectData: ProjectFile = JSON.parse(
@@ -121,12 +119,12 @@ export const createManifest = (
     '@context': 'http://iiif.io/api/presentation/3/context.json',
     id: `${siteURL}/manifest.json`,
     type: 'Manifest',
-    label: { en: [label] },
+    label: { en: [projectData.project.slug] },
     homepage: [
       {
         id: siteURL,
         type: 'Text',
-        label: { en: [title] },
+        label: { en: [projectData.project.title] },
         format: 'text/html',
       },
     ],
@@ -241,18 +239,10 @@ export const createManifest = (
 
 const optionDefinitions = [
   { name: 'dir', alias: 'd', type: String },
-  { name: 'label', alias: 'l', type: String },
   { name: 'url', alias: 'u', type: String },
-  { name: 'title', alias: 't', type: String },
   { name: 'subPages', alias: 's', type: String },
 ];
 
 const options = commandLineArgs(optionDefinitions);
 
-createManifest(
-  options.dir,
-  options.label,
-  options.url,
-  options.title,
-  options.subPages
-);
+createManifest(options.dir, options.url, options.subPages);
