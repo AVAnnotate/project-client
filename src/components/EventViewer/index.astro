@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import type { SlateEventNodeProps } from '@ty/slate';
+import AudioEvent from './AudioEvent.astro';
+import VideoEvent from './VideoEvent.astro';
+import type { Project } from '@ty/index';
+
+export interface Props extends Omit<SlateEventNodeProps, 'uuid'> {
+  end?: number;
+  start?: number;
+  sticky?: boolean;
+  uuids: string | string[];
+  embed?: boolean;
+}
+
+const {
+  uuids,
+  // include everything by default
+  includes = ['media', 'annotations', 'label', 'description'],
+  start,
+  end,
+  sticky,
+  embed,
+} = Astro.props;
+
+const associatedEvents = await getCollection('events', (ev) =>
+  Array.isArray(uuids) ? uuids.includes(ev.id) : ev.id === uuids
+);
+
+const annotationData = await getCollection('annotations');
+---
+
+{
+  associatedEvents.map((event) => {
+    const annotationSets = annotationData.filter(
+      (an) => an.data.event_id === event.id
+    );
+
+    return (
+      <div>
+        {event.data.item_type === 'Audio' && (
+          <AudioEvent
+            annotationSets={annotationSets}
+            event={event}
+            {...Astro.props}
+          />
+        )}
+        {event.data.item_type === 'Video' && (
+          <VideoEvent
+            annotationSets={annotationSets}
+            event={event}
+            {...Astro.props}
+          />
+        )}
+      </div>
+    );
+  })
+}

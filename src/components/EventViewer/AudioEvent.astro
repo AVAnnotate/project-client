@@ -1,0 +1,92 @@
+---
+import type { SlateEventNodeProps } from '@ty/slate';
+import type { CollectionEntry } from 'astro:content';
+import Container from '@components/Container.astro';
+import RichText from '@components/RichText/index.astro';
+import Player from '@components/Player';
+import Annotations from './AnnotationUI/Annotations/index.astro';
+import AnnotationHeader from './AnnotationUI/Annotations/AnnotationHeader.astro';
+import { useStore } from '@nanostores/react';
+import { $pagePlayersState } from 'src/store';
+
+interface Props extends SlateEventNodeProps {
+  annotationSets: CollectionEntry<'annotations'>[];
+  event: CollectionEntry<'events'>;
+  // UUID of the audiovisual file, for embedded events
+  file?: string;
+  embed?: boolean;
+}
+
+const {
+  // include everything by default
+  includes = ['media', 'annotations', 'label', 'description'],
+  start,
+  end,
+  event,
+  file,
+  annotationSets,
+  embed,
+} = Astro.props;
+
+const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
+
+const currentSet = annotationSets[0];
+
+if (!currentSet) {
+  throw new Error('Set not found.');
+}
+---
+
+<div>
+  <div class={`sticky top-[80px] z-10 ${!embed ? 'shadow' : ''}`}>
+    <div class='flex flex-col gap-6 bg-gray-100 py-6'>
+      <Container className='w-full'>
+        {includes.includes('label') && <h1>{event.data.label}</h1>}
+        {
+          includes.includes('description') && event.data.description && (
+            <RichText nodes={event.data.description} />
+          )
+        }
+      </Container>
+      {
+        (includes.includes('annotations') || includes.includes('media')) &&
+          Object.keys(event.data.audiovisual_files).map((file: string) => {
+            const url: string = event.data.audiovisual_files[file].file_url;
+
+            return (
+              <div
+                class='mediaContainer gap-4 flex flex-col'
+                data-player-id={file}
+                data-player-url={url}
+              >
+                {includes.includes('media') && (
+                  <Container className='w-full'>
+                    <Player
+                      url={url}
+                      id={file}
+                      client:only='react'
+                      type={event.data.item_type}
+                    />
+                  </Container>
+                )}
+              </div>
+            );
+          })
+      }
+      <Container className='w-full'>
+        <AnnotationHeader
+          annotationSet={currentSet}
+          playerId={avFileUuid}
+          type={event.data.item_type}
+        />
+      </Container>
+    </div>
+  </div>
+  <Container>
+    <Annotations
+      annotationSet={currentSet}
+      playerId={avFileUuid}
+      type={event.data.item_type}
+    />
+  </Container>
+</div>

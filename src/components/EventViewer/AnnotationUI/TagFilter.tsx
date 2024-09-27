@@ -1,3 +1,4 @@
+import TagPill from '@components/tags/TagPill.tsx';
 import {
   Checkbox,
   Popover,
@@ -10,7 +11,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { $pagePlayersState } from 'src/store.ts';
 
 export interface TagFilterProps {
@@ -30,7 +31,7 @@ const TagFilter = (props: TagFilterProps) => {
   const toggleTag = (tag: { category: string; tag: string }) => {
     const current = thisPlayer.activeFilters || [];
     const updated = current?.find(
-      (t) => t.category == tag.category && t.tag == tag.tag
+      (t) => t.category === tag.category && t.tag === tag.tag
     )
       ? current.filter((t) => t.category != tag.category || t.tag != tag.tag)
       : [...current, tag];
@@ -43,9 +44,9 @@ const TagFilter = (props: TagFilterProps) => {
   const toggleCategory = (category: string) => {
     const current =
       thisPlayer.activeFilters?.filter(
-        (tag) => tag.category.toLowerCase() == category.toLowerCase()
+        (tag) => tag.category.toLowerCase() === category.toLowerCase()
       ) || [];
-    if (current.length == tags[category].tags.length) {
+    if (current.length === tags[category].tags.length) {
       //in this case, everything in the category is already checked, and we want to uncheck them
       $pagePlayersState.setKey(playerId, {
         ...thisPlayer,
@@ -65,9 +66,9 @@ const TagFilter = (props: TagFilterProps) => {
         if (
           active.findIndex(
             (t) =>
-              t.category.toLowerCase() == tag.category.toLowerCase() &&
-              t.tag.toLowerCase() == tag.tag.toLowerCase()
-          ) == -1
+              t.category.toLowerCase() === tag.category.toLowerCase() &&
+              t.tag.toLowerCase() === tag.tag.toLowerCase()
+          ) === -1
         ) {
           active.push(tag);
         }
@@ -81,9 +82,9 @@ const TagFilter = (props: TagFilterProps) => {
 
   return (
     <Popover>
-      <PopoverButton className='bg-white border rounded-lg border-secondary flex flex-row justify-center items-center gap-2 px-2 py-1.5 data-[open]:bg-blue-hover'>
+      <PopoverButton className='bg-white rounded-lg flex flex-row justify-center items-center gap-2 px-2 py-1.5 data-[open]:bg-blue-hover font-semibold'>
         <AdjustmentsVerticalIcon className='size-4' />
-        <span>Filters</span>
+        <span>Filter</span>
         {thisPlayer.activeFilters && thisPlayer.activeFilters.length ? (
           <div className='rounded-2xl px-1.5 py-0.5 flex items-center justify-center text-white bg-primary text-xs'>
             {thisPlayer.activeFilters.length}
@@ -113,7 +114,7 @@ const TagFilter = (props: TagFilterProps) => {
         </div>
         {thisPlayer &&
           categories.map((cat, idx) => (
-            <>
+            <React.Fragment key={idx}>
               {idx > 0 ? (
                 <div className='h-[1px] bg-gray-500 rounded-full w-full my-3' />
               ) : null}
@@ -123,8 +124,9 @@ const TagFilter = (props: TagFilterProps) => {
                     checked={
                       thisPlayer.activeFilters &&
                       thisPlayer.activeFilters.filter(
-                        (tag) => tag.category.toLowerCase() == cat.toLowerCase()
-                      ).length == tags[cat].tags.length
+                        (tag) =>
+                          tag.category.toLowerCase() === cat.toLowerCase()
+                      ).length === tags[cat].tags.length
                     }
                     onChange={() => {
                       toggleCategory(cat);
@@ -139,31 +141,34 @@ const TagFilter = (props: TagFilterProps) => {
                 </div>
                 <div className='flex flex-row gap-2 flex-wrap'>
                   {tags[cat].tags.map((tag, idx) => (
-                    <div
-                      className={`cursor-pointer rounded-full flex flex-row justify-center gap-2 items-center px-2 py-1${
+                    <TagPill
+                      color={tags[cat].color}
+                      key={idx}
+                      tag={tag}
+                      icon={
                         thisPlayer.activeFilters &&
                         thisPlayer.activeFilters?.findIndex(
                           (t) => t.category == cat && t.tag == tag
                         ) != -1
+                          ? CheckIcon
+                          : undefined
+                      }
+                      className={
+                        thisPlayer.activeFilters &&
+                        thisPlayer.activeFilters?.findIndex(
+                          (t) => t.category === cat && t.tag === tag
+                        ) != -1
                           ? ' border-2 border-black'
                           : ''
-                      }`}
-                      style={{ backgroundColor: tags[cat].color }}
+                      }
                       onClick={() => {
                         toggleTag({ category: cat, tag: tag });
                       }}
-                      key={idx}
-                    >
-                      {thisPlayer.activeFilters &&
-                        thisPlayer.activeFilters?.findIndex(
-                          (t) => t.category == cat && t.tag == tag
-                        ) != -1 && <CheckIcon className='size-4' />}
-                      <p>{tag}</p>
-                    </div>
+                    />
                   ))}
                 </div>
               </div>
-            </>
+            </React.Fragment>
           ))}
       </PopoverPanel>
     </Popover>

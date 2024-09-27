@@ -2,9 +2,8 @@
 import type { GetStaticPaths } from 'astro';
 import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
-import Container from '@components/Container.astro';
 import { getEntry } from 'astro:content';
-import Event from '@components/Event.astro';
+import EventViewer from '@components/EventViewer/index.astro';
 import { getPage, getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
@@ -36,7 +35,5 @@ if (!page.data.autogenerate.type_id) {
 ---
 
 <Layout title={page.data.title} background='gray-100'>
-  <Container className='py-16'>
-    <Event sticky uuid={page.data.autogenerate.type_id} />
-  </Container>
+  <EventViewer uuids={page.data.autogenerate.type_id} />
 </Layout>

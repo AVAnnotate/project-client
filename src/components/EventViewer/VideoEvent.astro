@@ -1,0 +1,94 @@
+---
+import Container from '@components/Container.astro';
+import type { Includes } from '@ty/slate';
+import type { CollectionEntry } from 'astro:content';
+import RichText from '../RichText/index.astro';
+import Player from '@components/Player';
+import Annotations from './AnnotationUI/Annotations/index.astro';
+import AnnotationHeader from './AnnotationUI/Annotations/AnnotationHeader.astro';
+
+export interface Props {
+  event: CollectionEntry<'events'>;
+  annotationSets: CollectionEntry<'annotations'>[];
+  sticky?: boolean;
+  end?: number;
+  start?: number;
+  includes?: Includes[];
+  file?: string;
+  embed?: boolean;
+}
+
+const {
+  annotationSets,
+  event,
+  // include everything by default
+  includes = ['media', 'annotations', 'label', 'description'],
+  start,
+  end,
+  sticky,
+  file,
+} = Astro.props;
+
+const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
+
+const currentSet = annotationSets[0];
+
+if (!currentSet) {
+  throw new Error('Set not found.');
+}
+---
+
+<Container className='flex flex-col gap-6 bg-gray-100 py-6'>
+  {
+    (includes.includes('annotations') || includes.includes('media')) &&
+      Object.keys(event.data.audiovisual_files).map((file: string) => {
+        const url = event.data.audiovisual_files[file].file_url;
+        return (
+          <div
+            class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
+            data-player-id={file}
+            data-player-url={url}
+          >
+            {includes.includes('media') && (
+              <div>
+                {includes.includes('label') && (
+                  <h1 class='py-4'>{event.data.label}</h1>
+                )}
+                <Player
+                  url={url}
+                  id={file}
+                  client:only='react'
+                  type={event.data.item_type}
+                />
+                {includes.includes('description') && event.data.description && (
+                  <div class='my-4'>
+                    <RichText nodes={event.data.description} />
+                  </div>
+                )}
+                <div class='h-1 border-t border-gray-200 w-full' />
+                {event.data.citation && (
+                  <Container>
+                    <p>{event.data.citation}</p>
+                  </Container>
+                )}
+              </div>
+            )}
+            {includes.includes('annotations') && (
+              <div class='py-4'>
+                <AnnotationHeader
+                  playerId={file}
+                  annotationSet={currentSet}
+                  type={event.data.item_type}
+                />
+                <Annotations
+                  playerId={file}
+                  annotationSet={currentSet}
+                  type={event.data.item_type}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })
+  }
+</Container>

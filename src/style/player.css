@@ -85,3 +85,12 @@
   height: 24px;
   width: 24px;
 }
+
+.player video {
+  max-height: 500px;
+  background: #000;
+}
+
+.player div {
+  margin: auto;
+}
