@@ -242,7 +242,9 @@ export const createManifest = (
   });
 
   writeFileSync(
-    './client/src/content/manifests/manifest.json',
+    projectData.project.media_player === 'avannotate'
+      ? './client/src/content/manifests/manifest.json'
+      : './client/src-aviary/content/manifests/manifest.json',
     JSON.stringify(output)
   );
 };
