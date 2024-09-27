@@ -60,7 +60,7 @@ if (!currentSet) {
                   client:only='react'
                   type={event.data.item_type}
                 />
-                {includes.includes('description') && (
+                {includes.includes('description') && event.data.description && (
                   <div class='my-4'>
                     <RichText nodes={event.data.description} />
                   </div>

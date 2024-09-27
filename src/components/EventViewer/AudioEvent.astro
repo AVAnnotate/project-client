@@ -43,7 +43,7 @@ if (!currentSet) {
       <Container className='w-full'>
         {includes.includes('label') && <h1>{event.data.label}</h1>}
         {
-          includes.includes('description') && (
+          includes.includes('description') && event.data.description && (
             <RichText nodes={event.data.description} />
           )
         }
