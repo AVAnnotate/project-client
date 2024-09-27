@@ -45,7 +45,7 @@ export const createAnnotationPage = (
           id: pageId,
           type: 'AnnotationPage',
           label: {
-            en: [eventData.label],
+            en: [`${eventData.label}-${annotationData.set}`],
           },
           items: [],
         };
@@ -227,7 +227,7 @@ export const createManifest = (
                   },
                 ],
                 target: `${siteURL}/${snakeCase(
-                  eventData.label
+                  `${eventData.label}-${}`
                 )}-canvas${canvasCount}`,
               },
             ],

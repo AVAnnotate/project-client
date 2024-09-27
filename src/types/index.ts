@@ -105,6 +105,8 @@ export type AnnotationFile = {
 
   source_id: string;
 
+  set: string;
+
   annotations: Annotation[];
 };
 
