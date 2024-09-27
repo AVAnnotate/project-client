@@ -227,7 +227,7 @@ export const createManifest = (
                   },
                 ],
                 target: `${siteURL}/${snakeCase(
-                  `${eventData.label}-${}`
+                  `${eventData.label}`
                 )}-canvas${canvasCount}`,
               },
             ],
