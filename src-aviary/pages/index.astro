@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {Player} from '../components/Player';
+
+const url = `${Astro.url.origin}${Astro.url.pathname}/manifests/manifest.json`
+---
+
+<Layout title="Welcome to Astro.">
+	<main>
+		<Player manifestURL={url} client:only="react"/>
+	</main>
+</Layout>
+
+<style>
+	main {
+		font-size: 20px;
+		line-height: 1.6;
+	}
+</style>
