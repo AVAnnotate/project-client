@@ -45,7 +45,7 @@ export const createAnnotationPage = (
           id: pageId,
           type: 'AnnotationPage',
           label: {
-            en: [`${eventData.label}-${annotationData.set}`],
+            en: [annotationData.set],
           },
           items: [],
         };
