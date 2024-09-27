@@ -20,7 +20,7 @@ export const createAnnotationPage = (
   id: string,
   manifestId: string
 ) => {
-  let output: IIIFAnnotationPage | null = null;
+  let output: IIIFAnnotationPage[] = [];
   // Iterate all annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     if (file.endsWith('.json')) {
@@ -40,7 +40,7 @@ export const createAnnotationPage = (
       );
 
       if (annotationData.event_id === eventUUID) {
-        output = {
+        const obj: IIIFAnnotationPage = {
           '@context': 'http://iiif.io/api/presentation/3/context.json',
           id: pageId,
           type: 'AnnotationPage',
@@ -101,8 +101,10 @@ export const createAnnotationPage = (
             });
           });
 
-          output!.items!.push(item);
+          obj.items!.push(item);
         });
+
+        output.push(obj);
       }
     }
   });
@@ -168,7 +170,7 @@ export const createManifest = (
           items: [],
         };
 
-        const anno = createAnnotationPage(
+        const annos = createAnnotationPage(
           dataDir,
           siteURL,
           file.replace(/\.[^/.]+$/, ''),
@@ -180,24 +182,29 @@ export const createManifest = (
           `${siteURL}/manifests.json`
         );
 
-        if (anno) {
+        if (annos.length > 0) {
           if (allowSubPages === 'true' || allowSubPages === 'TRUE') {
-            writeFileSync(
-              `./client/src/content/manifests/${snakeCase(
-                eventData.label
-              )}-canvas${canvasCount}-${pageCount}.json`,
-              JSON.stringify(anno)
-            );
+            annos.forEach((anno) => {
+              writeFileSync(
+                `./client/src/content/manifests/${snakeCase(
+                  eventData.label
+                )}-canvas${canvasCount}-${pageCount}.json`,
+                JSON.stringify(anno)
+              );
 
-            event.annotations.push({
-              type: 'AnnotationPage',
-              id: `${siteURL}/manifests/${snakeCase(
-                eventData.label
-              )}-canvas${canvasCount}-${pageCount}.json`,
-              label: { en: ['Annotations'] },
+              event.annotations = [
+                ...event.annotations,
+                {
+                  type: 'AnnotationPage',
+                  id: `${siteURL}/manifests/${snakeCase(
+                    eventData.label
+                  )}-canvas${canvasCount}-${pageCount}.json`,
+                  label: { en: ['Annotations'] },
+                },
+              ];
             });
           } else {
-            event.annotations.push(anno);
+            event.annotations = [...event.annotations, ...annos];
           }
 
           event.items.push({
