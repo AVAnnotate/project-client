@@ -24,6 +24,7 @@ export const createAnnotationPage = (
   // Iterate all annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     // Read in the file
+    console.log('Annotation file: ', file);
     // All annotation pages are assumed to be in ./annotations
     const annotationData: AnnotationFile = JSON.parse(
       fs.readFileSync(`${dataPath}/annotations/${file}`, 'utf8')
@@ -96,6 +97,7 @@ export const createAnnotationPage = (
             value: `${tag.category}:${tag.tag}`,
             format: 'text/plain',
             purpose: 'tagging',
+            motivation: 'tagging',
           });
         });
 
