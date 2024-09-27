@@ -23,86 +23,87 @@ export const createAnnotationPage = (
   let output: IIIFAnnotationPage | null = null;
   // Iterate all annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
-    // Read in the file
-    console.log('Annotation file: ', file);
-    // All annotation pages are assumed to be in ./annotations
-    const annotationData: AnnotationFile = JSON.parse(
-      fs.readFileSync(`${dataPath}/annotations/${file}`, 'utf8')
-    );
+    if (file.endsWith('.json')) {
+      // Read in the file
+      // All annotation pages are assumed to be in ./annotations
+      const annotationData: AnnotationFile = JSON.parse(
+        fs.readFileSync(`${dataPath}/annotations/${file}`, 'utf8')
+      );
 
-    // Read in the matching Event file
-    // All Event files are assumed to be in ./events
-    const eventData: EventFile = JSON.parse(
-      fs.readFileSync(
-        `${dataPath}/events/${annotationData.event_id}.json`,
-        'utf8'
-      )
-    );
+      // Read in the matching Event file
+      // All Event files are assumed to be in ./events
+      const eventData: EventFile = JSON.parse(
+        fs.readFileSync(
+          `${dataPath}/events/${annotationData.event_id}.json`,
+          'utf8'
+        )
+      );
 
-    if (annotationData.event_id === eventUUID) {
-      output = {
-        '@context': 'http://iiif.io/api/presentation/3/context.json',
-        id: pageId,
-        type: 'AnnotationPage',
-        label: {
-          en: [eventData.label],
-        },
-        items: [],
-      };
-
-      annotationData.annotations.forEach((annotation) => {
-        const item: IIIFAnnotationItem = {
-          '@context': 'http://www.w3.org/ns/anno.jsonld',
-          type: 'Annotation',
-          id: id,
-          motivation: ['commenting', 'tagging'],
-          body: [
-            {
-              type: 'TextualBody',
-              value: annotation.annotation
-                .map((n) => Node.string(n))
-                .join('\n'),
-              format: 'text/plain',
-              motivation: 'commenting',
-            },
-          ],
-          target: {
-            source: {
-              id: targetCanvas,
-              type: 'Canvas',
-              partOf: [
-                {
-                  id: manifestId,
-                  type: 'Manifest',
-                },
-              ],
-            },
-            selector:
-              annotation.end_time &&
-              annotation.end_time !== annotation.start_time
-                ? {
-                    type: 'RangeSelector',
-                    t: `${annotation.start_time},${annotation.end_time}`,
-                  }
-                : {
-                    type: 'PointSelector',
-                    t: `${annotation.start_time}`,
-                  },
+      if (annotationData.event_id === eventUUID) {
+        output = {
+          '@context': 'http://iiif.io/api/presentation/3/context.json',
+          id: pageId,
+          type: 'AnnotationPage',
+          label: {
+            en: [eventData.label],
           },
+          items: [],
         };
 
-        annotation.tags.forEach((tag) => {
-          item.body.push({
-            type: 'TextualBody',
-            value: `${tag.category}:${tag.tag}`,
-            format: 'text/plain',
-            purpose: 'tagging',
-            motivation: 'tagging',
-          });
-        });
+        annotationData.annotations.forEach((annotation) => {
+          const item: IIIFAnnotationItem = {
+            '@context': 'http://www.w3.org/ns/anno.jsonld',
+            type: 'Annotation',
+            id: id,
+            motivation: ['commenting', 'tagging'],
+            body: [
+              {
+                type: 'TextualBody',
+                value: annotation.annotation
+                  .map((n) => Node.string(n))
+                  .join('\n'),
+                format: 'text/plain',
+                motivation: 'commenting',
+              },
+            ],
+            target: {
+              source: {
+                id: targetCanvas,
+                type: 'Canvas',
+                partOf: [
+                  {
+                    id: manifestId,
+                    type: 'Manifest',
+                  },
+                ],
+              },
+              selector:
+                annotation.end_time &&
+                annotation.end_time !== annotation.start_time
+                  ? {
+                      type: 'RangeSelector',
+                      t: `${annotation.start_time},${annotation.end_time}`,
+                    }
+                  : {
+                      type: 'PointSelector',
+                      t: `${annotation.start_time}`,
+                    },
+            },
+          };
 
-        output!.items!.push(item);
-      });
+          annotation.tags.forEach((tag) => {
+            item.body.push({
+              type: 'TextualBody',
+              value: `${tag.category}:${tag.tag}`,
+              format: 'text/plain',
+              purpose: 'tagging',
+              motivation: 'tagging',
+            });
+          });
+
+          output!.items!.push(item);
+        });
+      }
     }
   });
 
