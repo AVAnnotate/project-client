@@ -11,5 +11,5 @@ export const dynamicConfig = {
   integrations: [react(), tailwind()],
   site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
   base: import.meta.env.PROD ? `${project.project.slug}` : 'dist',
-  src: import.meta.env.PROD ? project.project.media_player === 'avannotate' ? './src' : project.project.media_player === 'aviary' ? './src-aviary' : './src' : './src'
+  srcDir: import.meta.env.PROD ? project.project.media_player === 'avannotate' ? './src' : project.project.media_player === 'aviary' ? './src-aviary' : './src' : './src'
 }
