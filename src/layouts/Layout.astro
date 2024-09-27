@@ -12,15 +12,16 @@ interface Props {
   background?: string;
   title?: string;
   projectName?: string;
-  projectBy?: string;
 }
 
 const {
   background,
   title = projectData.data.project.title,
   projectName = projectData.data.project.title,
-  projectBy = projectData.data.project.creator,
 } = Astro.props;
+
+const projectBy =
+  projectData.data.project.authors || projectData.data.project.creator;
 ---
 
 <!doctype html>
