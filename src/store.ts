@@ -11,7 +11,7 @@ export interface AnnotationState {
   searchQuery?: string;
   activeFilters?: { category: string; tag: string }[];
   annotationStarts?: { start: number; end?: number }[];
-  setUuid: string;
+  sets: string[];
   avFileUuid: string;
 }
 

@@ -75,8 +75,8 @@ if (!currentSet) {
       }
       <Container className='w-full'>
         <AnnotationHeader
-          annotationSet={currentSet}
           playerId={avFileUuid}
+          annotationSets={annotationSets}
           type={event.data.item_type}
         />
       </Container>
