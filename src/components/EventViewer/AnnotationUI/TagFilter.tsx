@@ -96,12 +96,12 @@ const TagFilter = (props: TagFilterProps) => {
         className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4'
       >
         <div className='flex flex-row justify-between w-full pb-2'>
-          <p className='text-lg font-bold'>Tags</p>
+          <p className='text-sm  font-semibold'>Tags</p>
           {thisPlayer.activeFilters && thisPlayer.activeFilters.length ? (
-            <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default'>
+            <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
               <p>{`${thisPlayer.activeFilters.length} filter${thisPlayer.activeFilters.length > 1 ? 's' : ''} applied`}</p>
               <XMarkIcon
-                className='size-4 text-white/70 hover:text-white hover:scale-105 cursor-pointer'
+                className='size-4 text-white hover:scale-105 cursor-pointer'
                 onClick={() => {
                   $pagePlayersState.setKey(playerId, {
                     ...thisPlayer,
@@ -116,7 +116,7 @@ const TagFilter = (props: TagFilterProps) => {
           categories.map((cat, idx) => (
             <React.Fragment key={idx}>
               {idx > 0 ? (
-                <div className='h-[1px] bg-gray-500 rounded-full w-full my-3' />
+                <div className='h-[1px] bg-gray-200 w-full my-3' />
               ) : null}
               <div className='flex flex-col gap-2' key={idx}>
                 <div className='flex flex-row gap-3 py-1'>
@@ -131,11 +131,11 @@ const TagFilter = (props: TagFilterProps) => {
                     onChange={() => {
                       toggleCategory(cat);
                     }}
-                    className='group size-6 rounded-md bg-white p-1 ring-1 ring-gray-500 ring-inset data-[checked]:bg-white'
+                    className='group size-4 bg-white rounded-sm data-[checked]:bg-primary p-0.5 ring-1 ring-gray-300 ring-inset data-[checked]:ring-primary'
                   >
-                    <CheckIcon className='hidden size-4 group-data-[checked]:block' />
+                    <CheckIcon className='hidden size-3 group-data-[checked]:block text-white' />
                   </Checkbox>
-                  <p className='capitalize font-bold'>
+                  <p className='capitalize font-semibold text-xs'>
                     {cat.replaceAll('_', '')}
                   </p>
                 </div>
@@ -158,7 +158,7 @@ const TagFilter = (props: TagFilterProps) => {
                         thisPlayer.activeFilters?.findIndex(
                           (t) => t.category === cat && t.tag === tag
                         ) != -1
-                          ? ' border-2 border-black'
+                          ? 'outline outline-1 outline-black'
                           : ''
                       }
                       onClick={() => {
