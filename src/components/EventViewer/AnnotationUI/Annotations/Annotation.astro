@@ -4,6 +4,12 @@ import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import TagPill from '@components/tags/TagPill';
 import { formatTimestamp } from 'src/utils/player';
 import { getEntry } from 'astro:content';
+import type { Annotation } from '@ty/index';
+
+interface Props {
+  ann: Annotation & { set: string };
+  playerId: string;
+}
 
 const { ann, playerId } = Astro.props;
 
@@ -16,6 +22,7 @@ const tagGroups = projectData.data.project.tags.tagGroups;
   data-start={ann.start_time}
   data-end={ann.end_time}
   data-tags={JSON.stringify(ann.tags)}
+  data-set={ann.set}
 >
   <div class='flex flex-row gap-2 w-[140px] items-start'>
     <button

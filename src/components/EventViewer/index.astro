@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import type { SlateEventNodeProps } from '@ty/slate';
 import AudioEvent from './AudioEvent.astro';
 import VideoEvent from './VideoEvent.astro';
-import type { Project } from '@ty/index';
 
 export interface Props extends Omit<SlateEventNodeProps, 'uuid'> {
   end?: number;

@@ -4,15 +4,16 @@ import Annotation from './Annotation.astro';
 
 export interface Props {
   playerId: string;
-  annotationSet: CollectionEntry<'annotations'>;
+  annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
 }
 
-const { playerId, annotationSet, type } = Astro.props;
+const { playerId, annotationSets, type } = Astro.props;
 
-const sortedAnnotations = annotationSet.data.annotations.sort(
-  (a: any, b: any) => a.start_time - b.start_time
-);
+const sortedAnnotations = annotationSets
+  .map((set) => set.data.annotations.map((ann) => ({ ...ann, set: set.id })))
+  .flat()
+  .sort((a: any, b: any) => a.start_time - b.start_time);
 ---
 
 <div class={`flex flex-col`}>
@@ -24,7 +25,7 @@ const sortedAnnotations = annotationSet.data.annotations.sort(
       id={playerId}
     >
       {
-        sortedAnnotations.map((ann: any) => {
+        sortedAnnotations.map((ann) => {
           return <Annotation ann={ann} playerId={playerId} />;
         })
       }
@@ -119,14 +120,24 @@ const sortedAnnotations = annotationSet.data.annotations.sort(
         }
       }
     }
-    //filter on text and tags
+    //filter on sets, text, and tags
     if (
       changed &&
       (state[changed].searchQuery != oldState[changed].searchQuery ||
-        state[changed].activeFilters != oldState[changed].activeFilters)
+        state[changed].activeFilters != oldState[changed].activeFilters ||
+        state[changed].sets.length != oldState[changed].sets.length)
     ) {
       for (let i = 0; i < annotationNodes.length; i++) {
         const thisNode = annotationNodes[i];
+
+        const setFiltersEmpty = state[changed].sets.length === 0;
+        const set = thisNode.getAttribute('data-set');
+
+        if (set) {
+          if (!setFiltersEmpty) {
+          }
+        }
+
         const text = thisNode.textContent;
         let tags: any[] = [];
         if (thisNode instanceof HTMLElement && thisNode.dataset.tags) {
