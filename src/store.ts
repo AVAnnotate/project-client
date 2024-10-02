@@ -9,7 +9,7 @@ export interface AnnotationState {
   showTags?: boolean;
   currentAnnotation?: number;
   searchQuery?: string;
-  activeFilters?: { category: string; tag: string }[];
+  tags: { category: string; tag: string }[];
   annotationStarts?: { start: number; end?: number }[];
   sets: string[];
   avFileUuid: string;

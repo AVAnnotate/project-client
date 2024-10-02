@@ -65,7 +65,7 @@ const TagFilter = (props: TagFilterProps) => {
   const categories = Object.keys(allTags);
 
   const toggleTag = (tag: { category: string; tag: string }) => {
-    const current = thisPlayer.activeFilters || [];
+    const current = thisPlayer.tags || [];
     const updated = current?.find(
       (t) => t.category === tag.category && t.tag === tag.tag
     )
@@ -73,20 +73,20 @@ const TagFilter = (props: TagFilterProps) => {
       : [...current, tag];
     $pagePlayersState.setKey(playerId, {
       ...thisPlayer,
-      activeFilters: updated,
+      tags: updated,
     });
   };
 
   const toggleCategory = (category: string) => {
     const current =
-      thisPlayer.activeFilters?.filter(
+      thisPlayer.tags?.filter(
         (tag) => tag.category.toLowerCase() === category.toLowerCase()
       ) || [];
     if (current.length === allTags[category].tags.length) {
       //in this case, everything in the category is already checked, and we want to uncheck them
       $pagePlayersState.setKey(playerId, {
         ...thisPlayer,
-        activeFilters: thisPlayer.activeFilters?.filter(
+        tags: thisPlayer.tags?.filter(
           (tag) => tag.category.toLowerCase() != category.toLowerCase()
         ),
       });
@@ -95,9 +95,7 @@ const TagFilter = (props: TagFilterProps) => {
         category: category,
         tag: tag,
       }));
-      const active = thisPlayer.activeFilters
-        ? [...thisPlayer.activeFilters]
-        : [];
+      const active = thisPlayer.tags ? [...thisPlayer.tags] : [];
       allCategoryTags.forEach((tag) => {
         if (
           active.findIndex(
@@ -111,7 +109,7 @@ const TagFilter = (props: TagFilterProps) => {
       });
       $pagePlayersState.setKey(playerId, {
         ...thisPlayer,
-        activeFilters: active,
+        tags: active,
       });
     }
   };
@@ -135,9 +133,9 @@ const TagFilter = (props: TagFilterProps) => {
       <PopoverButton className='bg-white rounded-lg flex flex-row justify-center items-center gap-2 px-2 py-1.5 data-[open]:bg-blue-hover font-semibold'>
         <AdjustmentsVerticalIcon className='size-4' />
         <span>Filter</span>
-        {thisPlayer.activeFilters && thisPlayer.activeFilters.length ? (
+        {thisPlayer.tags && thisPlayer.tags.length ? (
           <div className='rounded-2xl px-1.5 py-0.5 flex items-center justify-center text-white bg-primary text-xs'>
-            {thisPlayer.activeFilters.length}
+            {thisPlayer.tags.length}
           </div>
         ) : null}
       </PopoverButton>
@@ -148,21 +146,23 @@ const TagFilter = (props: TagFilterProps) => {
         <div className='flex flex-row justify-between w-full pb-2'>
           {props.annotationSets.length > 1 && (
             <div className='w-full pb-2'>
-              <p className='text-sm font-semibold'>Sets</p>
-              {thisPlayer.sets.length > 1 && (
-                <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
-                  <p>{`${thisPlayer.sets.length} filter${thisPlayer.sets.length > 1 ? 's' : ''} applied`}</p>
-                  <XMarkIcon
-                    className='size-4 text-white hover:scale-105 cursor-pointer'
-                    onClick={() => {
-                      $pagePlayersState.setKey(playerId, {
-                        ...thisPlayer,
-                        sets: [],
-                      });
-                    }}
-                  />
-                </div>
-              )}
+              <div className='flex flex-row justify-between w-full pb-2'>
+                <p className='text-sm font-semibold'>Sets</p>
+                {thisPlayer.sets.length > 0 && (
+                  <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
+                    <p>{`${thisPlayer.sets.length} filter${thisPlayer.sets.length > 1 ? 's' : ''} applied`}</p>
+                    <XMarkIcon
+                      className='size-4 text-white hover:scale-105 cursor-pointer'
+                      onClick={() => {
+                        $pagePlayersState.setKey(playerId, {
+                          ...thisPlayer,
+                          sets: [],
+                        });
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
               {props.annotationSets.map((set) => (
                 <div className='block' key={set.id}>
                   <div className='flex flex-row gap-3 py-1'>
@@ -188,15 +188,15 @@ const TagFilter = (props: TagFilterProps) => {
         </div>
         <div className='flex flex-row justify-between w-full pb-2'>
           <p className='text-sm  font-semibold'>Tags</p>
-          {thisPlayer.activeFilters && thisPlayer.activeFilters.length ? (
+          {thisPlayer.tags && thisPlayer.tags.length ? (
             <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
-              <p>{`${thisPlayer.activeFilters.length} filter${thisPlayer.activeFilters.length > 1 ? 's' : ''} applied`}</p>
+              <p>{`${thisPlayer.tags.length} filter${thisPlayer.tags.length > 1 ? 's' : ''} applied`}</p>
               <XMarkIcon
                 className='size-4 text-white hover:scale-105 cursor-pointer'
                 onClick={() => {
                   $pagePlayersState.setKey(playerId, {
                     ...thisPlayer,
-                    activeFilters: [],
+                    tags: [],
                   });
                 }}
               />
@@ -213,8 +213,8 @@ const TagFilter = (props: TagFilterProps) => {
                 <div className='flex flex-row gap-3 py-1'>
                   <Checkbox
                     checked={
-                      thisPlayer.activeFilters &&
-                      thisPlayer.activeFilters.filter(
+                      thisPlayer.tags &&
+                      thisPlayer.tags.filter(
                         (tag) =>
                           tag.category.toLowerCase() === cat.toLowerCase()
                       ).length === allTags[cat].tags.length
@@ -237,16 +237,16 @@ const TagFilter = (props: TagFilterProps) => {
                       key={idx}
                       tag={tag}
                       icon={
-                        thisPlayer.activeFilters &&
-                        thisPlayer.activeFilters?.findIndex(
+                        thisPlayer.tags &&
+                        thisPlayer.tags?.findIndex(
                           (t) => t.category == cat && t.tag == tag
                         ) != -1
                           ? CheckIcon
                           : undefined
                       }
                       className={
-                        thisPlayer.activeFilters &&
-                        thisPlayer.activeFilters?.findIndex(
+                        thisPlayer.tags &&
+                        thisPlayer.tags?.findIndex(
                           (t) => t.category === cat && t.tag === tag
                         ) != -1
                           ? 'outline outline-1 outline-black'

@@ -34,6 +34,7 @@ const sortedAnnotations = annotationSets
 </div>
 
 <script>
+  import type { Tag } from '@ty/index.ts';
   import { $pagePlayersState } from 'src/store.ts';
   const annotationPlayNodes = document.getElementsByClassName('playAnnotation');
   const annotationNodes = document.getElementsByClassName('annotationNode');
@@ -120,77 +121,75 @@ const sortedAnnotations = annotationSets
         }
       }
     }
+
     //filter on sets, text, and tags
-    if (
-      changed &&
-      (state[changed].searchQuery != oldState[changed].searchQuery ||
-        state[changed].activeFilters != oldState[changed].activeFilters ||
-        state[changed].sets.length != oldState[changed].sets.length)
-    ) {
+    if (changed) {
       for (let i = 0; i < annotationNodes.length; i++) {
         const thisNode = annotationNodes[i];
 
-        const setFiltersEmpty = state[changed].sets.length === 0;
-        const set = thisNode.getAttribute('data-set');
+        // hide if its set is hidden
+        if (state[changed].sets.length > 0) {
+          const setFiltersEmpty = state[changed].sets.length === 0;
+          const set = thisNode.getAttribute('data-set');
 
-        if (set) {
-          if (!setFiltersEmpty) {
-          }
-        }
-
-        const text = thisNode.textContent;
-        let tags: any[] = [];
-        if (thisNode instanceof HTMLElement && thisNode.dataset.tags) {
-          tags = JSON.parse(thisNode.dataset.tags);
-        }
-        if (
-          (!state[changed].searchQuery || state[changed].searchQuery === '') &&
-          (!state[changed].activeFilters ||
-            // @ts-ignore
-            !state[changed]!.activeFilters.length)
-        ) {
-          thisNode.classList.remove('hidden');
-          thisNode.classList.add('flex');
-          continue;
-        } else if (
-          state[changed].searchQuery?.length &&
-          !text
-            ?.toLowerCase()
-            // @ts-ignore
-            .includes(state[changed]!.searchQuery.toLowerCase())
-        ) {
-          thisNode.classList.add('hidden');
-          thisNode.classList.remove('flex');
-          continue;
-        } else if (state[changed].activeFilters?.length) {
-          let show = false;
-          // @ts-ignore
-          for (let j = 0; j < state[changed]!.activeFilters.length; j++) {
-            // @ts-ignore
-            const tag = state[changed]!.activeFilters[j];
-            if (
-              tags.find(
-                (t) =>
-                  t.category.toLowerCase() === tag.category.toLowerCase() &&
-                  t.tag.toLowerCase() === tag.tag.toLowerCase()
-              )
-            ) {
-              show = true;
-              break;
-            }
-          }
-          if (show) {
-            thisNode.classList.remove('hidden');
-            thisNode.classList.add('flex');
-          } else {
+          if (set && !setFiltersEmpty && !state[changed].sets.includes(set)) {
             thisNode.classList.remove('flex');
             thisNode.classList.add('hidden');
+            continue;
           }
-        } else {
-          //we can only get here if there's a text filter but no tag filters and the node is a match for the text query, so it should be shown
-          thisNode.classList.remove('hidden');
-          thisNode.classList.add('flex');
         }
+
+        // hide if its sets are hidden
+        if (state[changed].tags.length > 0) {
+          const tags =
+            thisNode instanceof HTMLElement && thisNode.dataset.tags
+              ? (JSON.parse(thisNode.dataset.tags) as Tag[])
+              : null;
+
+          if (tags) {
+            let match = false;
+            for (let i = 0; i < tags.length; i++) {
+              const tag = tags[i];
+              if (
+                state[changed].tags.find(
+                  (tf) =>
+                    tf.category.toLowerCase() === tag.category.toLowerCase() &&
+                    tf.tag.toLowerCase() === tag.tag.toLowerCase()
+                )
+              ) {
+                match = true;
+                break;
+              }
+            }
+
+            if (!match) {
+              thisNode.classList.remove('flex');
+              thisNode.classList.add('hidden');
+              continue;
+            }
+          }
+        }
+
+        // hide if the search query doesn't include any of its text
+        if (state[changed].searchQuery) {
+          const text = thisNode.textContent;
+
+          if (text) {
+            const match = text
+              .toLowerCase()
+              .includes(state[changed].searchQuery.toLowerCase());
+
+            if (!match) {
+              thisNode.classList.remove('flex');
+              thisNode.classList.add('hidden');
+              continue;
+            }
+          }
+        }
+
+        // display the annotation if it passed all the above checks
+        thisNode.classList.add('flex');
+        thisNode.classList.remove('hidden');
       }
     }
   });
