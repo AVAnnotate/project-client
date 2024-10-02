@@ -7,11 +7,13 @@ import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 // wrap around Astro's standard collections API while guaranteeing that we get
 // normal page objects only, and typecasting that way.
 
-interface PageCollectionEntry extends Omit<CollectionEntry<'pages'>, 'data'> {
+export interface PageCollectionEntry
+  extends Omit<CollectionEntry<'pages'>, 'data'> {
   data: Page;
 }
 
-interface OrderCollectionEntry extends Omit<CollectionEntry<'pages'>, 'data'> {
+export interface OrderCollectionEntry
+  extends Omit<CollectionEntry<'pages'>, 'data'> {
   data: string[];
 }
 
