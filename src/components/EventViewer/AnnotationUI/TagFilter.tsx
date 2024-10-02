@@ -143,11 +143,12 @@ const TagFilter = (props: TagFilterProps) => {
         anchor='bottom end'
         className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4'
       >
+        <p className='text-md font-semibold mb-4'>Filters</p>
         <div className='flex flex-row justify-between w-full pb-2'>
           {props.annotationSets.length > 1 && (
             <div className='w-full pb-2'>
               <div className='flex flex-row justify-between w-full pb-2'>
-                <p className='text-sm font-semibold'>Sets</p>
+                <p className='text-sm font-semibold'>Annotation Sets</p>
                 {thisPlayer.sets.length > 0 && (
                   <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
                     <p>{`${thisPlayer.sets.length} filter${thisPlayer.sets.length > 1 ? 's' : ''} applied`}</p>
