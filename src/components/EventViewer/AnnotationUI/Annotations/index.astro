@@ -177,7 +177,7 @@ const sortedAnnotations = annotationSets
           if (text) {
             const match = text
               .toLowerCase()
-              .includes(state[changed].searchQuery.toLowerCase());
+              .includes(state[changed].searchQuery!.toLowerCase());
 
             if (!match) {
               thisNode.classList.remove('flex');
