@@ -1,0 +1,49 @@
+---
+import RichText from '@components/RichText/index.astro';
+import { PlayCircleIcon } from '@heroicons/react/24/outline';
+import TagPill from '@components/tags/TagPill';
+import { formatTimestamp } from 'src/utils/player';
+import { getEntry } from 'astro:content';
+
+const { ann, playerId } = Astro.props;
+
+const projectData = await getEntry('project', 'project');
+const tagGroups = projectData.data.project.tags.tagGroups;
+---
+
+<div
+  class='annotationNode flex flex-row justify-between gap-4 p-4 my-4 rounded-md bg-white'
+  data-start={ann.start_time}
+  data-end={ann.end_time}
+  data-tags={JSON.stringify(ann.tags)}
+>
+  <div class='flex flex-row gap-2 w-[140px] items-start'>
+    <button
+      class='playAnnotation'
+      data-start={ann.start_time}
+      data-end={ann.end_time}
+      data-player-id={playerId}
+    >
+      <PlayCircleIcon className='h-6 w-6' />
+    </button>
+    <p class='w-[140px] font-semibold text-sm'>
+      {`${formatTimestamp(ann.start_time, false)}`}&nbsp;-&nbsp;{
+        `${formatTimestamp(ann.end_time, false)}`
+      }
+    </p>
+  </div>
+  <div class='w-full flex flex-col gap-4'>
+    <RichText nodes={ann.annotation} />
+    <div class='flex flex-row gap-4 annotationTags' data-player-id={playerId}>
+      {
+        ann.tags?.map((tag: any) => {
+          const group = tagGroups.find(
+            (group) =>
+              group.category.toLowerCase() == tag.category.toLowerCase()
+          );
+          return <TagPill tag={tag.tag} color={group ? group.color : '#FFF'} />;
+        })
+      }
+    </div>
+  </div>
+</div>

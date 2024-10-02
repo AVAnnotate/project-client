@@ -52,9 +52,15 @@ export interface IIIFCanvas extends IIIFClass {
   annotations: IIIFAnnotationPage[];
   items: IIIFAnnotationPage[];
 }
+
+export interface IIIFMetadata {
+  label: IIIFLabel;
+  value: IIIFLabel;
+}
 export interface IIIFPresentationManifest extends IIIFClass {
   '@context': string;
   homepage: IIIFHomepage[];
   provider?: IIIFProvider[];
   items: IIIFCanvas[];
+  metadata: IIIFMetadata[];
 }

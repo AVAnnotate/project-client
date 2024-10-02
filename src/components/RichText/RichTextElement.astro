@@ -1,9 +1,24 @@
 ---
+import EventViewer from '@components/EventViewer/index.astro';
+
 const { attributes, element } = Astro.props;
+
+const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
+  switch (size) {
+    case 'thumbnail':
+      return 'max-w-40';
+    case 'medium':
+      return 'max-w-[400px]';
+    case 'large':
+      return 'max-w-[640px]';
+    case 'full':
+      return 'max-w-full';
+  }
+};
 ---
 
 {
-  (() => {
+  (async () => {
     const style = { textAlign: element.align };
 
     switch (element.type) {
@@ -46,7 +61,7 @@ const { attributes, element } = Astro.props;
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img src={element.url} class={`slate-img-${element.size}`} />
+            <img src={element.url} class={getImageClass(element.size)} />
             <slot />
           </div>
         );
@@ -70,7 +85,17 @@ const { attributes, element } = Astro.props;
           </div>
         );
       case 'event':
-      // todo
+        return (
+          <div class='bg-gray-100 p-4'>
+            <EventViewer
+              end={element.end}
+              start={element.start}
+              includes={element.includes}
+              uuids={element.uuid}
+              embed
+            />
+          </div>
+        );
       case 'event-comparison':
       // todo
       default:
@@ -82,3 +107,8 @@ const { attributes, element } = Astro.props;
     }
   })()
 }
+<style>
+  p {
+    margin-bottom: 1em;
+  }
+</style>

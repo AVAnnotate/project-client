@@ -36,13 +36,18 @@ if (!annotationSets.length) {
 
 const events = await getCollection('events');
 
-//a slightly overly elaborate way to retrieve the proper label for the event, necessary since the annotation file doesn't contain it so we need to go looking in the event files
-for (let i = 0; i < annotationSets.length; i++) {
-  const event = events.find((ev) => ev.id == annotationSets[i].data.event_id);
-  if (event) {
-    annotationSets[i].data['event_label'] = event.data.label;
-  }
-}
+// create a sets array that includes the label for the corresponding event
+const labeledSets = annotationSets.map((set) => {
+  const event = events.find((ev) => ev.id === set.data.event_id);
+  const eventLabel = event ? event.data.label : '';
+
+  return {
+    ...set,
+    eventLabel,
+  };
+});
+
+for (let i = 0; i < annotationSets.length; i++) {}
 const detectTag = (
   tag: { tag: string; category: string },
   ann: { tag: string; category: string }[]
@@ -55,7 +60,7 @@ const detectTag = (
     tag: tag.tag.toLowerCase(),
     category: tag.category.toLowerCase(),
   };
-  return !!lowerCaseAnn.find((t) => t.tag == lowerCaseTag.tag); //should also match the category but for now the data is bugged so all the categories are speaker
+  return !!lowerCaseAnn.find((t) => t.tag === lowerCaseTag.tag); //should also match the category but for now the data is bugged so all the categories are speaker
 };
 const getTagCount = (tag: { tag: string; category: string }) => {
   let count = 0;
@@ -111,14 +116,14 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
           {tagData[cat].tags.length ? (
             <div class='w-full py-6 flex flex-col gap-6'>
               <h3 class='text-lg capitalize'>{cat.replaceAll('_', '')}</h3>
-              {annotationSets.map((set) => (
+              {labeledSets.map((set) => (
                 <div class='flex flex-col gap-4'>
-                  <p>{set.data.event_label}</p>
+                  <p>{set.eventLabel}</p>
                   <div class='flex flex-row overflow-x-auto w-full h-[50px] gap-1'>
                     {set.data.annotations.map((ann: any) => {
                       const tags = ann.tags.filter(
                         (tag: any) =>
-                          tag.category.toLowerCase() == cat.toLowerCase()
+                          tag.category.toLowerCase() === cat.toLowerCase()
                       );
                       return (
                         <div

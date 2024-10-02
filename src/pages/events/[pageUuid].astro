@@ -2,10 +2,9 @@
 import type { GetStaticPaths } from 'astro';
 import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
-import Container from '@components/Container.astro';
-import RichText from '@components/RichText/index.astro';
-import PlayerWithAnnotations from '@components/PlayerWithAnnotations.astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+import EventViewer from '@components/EventViewer/index.astro';
+import { getPage, getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
 
@@ -15,10 +14,7 @@ const baseUrl = import.meta.env.PROD
 
 export const getStaticPaths = (async () => {
   // filter out custom pages
-  const pages = await getCollection(
-    'pages',
-    (page) => page.id !== 'order' && page.data.autogenerate.enabled
-  );
+  const pages = await getPages((page) => page.data.autogenerate.enabled);
 
   return pages.map((page) => ({
     params: { pageUuid: page.id },
@@ -31,55 +27,13 @@ if (!pageUuid) {
   return Astro.redirect(`/${baseUrl}`);
 }
 
-const page = await getEntry('pages', pageUuid);
+const page = await getPage(pageUuid);
 
-const typeId: string | string[] | undefined = page.data.autogenerate.type_id;
-
-if (!typeId) {
-  console.log('No events listed');
+if (!page.data.autogenerate.type_id) {
   return Astro.redirect(`/${baseUrl}`);
 }
-const associatedEvents = await getCollection('events', (ev) =>
-  typeof typeId === 'string' ? ev.id === typeId : typeId.includes(ev.id)
-);
-
-const annotationData = await getCollection('annotations');
-
-const annotations = annotationData.filter((ad) =>
-  Array.isArray(typeId)
-    ? typeId.includes(ad.data.event_id)
-    : ad.data.event_id === typeId
-);
 ---
 
-<Layout title={page.data.title}>
-  <Container className='py-16'>
-    {
-      associatedEvents.map((event: any) => {
-        return (
-          <div class='flex flex-col gap-6'>
-            <h1>{event.data.label}</h1>
-            <RichText nodes={event.data.description} />
-            {Object.keys(event.data.audiovisual_files).map((file: string) => {
-              const url: string = event.data.audiovisual_files[file].file_url;
-              const annotationsToShow = annotations
-                .find((ann) => ann.data.source_id == file)
-                ?.data.annotations.sort(
-                  (a: any, b: any) => a.start_time - b.start_time
-                );
-              return (
-                <PlayerWithAnnotations
-                  file={file}
-                  annotations={annotationsToShow}
-                  url={url}
-                  sticky
-                />
-              );
-            })}
-            <p>{event.data.citation}</p>
-          </div>
-        );
-      })
-    }
-  </Container>
+<Layout title={page.data.title} background='gray-100'>
+  <EventViewer uuids={page.data.autogenerate.type_id} />
 </Layout>

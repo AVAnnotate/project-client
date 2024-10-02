@@ -8,33 +8,33 @@ const { nodes } = Astro.props;
 
 <div>
   {
-    nodes.map((node: Node) => {
-      const serialize = (node2: Node) => {
-        if (Text.isText(node2)) {
+    (() => {
+      const serialize = (node: Node) => {
+        if (Text.isText(node)) {
           return (
-            <RichTextLeaf attributes={{ ...node2 }} leaf={node2}>
-              {node2.text}
+            <RichTextLeaf attributes={{ ...node }} leaf={node}>
+              {node.text}
             </RichTextLeaf>
           );
         }
 
-        if (node2.children) {
-          const children = node2.children.map((n) => serialize(n));
+        if (node.children) {
+          const children = node.children.map((n) => serialize(n));
           return (
-            <RichTextLeaf leaf={node2}>
-              <RichTextElement element={node2}>{children}</RichTextElement>
+            <RichTextLeaf leaf={node}>
+              <RichTextElement element={node}>{children}</RichTextElement>
             </RichTextLeaf>
           );
         } else {
           return (
-            <RichTextLeaf leaf={node2}>
-              <RichTextElement element={node2} />
+            <RichTextLeaf leaf={node}>
+              <RichTextElement element={node} />
             </RichTextLeaf>
           );
         }
       };
 
-      return serialize(node);
-    })
+      return nodes.map((node: Node) => serialize(node));
+    })()
   }
 </div>

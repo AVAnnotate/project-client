@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Container from '../../components/Container.astro';
 import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import TagPill from '@components/tags/TagPill.astro';
+import TagPill from '@components/tags/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
@@ -42,7 +42,7 @@ const detectTag = (
     tag: tag.tag.toLowerCase(),
     category: tag.category.toLowerCase(),
   };
-  return !!lowerCaseAnn.find((t) => t.tag == lowerCaseTag.tag); //should also match the category but for now the data is bugged so all the categories are speaker
+  return !!lowerCaseAnn.find((t) => t.tag === lowerCaseTag.tag); //should also match the category but for now the data is bugged so all the categories are speaker
 };
 const getTagCount = (tag: { tag: string; category: string }) => {
   let count = 0;
