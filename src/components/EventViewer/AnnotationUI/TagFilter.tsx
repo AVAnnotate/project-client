@@ -133,11 +133,11 @@ const TagFilter = (props: TagFilterProps) => {
       <PopoverButton className='bg-white rounded-lg flex flex-row justify-center items-center gap-2 px-2 py-1.5 data-[open]:bg-blue-hover font-semibold'>
         <AdjustmentsVerticalIcon className='size-4' />
         <span>Filter</span>
-        {thisPlayer.tags && thisPlayer.tags.length ? (
+        {(thisPlayer.tags.length > 0 || thisPlayer.sets.length > 0) && (
           <div className='rounded-2xl px-1.5 py-0.5 flex items-center justify-center text-white bg-primary text-xs'>
-            {thisPlayer.tags.length}
+            {thisPlayer.tags.length + thisPlayer.sets.length}
           </div>
-        ) : null}
+        )}
       </PopoverButton>
       <PopoverPanel
         anchor='bottom end'
@@ -189,7 +189,7 @@ const TagFilter = (props: TagFilterProps) => {
         </div>
         <div className='flex flex-row justify-between w-full pb-2'>
           <p className='text-sm  font-semibold'>Tags</p>
-          {thisPlayer.tags && thisPlayer.tags.length ? (
+          {thisPlayer.tags.length > 0 && (
             <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
               <p>{`${thisPlayer.tags.length} filter${thisPlayer.tags.length > 1 ? 's' : ''} applied`}</p>
               <XMarkIcon
@@ -202,7 +202,7 @@ const TagFilter = (props: TagFilterProps) => {
                 }}
               />
             </div>
-          ) : null}
+          )}
         </div>
         {thisPlayer &&
           categories.map((cat, idx) => (
