@@ -9,9 +9,10 @@ import type { Annotation } from '@ty/index';
 interface Props {
   ann: Annotation & { set: string };
   playerId: string;
+  setName?: string;
 }
 
-const { ann, playerId } = Astro.props;
+const { ann, playerId, setName } = Astro.props;
 
 const projectData = await getEntry('project', 'project');
 const tagGroups = projectData.data.project.tags.tagGroups;
@@ -39,7 +40,16 @@ const tagGroups = projectData.data.project.tags.tagGroups;
       }
     </p>
   </div>
-  <div class='w-full flex flex-col gap-4'>
+  <div class='w-full flex flex-col gap-4 text-sm'>
+    {
+      setName && (
+        <div>
+          <span class='text-xs font-semibold bg-gray-200 py-1 px-2 rounded-md'>
+            {setName}
+          </span>
+        </div>
+      )
+    }
     <RichText nodes={ann.annotation} />
     <div class='flex flex-row gap-4 annotationTags' data-player-id={playerId}>
       {

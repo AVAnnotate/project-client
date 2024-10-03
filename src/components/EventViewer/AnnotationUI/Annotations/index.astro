@@ -11,7 +11,13 @@ export interface Props {
 const { playerId, annotationSets, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
-  .map((set) => set.data.annotations.map((ann) => ({ ...ann, set: set.id })))
+  .map((set) =>
+    set.data.annotations.map((ann) => ({
+      ...ann,
+      set: set.id,
+      setName: set.data.set,
+    }))
+  )
   .flat()
   .sort((a: any, b: any) => a.start_time - b.start_time);
 ---
@@ -26,7 +32,13 @@ const sortedAnnotations = annotationSets
     >
       {
         sortedAnnotations.map((ann) => {
-          return <Annotation ann={ann} playerId={playerId} />;
+          return (
+            <Annotation
+              ann={ann}
+              playerId={playerId}
+              setName={annotationSets.length > 1 ? ann.setName : undefined}
+            />
+          );
         })
       }
     </div>
