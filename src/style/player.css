@@ -91,6 +91,11 @@
   background: #000;
 }
 
+/* YouTube embeds are contained in iframes instead of video elements */
+.player iframe {
+  height: 500px;
+}
+
 .player div {
   margin: auto;
 }
