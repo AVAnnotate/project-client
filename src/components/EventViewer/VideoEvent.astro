@@ -30,12 +30,6 @@ const {
 } = Astro.props;
 
 const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
-
-const currentSet = annotationSets[0];
-
-if (!currentSet) {
-  throw new Error('Set not found.');
-}
 ---
 
 <Container className='flex flex-col gap-6 bg-gray-100 py-6'>
@@ -77,12 +71,12 @@ if (!currentSet) {
               <div class='py-4'>
                 <AnnotationHeader
                   playerId={file}
-                  annotationSet={currentSet}
+                  annotationSets={annotationSets}
                   type={event.data.item_type}
                 />
                 <Annotations
                   playerId={file}
-                  annotationSet={currentSet}
+                  annotationSets={annotationSets}
                   type={event.data.item_type}
                 />
               </div>

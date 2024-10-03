@@ -5,7 +5,10 @@ const { className } = Astro.props;
 ---
 
 <div
-  class={clsx('mx-6 md:mx-24 xl:mx-32 2xl:mx-auto max-w-screen-2xl', className)}
+  class={clsx(
+    'mx-6 md:mx-24 xl:mx-32 2xl:mx-auto 2xl:w-full max-w-screen-2xl',
+    className
+  )}
 >
   <slot />
 </div>
