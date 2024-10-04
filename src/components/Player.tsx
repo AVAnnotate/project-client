@@ -20,7 +20,6 @@ interface Props {
   // optional props for controlling the
   // player from a parent component
   playing?: boolean;
-  position?: number;
   id: string;
   type: 'Audio' | 'Video';
 }
@@ -46,14 +45,6 @@ const Player: React.FC<Props> = (props) => {
 
   // whether the user is currently seeking
   const [seeking, setSeeking] = useState(false);
-
-  useEffect(() => {
-    // we need to use typeof here instead of a null
-    // check because 0 is falsy!
-    if (player && typeof props.position === 'number') {
-      player.seekTo(props.position);
-    }
-  }, [props.position]);
 
   useEffect(() => {
     if (player) {

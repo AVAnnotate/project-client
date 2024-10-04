@@ -53,7 +53,7 @@ const projectBy =
 
 <script>
   import { $pagePlayersState } from 'src/store.ts';
-  //initially, reset the loaded players to none
+  // initially, reset the loaded players to none
   $pagePlayersState.set({});
   const players = document.getElementsByClassName('mediaContainer');
   for (let i = 0; i < players.length; i++) {
@@ -72,6 +72,8 @@ const projectBy =
         annotationStarts: [],
         sets: [],
         avFileUuid: '',
+        annotations: [],
+        filteredAnnotations: [],
       });
     }
   }
