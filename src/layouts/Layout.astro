@@ -60,20 +60,21 @@ const projectBy =
     const thisNode = players[i];
     if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
       $pagePlayersState.setKey(thisNode.dataset.playerId, {
-        id: thisNode.dataset.playerUrl || '',
-        position: 0,
-        seekTo: 0,
-        isPlaying: false,
-        autoScroll: true,
-        showTags: true,
-        currentAnnotation: 0,
-        searchQuery: '',
-        tags: [],
-        annotationStarts: [],
-        sets: [],
-        avFileUuid: '',
         annotations: [],
+        annotationStarts: [],
+        autoScroll: true,
+        avFileUuid: '',
+        currentAnnotation: 0,
+        id: thisNode.dataset.playerUrl || '',
+        isPlaying: false,
         filteredAnnotations: [],
+        position: 0,
+        searchQuery: '',
+        seekTo: 0,
+        sets: [],
+        snapToAnnotations: false,
+        showTags: true,
+        tags: [],
       });
     }
   }

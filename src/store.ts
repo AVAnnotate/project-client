@@ -7,8 +7,8 @@ export interface AnnotationState {
   position: number;
   seekTo?: number;
   isPlaying: boolean;
-  autoScroll?: boolean;
-  showTags?: boolean;
+  autoScroll: boolean;
+  showTags: boolean;
   currentAnnotation?: number;
   searchQuery?: string;
   tags: Tag[];
@@ -17,6 +17,7 @@ export interface AnnotationState {
   avFileUuid: string;
   annotations: DisplayedAnnotation[];
   filteredAnnotations: string[];
+  snapToAnnotations: boolean;
 }
 
 // keeps track of all players on the loaded page
@@ -82,10 +83,26 @@ const getFilteredAnnotations = (newState: AnnotationState) =>
     })
     .map((ann) => ann.uuid);
 
-export const toggleTagFilter = (tag: Tag, playerId: string) => {
-  const thisPlayer = $pagePlayersState.get()[playerId];
+const getNewSnapState = (
+  oldState: AnnotationState,
+  newState: AnnotationState
+) => {
+  // disable annotation playback snapping when the user disables all tag filters,
+  // and enable it if the user has just enabled their first tag filter
+  if (newState.tags.length === 0) {
+    return false;
+  } else if (oldState.tags.length === 0 && newState.tags.length > 0) {
+    return true;
+  }
 
-  const current = thisPlayer.tags || [];
+  // otherwise, keep the previous value
+  return newState.snapToAnnotations;
+};
+
+export const toggleTagFilter = (tag: Tag, playerId: string) => {
+  const oldState = $pagePlayersState.get()[playerId];
+
+  const current = oldState.tags || [];
   const updated = current?.find(
     (t) => t.category === tag.category && t.tag === tag.tag
   )
@@ -93,11 +110,12 @@ export const toggleTagFilter = (tag: Tag, playerId: string) => {
     : [...current, tag];
 
   const newState = {
-    ...thisPlayer,
+    ...oldState,
     tags: updated,
   };
 
   newState.filteredAnnotations = getFilteredAnnotations(newState);
+  newState.snapToAnnotations = getNewSnapState(oldState, newState);
 
   $pagePlayersState.setKey(playerId, newState);
 };
@@ -107,10 +125,10 @@ export const toggleCategoryFilter = (
   allTags: { [key: string]: { tags: any[] } },
   playerId: string
 ) => {
-  const thisPlayer = $pagePlayersState.get()[playerId];
+  const oldState = $pagePlayersState.get()[playerId];
 
   const current =
-    thisPlayer.tags?.filter(
+    oldState.tags?.filter(
       (tag) => tag.category.toLowerCase() === category.toLowerCase()
     ) || [];
 
@@ -119,8 +137,8 @@ export const toggleCategoryFilter = (
   if (current.length === allTags[category].tags.length) {
     //in this case, everything in the category is already checked, and we want to uncheck them
     newState = {
-      ...thisPlayer,
-      tags: thisPlayer.tags?.filter(
+      ...oldState,
+      tags: oldState.tags?.filter(
         (tag) => tag.category.toLowerCase() !== category.toLowerCase()
       ),
     };
@@ -129,7 +147,7 @@ export const toggleCategoryFilter = (
       category: category,
       tag: tag,
     }));
-    const active = thisPlayer.tags ? [...thisPlayer.tags] : [];
+    const active = oldState.tags ? [...oldState.tags] : [];
     allCategoryTags.forEach((tag) => {
       if (
         active.findIndex(
@@ -143,12 +161,13 @@ export const toggleCategoryFilter = (
     });
 
     newState = {
-      ...thisPlayer,
+      ...oldState,
       tags: active,
     };
   }
 
   newState.filteredAnnotations = getFilteredAnnotations(newState);
+  newState.snapToAnnotations = getNewSnapState(oldState, newState);
 
   $pagePlayersState.setKey(playerId, newState);
 };
@@ -176,14 +195,18 @@ export const toggleSetFilter = (set: string, playerId: string) => {
 };
 
 export const clearFilter = (type: 'sets' | 'tags', playerId: string) => {
-  const thisPlayer = $pagePlayersState.get()[playerId];
+  const oldState = $pagePlayersState.get()[playerId];
 
   const newState = {
-    ...thisPlayer,
+    ...oldState,
     [type]: [],
   };
 
   newState.filteredAnnotations = getFilteredAnnotations(newState);
+
+  if (type === 'tags') {
+    newState.snapToAnnotations = false;
+  }
 
   $pagePlayersState.setKey(playerId, newState);
 };
