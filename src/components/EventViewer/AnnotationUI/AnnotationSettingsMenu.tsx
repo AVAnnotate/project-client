@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import OptionToggle from './OptionToggle.tsx';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { Gear } from 'react-bootstrap-icons';
