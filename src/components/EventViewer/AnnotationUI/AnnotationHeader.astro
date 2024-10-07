@@ -1,7 +1,8 @@
 ---
-import OptionToggle from "../OptionToggle";
-import TagFilter from "../TagFilter";
-import TextSearch from "../TextSearch";
+import AnnotationSettingsMenu from "./AnnotationSettingsMenu";
+import OptionToggle from "./OptionToggle";
+import TagFilter from "./TagFilter";
+import TextSearch from "./TextSearch";
 import { getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
@@ -24,28 +25,8 @@ const { annotationSets, playerId, type } = Astro.props;
       <h3 class='font-bold text-lg'>Annotations</h3>
       {
         type === 'Video' && (
-          <div>
-            <div class="flex flex-row align-center gap-4">
-              <OptionToggle
-                client:only="react"
-                label="Autoscroll"
-                playerId={playerId}
-                property="autoScroll"
-              />
-              <OptionToggle
-                client:only="react"
-                label="Show Tags"
-                playerId={playerId}
-                property="showTags"
-              />
-              <OptionToggle
-                client:only="react"
-                label="Snap to Annotations"
-                playerId={playerId}
-                property="snapToAnnotations"
-              />
-            </div>
-          </div>)
+          <AnnotationSettingsMenu playerId={playerId} client:only="react" />
+        )
       }
     </div>
     { type === 'Video' && <div class="h-1 border-t border-gray-200 w-full" />}

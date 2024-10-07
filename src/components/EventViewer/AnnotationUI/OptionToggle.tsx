@@ -16,6 +16,7 @@ interface OptionToggleProps {
   playerId: string;
   property: keyof OnlyBooleans<AnnotationState>;
   label: string;
+  switchPosition?: 'left' | 'right';
 }
 
 const OptionToggle: React.FC<OptionToggleProps> = (props) => {
@@ -28,9 +29,13 @@ const OptionToggle: React.FC<OptionToggleProps> = (props) => {
     });
   };
 
+  const switchPosition = props.switchPosition || 'left';
+
   return (
-    <Field>
-      <Label className='font-semibold pr-4 text-md'>{props.label}</Label>
+    <Field className='flex flex-row gap-4'>
+      {switchPosition === 'right' && (
+        <Label className='font-semibold text-md grow'>{props.label}</Label>
+      )}
       <Switch
         checked={pagePlayers[props.playerId][props.property]}
         onChange={handleToggle}
@@ -41,6 +46,9 @@ const OptionToggle: React.FC<OptionToggleProps> = (props) => {
           <Check2 className='text-white absolute w-4 h-4 left-1.5 top-[5px]' />
         )}
       </Switch>
+      {switchPosition === 'left' && (
+        <Label className='font-semibold text-md grow'>{props.label}</Label>
+      )}
     </Field>
   );
 };
