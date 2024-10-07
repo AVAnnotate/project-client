@@ -11,10 +11,9 @@ import {
   VolumeUpFill,
 } from 'react-bootstrap-icons';
 import * as Slider from '@radix-ui/react-slider';
-import { $pagePlayersState } from '../../store.ts';
+import { $pagePlayersState, type AnnotationState } from '../../store.ts';
 import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
-import useSegments from './useSegments.tsx';
 
 interface Props {
   url: string;
@@ -23,6 +22,17 @@ interface Props {
   id: string;
   type: 'Audio' | 'Video';
 }
+
+const getSegments = (playerState: AnnotationState): [number, number][] => {
+  const annotations =
+    playerState.tags.length === 0
+      ? playerState.annotations
+      : playerState.annotations.filter((ann) =>
+          playerState.filteredAnnotations.includes(ann.uuid)
+        );
+
+  return annotations.map((ann) => [ann.start_time, ann.end_time]);
+};
 
 const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
 
@@ -36,7 +46,7 @@ const Player: React.FC<Props> = (props) => {
 
   const playerState = pagePlayers[props.id];
 
-  const segments = useSegments(playerState);
+  const segments = useMemo(() => getSegments(playerState), [playerState]);
 
   // store the player itself in state instead of a ref
   // because there's something weird in their packaging
