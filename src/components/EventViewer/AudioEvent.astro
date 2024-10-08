@@ -58,6 +58,8 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
                       id={file}
                       client:only='react'
                       type={event.data.item_type}
+                      start={start}
+                      end={end}
                     />
                   </Container>
                 )}

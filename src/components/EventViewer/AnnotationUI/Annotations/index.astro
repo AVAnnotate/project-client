@@ -113,33 +113,28 @@ const sortedAnnotations = annotationSets
       return null;
     }
 
-    if (
-      Math.floor(state[changed].position * 1000) % 7 ===
-      0 //this is just meant to get it firing at a reasonable interval...should find a less random way
-    ) {
-      const startTimes = state[changed].annotationStarts;
-      const current = startTimes?.findIndex((time, idx) => {
-        if (typeof time.end === 'number') {
-          return (
-            time.start <= state[changed].position &&
-            time.end > state[changed].position
-          );
-        }
-        return idx < startTimes.length - 1
-          ? time.start <= state[changed].position &&
-              startTimes[idx + 1].start > state[changed].position
-          : time.start <= state[changed].position;
-      });
-      if (typeof current === 'number' && current >= 0) {
-        const activeNode = annotationNodes[current];
-        if (state[changed].autoScroll) {
-          activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
-        activeNode.classList.add(activeBackground);
-        for (let i = 0; i < annotationNodes.length; i++) {
-          if (i !== current) {
-            annotationNodes[i].classList.remove(activeBackground);
-          }
+    const startTimes = state[changed].annotationStarts;
+    const current = startTimes?.findIndex((time, idx) => {
+      if (typeof time.end === 'number') {
+        return (
+          time.start <= state[changed].position &&
+          time.end > state[changed].position
+        );
+      }
+      return idx < startTimes.length - 1
+        ? time.start <= state[changed].position &&
+            startTimes[idx + 1].start > state[changed].position
+        : time.start <= state[changed].position;
+    });
+    if (typeof current === 'number' && current >= 0) {
+      const activeNode = annotationNodes[current];
+      if (state[changed].autoScroll) {
+        activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+      activeNode.classList.add(activeBackground);
+      for (let i = 0; i < annotationNodes.length; i++) {
+        if (i !== current) {
+          annotationNodes[i].classList.remove(activeBackground);
         }
       }
     }

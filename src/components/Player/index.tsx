@@ -16,11 +16,11 @@ import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
 
 interface Props {
-  url: string;
-  // optional props for controlling the
-  // player from a parent component
+  end?: number;
   id: string;
+  start?: number;
   type: 'Audio' | 'Video';
+  url: string;
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -161,7 +161,7 @@ const Player: React.FC<Props> = (props) => {
           }
         }}
         onReady={(player) => setPlayer(player)}
-        progressInterval={50}
+        progressInterval={500}
         url={props.url}
         height={props.type === 'Video' ? '100%' : 0}
         width={props.type === 'Video' ? '100%' : 0}
