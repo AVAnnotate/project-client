@@ -130,6 +130,7 @@ export type Page = {
   created_by: string;
   title: string;
   parent?: string;
+  slug?: string;
   updated_at: string;
   updated_by: string;
   autogenerate: AutoGenerate;
