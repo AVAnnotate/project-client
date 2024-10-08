@@ -11,7 +11,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
-import { type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import React, { useMemo } from 'react';
 import {
   $pagePlayersState,
