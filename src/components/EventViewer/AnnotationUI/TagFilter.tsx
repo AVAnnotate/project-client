@@ -11,9 +11,15 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
-import { type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import React, { useMemo } from 'react';
-import { $pagePlayersState } from 'src/store.ts';
+import {
+  $pagePlayersState,
+  clearFilter,
+  toggleCategoryFilter,
+  toggleSetFilter,
+  toggleTagFilter,
+} from 'src/store.ts';
 
 export interface TagFilterProps {
   playerId: string;
@@ -64,70 +70,6 @@ const TagFilter = (props: TagFilterProps) => {
 
   const categories = Object.keys(allTags);
 
-  const toggleTag = (tag: { category: string; tag: string }) => {
-    const current = thisPlayer.tags || [];
-    const updated = current?.find(
-      (t) => t.category === tag.category && t.tag === tag.tag
-    )
-      ? current.filter((t) => t.category != tag.category || t.tag != tag.tag)
-      : [...current, tag];
-    $pagePlayersState.setKey(playerId, {
-      ...thisPlayer,
-      tags: updated,
-    });
-  };
-
-  const toggleCategory = (category: string) => {
-    const current =
-      thisPlayer.tags?.filter(
-        (tag) => tag.category.toLowerCase() === category.toLowerCase()
-      ) || [];
-    if (current.length === allTags[category].tags.length) {
-      //in this case, everything in the category is already checked, and we want to uncheck them
-      $pagePlayersState.setKey(playerId, {
-        ...thisPlayer,
-        tags: thisPlayer.tags?.filter(
-          (tag) => tag.category.toLowerCase() != category.toLowerCase()
-        ),
-      });
-    } else {
-      const allCategoryTags = allTags[category].tags.map((tag) => ({
-        category: category,
-        tag: tag,
-      }));
-      const active = thisPlayer.tags ? [...thisPlayer.tags] : [];
-      allCategoryTags.forEach((tag) => {
-        if (
-          active.findIndex(
-            (t) =>
-              t.category.toLowerCase() === tag.category.toLowerCase() &&
-              t.tag.toLowerCase() === tag.tag.toLowerCase()
-          ) === -1
-        ) {
-          active.push(tag);
-        }
-      });
-      $pagePlayersState.setKey(playerId, {
-        ...thisPlayer,
-        tags: active,
-      });
-    }
-  };
-
-  const toggleSet = (setUuid: string) => {
-    if (thisPlayer.sets.includes(setUuid)) {
-      $pagePlayersState.setKey(playerId, {
-        ...thisPlayer,
-        sets: thisPlayer.sets.filter((s) => s !== setUuid),
-      });
-    } else {
-      $pagePlayersState.setKey(playerId, {
-        ...thisPlayer,
-        sets: [...thisPlayer.sets, setUuid],
-      });
-    }
-  };
-
   return (
     <Popover>
       <PopoverButton className='bg-white rounded-lg flex flex-row justify-center items-center gap-2 px-2 py-1.5 data-[open]:bg-blue-hover font-semibold'>
@@ -154,12 +96,7 @@ const TagFilter = (props: TagFilterProps) => {
                     <p>{`${thisPlayer.sets.length} filter${thisPlayer.sets.length > 1 ? 's' : ''} applied`}</p>
                     <XMarkIcon
                       className='size-4 text-white hover:scale-105 cursor-pointer'
-                      onClick={() => {
-                        $pagePlayersState.setKey(playerId, {
-                          ...thisPlayer,
-                          sets: [],
-                        });
-                      }}
+                      onClick={() => clearFilter('sets', playerId)}
                     />
                   </div>
                 )}
@@ -172,7 +109,7 @@ const TagFilter = (props: TagFilterProps) => {
                         thisPlayer.sets && thisPlayer.sets.includes(set.id)
                       }
                       onChange={() => {
-                        toggleSet(set.id);
+                        toggleSetFilter(set.id, playerId);
                       }}
                       className='group size-4 bg-white rounded-sm data-[checked]:bg-primary p-0.5 ring-1 ring-gray-300 ring-inset data-[checked]:ring-primary'
                     >
@@ -194,12 +131,7 @@ const TagFilter = (props: TagFilterProps) => {
               <p>{`${thisPlayer.tags.length} filter${thisPlayer.tags.length > 1 ? 's' : ''} applied`}</p>
               <XMarkIcon
                 className='size-4 text-white hover:scale-105 cursor-pointer'
-                onClick={() => {
-                  $pagePlayersState.setKey(playerId, {
-                    ...thisPlayer,
-                    tags: [],
-                  });
-                }}
+                onClick={() => clearFilter('tags', playerId)}
               />
             </div>
           )}
@@ -221,7 +153,7 @@ const TagFilter = (props: TagFilterProps) => {
                       ).length === allTags[cat].tags.length
                     }
                     onChange={() => {
-                      toggleCategory(cat);
+                      toggleCategoryFilter(cat, allTags, playerId);
                     }}
                     className='group size-4 bg-white rounded-sm data-[checked]:bg-primary p-0.5 ring-1 ring-gray-300 ring-inset data-[checked]:ring-primary'
                   >
@@ -241,7 +173,7 @@ const TagFilter = (props: TagFilterProps) => {
                         thisPlayer.tags &&
                         thisPlayer.tags?.findIndex(
                           (t) => t.category == cat && t.tag == tag
-                        ) != -1
+                        ) !== -1
                           ? CheckIcon
                           : undefined
                       }
@@ -249,12 +181,12 @@ const TagFilter = (props: TagFilterProps) => {
                         thisPlayer.tags &&
                         thisPlayer.tags?.findIndex(
                           (t) => t.category === cat && t.tag === tag
-                        ) != -1
+                        ) !== -1
                           ? 'outline outline-1 outline-black'
                           : ''
                       }
                       onClick={() => {
-                        toggleTag({ category: cat, tag: tag });
+                        toggleTagFilter({ category: cat, tag }, playerId);
                       }}
                     />
                   ))}

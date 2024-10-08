@@ -1,6 +1,8 @@
 ---
 import { type CollectionEntry } from 'astro:content';
 import Annotation from './Annotation.astro';
+import type { DisplayedAnnotation } from '@ty/index';
+import AnnotationNanostorePopulator from './AnnotationNanostorePopulator';
 
 export interface Props {
   playerId: string;
@@ -19,13 +21,20 @@ const sortedAnnotations = annotationSets
     }))
   )
   .flat()
-  .sort((a: any, b: any) => a.start_time - b.start_time);
+  .sort(
+    (a: any, b: any) => a.start_time - b.start_time
+  ) as DisplayedAnnotation[];
 ---
 
 <div class={`flex flex-col`}>
   <div
     class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
   >
+    <AnnotationNanostorePopulator
+      annotations={sortedAnnotations}
+      playerId={playerId}
+      client:only='react'
+    />
     <div
       class={`${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
       id={playerId}
@@ -46,11 +55,24 @@ const sortedAnnotations = annotationSets
 </div>
 
 <script>
-  import type { Tag } from '@ty/index.ts';
   import { $pagePlayersState } from 'src/store.ts';
+
   const annotationPlayNodes = document.getElementsByClassName('playAnnotation');
   const annotationNodes = document.getElementsByClassName('annotationNode');
   const annotationTagNodes = document.getElementsByClassName('annotationTags');
+
+  const activeBackground = '!bg-blue-hover';
+
+  const hideNode = (node: HTMLElement | Element) => {
+    node.classList.add('hidden');
+    node.classList.remove('flex');
+  };
+
+  const showNode = (node: HTMLElement | Element) => {
+    node.classList.add('flex');
+    node.classList.remove('hidden');
+  };
+
   for (let i = 0; i < annotationPlayNodes.length; i++) {
     const thisNode = annotationPlayNodes[i];
     if (
@@ -86,12 +108,14 @@ const sortedAnnotations = annotationSets
     }
   }
 
-  const activeBackground = '!bg-blue-hover';
-
   $pagePlayersState.listen((state, oldState, changed) => {
+    if (!changed) {
+      return null;
+    }
+
     if (
-      changed &&
-      Math.floor(state[changed].position * 1000) % 7 === 0 //this is just meant to get it firing at a reasonable interval...should find a less random way
+      Math.floor(state[changed].position * 1000) % 7 ===
+      0 //this is just meant to get it firing at a reasonable interval...should find a less random way
     ) {
       const startTimes = state[changed].annotationStarts;
       const current = startTimes?.findIndex((time, idx) => {
@@ -113,95 +137,36 @@ const sortedAnnotations = annotationSets
         }
         activeNode.classList.add(activeBackground);
         for (let i = 0; i < annotationNodes.length; i++) {
-          if (i != current) {
+          if (i !== current) {
             annotationNodes[i].classList.remove(activeBackground);
           }
         }
       }
     }
+
     //show or hide tags if necessary
-    if (changed && state[changed].showTags != oldState[changed].showTags) {
+    if (state[changed].showTags !== oldState[changed].showTags) {
       if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
-          annotationTagNodes[i].classList.remove('hidden');
-          annotationTagNodes[i].classList.add('flex');
+          showNode(annotationTagNodes[i]);
         }
       } else {
         for (let i = 0; i < annotationTagNodes.length; i++) {
-          annotationTagNodes[i].classList.remove('flex');
-          annotationTagNodes[i].classList.add('hidden');
+          hideNode(annotationTagNodes[i]);
         }
       }
     }
 
     //filter on sets, text, and tags
-    if (changed) {
-      for (let i = 0; i < annotationNodes.length; i++) {
-        const thisNode = annotationNodes[i];
+    for (let i = 0; i < annotationNodes.length; i++) {
+      const node = annotationNodes[i];
 
-        // hide if its set is hidden
-        if (state[changed].sets.length > 0) {
-          const setFiltersEmpty = state[changed].sets.length === 0;
-          const set = thisNode.getAttribute('data-set');
+      const uuid = node.getAttribute('data-uuid');
 
-          if (set && !setFiltersEmpty && !state[changed].sets.includes(set)) {
-            thisNode.classList.remove('flex');
-            thisNode.classList.add('hidden');
-            continue;
-          }
-        }
-
-        // hide if its sets are hidden
-        if (state[changed].tags.length > 0) {
-          const tags =
-            thisNode instanceof HTMLElement && thisNode.dataset.tags
-              ? (JSON.parse(thisNode.dataset.tags) as Tag[])
-              : null;
-
-          if (tags) {
-            let match = false;
-            for (let i = 0; i < tags.length; i++) {
-              const tag = tags[i];
-              if (
-                state[changed].tags.find(
-                  (tf) =>
-                    tf.category.toLowerCase() === tag.category.toLowerCase() &&
-                    tf.tag.toLowerCase() === tag.tag.toLowerCase()
-                )
-              ) {
-                match = true;
-                break;
-              }
-            }
-
-            if (!match) {
-              thisNode.classList.remove('flex');
-              thisNode.classList.add('hidden');
-              continue;
-            }
-          }
-        }
-
-        // hide if the search query doesn't include any of its text
-        if (state[changed].searchQuery) {
-          const text = thisNode.textContent;
-
-          if (text) {
-            const match = text
-              .toLowerCase()
-              .includes(state[changed].searchQuery!.toLowerCase());
-
-            if (!match) {
-              thisNode.classList.remove('flex');
-              thisNode.classList.add('hidden');
-              continue;
-            }
-          }
-        }
-
-        // display the annotation if it passed all the above checks
-        thisNode.classList.add('flex');
-        thisNode.classList.remove('hidden');
+      if (uuid && state[changed].filteredAnnotations.includes(uuid)) {
+        showNode(annotationNodes[i]);
+      } else {
+        hideNode(annotationNodes[i]);
       }
     }
   });

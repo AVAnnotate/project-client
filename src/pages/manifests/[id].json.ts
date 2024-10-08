@@ -1,4 +1,3 @@
-// @ts-ignore
 import { getCollection, getEntry } from 'astro:content';
 import type { APIRoute } from 'astro';
 

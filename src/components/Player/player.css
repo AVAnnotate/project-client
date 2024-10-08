@@ -25,13 +25,12 @@
 }
 
 .player-control-panel .content .position-label .position {
-  width: 106px;
+  width: 62px;
   margin: 0;
 }
 
 .player-control-panel .content .position-label .duration {
-  width: 110px;
-  margin: 0 7px;
+  width: 62px;
   font-weight: 600;
 }
 

@@ -31,7 +31,7 @@ pages.sort((a, b) => {
 <div class='py-4 flex flex-col gap-2'>
   {
     pages
-      .filter((page) => page.data.autogenerate.type != 'home')
+      .filter((page) => page.data.autogenerate.type !== 'home')
       .map((page) => (
         <a
           class='underline'
