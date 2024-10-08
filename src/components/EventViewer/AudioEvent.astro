@@ -6,6 +6,7 @@ import RichText from '@components/RichText/index.astro';
 import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
+import { randomUUID } from 'crypto';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -26,7 +27,7 @@ const {
   embed,
 } = Astro.props;
 
-const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
+const playerId = randomUUID();
 ---
 
 <div>
@@ -48,14 +49,14 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
             return (
               <div
                 class='mediaContainer gap-4 flex flex-col'
-                data-player-id={file}
+                data-player-id={playerId}
                 data-player-url={url}
               >
                 {includes.includes('media') && (
                   <Container>
                     <Player
                       url={url}
-                      id={file}
+                      id={playerId}
                       client:only='react'
                       type={event.data.item_type}
                       start={start}
@@ -69,7 +70,7 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
       }
       <Container>
         <AnnotationHeader
-          playerId={avFileUuid}
+          playerId={playerId}
           annotationSets={annotationSets}
           type={event.data.item_type}
         />
@@ -79,7 +80,7 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
   <Container>
     <Annotations
       annotationSets={annotationSets}
-      playerId={avFileUuid}
+      playerId={playerId}
       type={event.data.item_type}
     />
   </Container>

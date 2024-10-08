@@ -6,6 +6,7 @@ import RichText from '../RichText/index.astro';
 import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
+import { randomUUID } from 'crypto';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -29,7 +30,7 @@ const {
   file,
 } = Astro.props;
 
-const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
+const playerId = randomUUID();
 ---
 
 <Container className='flex flex-col gap-6 bg-gray-100 py-6'>
@@ -40,7 +41,7 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
         return (
           <div
             class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
-            data-player-id={file}
+            data-player-id={playerId}
             data-player-url={url}
           >
             {includes.includes('media') && (
@@ -50,7 +51,7 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
                 )}
                 <Player
                   url={url}
-                  id={file}
+                  id={playerId}
                   client:only='react'
                   type={event.data.item_type}
                   start={start}
@@ -72,12 +73,12 @@ const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
             {includes.includes('annotations') && (
               <div class='py-4'>
                 <AnnotationHeader
-                  playerId={file}
+                  playerId={playerId}
                   annotationSets={annotationSets}
                   type={event.data.item_type}
                 />
                 <Annotations
-                  playerId={file}
+                  playerId={playerId}
                   annotationSets={annotationSets}
                   type={event.data.item_type}
                 />
