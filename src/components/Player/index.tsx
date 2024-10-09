@@ -1,7 +1,6 @@
-// react-player requires a weird workaround to keep TS from complaining
-import { default as _ReactPlayer } from 'react-player';
-import type { ReactPlayerProps } from 'react-player/types/lib';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import ReactPlayer from 'react-player';
+import type { default as ReactPlayerType } from 'react-player';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './player.css';
 import { Button } from '@radix-ui/themes';
 import {
@@ -14,6 +13,8 @@ import * as Slider from '@radix-ui/react-slider';
 import { $pagePlayersState, type AnnotationState } from '../../store.ts';
 import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
+import type { OnProgressProps } from 'react-player/base';
+import type FilePlayer from 'react-player/file';
 
 interface Props {
   end?: number;
@@ -34,31 +35,30 @@ const getSegments = (playerState: AnnotationState): [number, number][] => {
   return annotations.map((ann) => [ann.start_time, ann.end_time]);
 };
 
-const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
-
 const Player: React.FC<Props> = (props) => {
   // total length of recording, in seconds
   const [duration, setDuration] = useState(0);
-
   const [muted, setMuted] = useState(false);
 
   const pagePlayers = useStore($pagePlayersState);
-
   const playerState = pagePlayers[props.id];
 
-  const segments = useMemo(() => getSegments(playerState), [playerState]);
+  const segments = useMemo(() => {
+    if (playerState.snapToAnnotations) {
+      return getSegments(playerState);
+    } else {
+      return [];
+    }
+  }, [playerState]);
 
-  // store the player itself in state instead of a ref
-  // because there's something weird in their packaging
-  // that breaks ref-based calls
-  const [player, setPlayer] = useState<any>(null);
+  const player = useRef<ReactPlayerType>(null);
 
   // whether the user is currently seeking
   const [seeking, setSeeking] = useState(false);
 
   useEffect(() => {
-    if (player) {
-      player.seekTo(playerState.seekTo);
+    if (player.current && playerState.seekTo) {
+      player.current.seekTo(playerState.seekTo);
     }
   }, [playerState.seekTo]);
 
@@ -75,8 +75,8 @@ const Player: React.FC<Props> = (props) => {
   const onSeek = useCallback(
     (val: number[]) => {
       setSeeking(false);
-      if (player) {
-        player.seekTo(val[0] * duration);
+      if (player.current) {
+        player.current.seekTo(val[0] * duration);
       }
     },
     [player, setSeeking]
@@ -117,6 +117,42 @@ const Player: React.FC<Props> = (props) => {
     }
   }, [seeking]);
 
+  const onProgress = (data: OnProgressProps) => {
+    // don't move the point if the user is currently dragging it
+    if (!seeking) {
+      if (
+        playerState.snapToAnnotations &&
+        !isContainedInSegment(segments, data.playedSeconds)
+      ) {
+        // skip forward to the next segment if we've moved out of one
+        const nextSegment = getNextSegment(segments, data.playedSeconds);
+
+        $pagePlayersState.setKey(props.id, {
+          ...playerState,
+          isPlaying: false,
+        });
+
+        // if there's no next segment, leave the player paused (i.e. we've reached the end)
+        if (nextSegment) {
+          // leave a short (500ms) pause between segments
+          setTimeout(() => {
+            $pagePlayersState.setKey(props.id, {
+              ...playerState,
+              seekTo: nextSegment[0],
+              position: nextSegment[0],
+              isPlaying: true,
+            });
+          }, 500);
+        }
+      } else {
+        $pagePlayersState.setKey(props.id, {
+          ...playerState,
+          position: data.playedSeconds,
+        });
+      }
+    }
+  };
+
   return (
     <div className='player'>
       <ReactPlayer
@@ -124,44 +160,20 @@ const Player: React.FC<Props> = (props) => {
         playing={playerState.isPlaying}
         played={playerState.position / duration || 0}
         muted={muted}
-        onDuration={(dur) => setDuration(dur)}
-        onProgress={(data) => {
-          // don't move the point if the user is currently dragging it
-          if (!seeking) {
-            if (
-              playerState.snapToAnnotations &&
-              !isContainedInSegment(segments, data.playedSeconds)
-            ) {
-              // skip forward to the next segment if we've moved out of one
-              const nextSegment = getNextSegment(segments, data.playedSeconds);
-
-              $pagePlayersState.setKey(props.id, {
-                ...playerState,
-                isPlaying: false,
-              });
-
-              // if there's no next segment, leave the player paused (i.e. we've reached the end)
-              if (nextSegment) {
-                // leave a short (500ms) pause between segments
-                setTimeout(() => {
-                  $pagePlayersState.setKey(props.id, {
-                    ...playerState,
-                    seekTo: nextSegment[0],
-                    position: nextSegment[0],
-                    isPlaying: true,
-                  });
-                }, 500);
-              }
-            } else {
-              $pagePlayersState.setKey(props.id, {
-                ...playerState,
-                position: data.playedSeconds,
-              });
-            }
+        onDuration={(dur) => {
+          if (props.start && props.end) {
+            setDuration(props.end - props.start);
+          } else if (props.start) {
+            setDuration(dur - props.start);
+          } else if (props.end) {
+            setDuration(props.end);
+          } else {
+            setDuration(dur);
           }
         }}
-        onReady={(player) => setPlayer(player)}
+        onProgress={onProgress}
         progressInterval={500}
+        ref={player}
         url={props.url}
         height={props.type === 'Video' ? '100%' : 0}
         width={props.type === 'Video' ? '100%' : 0}
