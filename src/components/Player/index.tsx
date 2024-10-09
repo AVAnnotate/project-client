@@ -14,7 +14,6 @@ import { $pagePlayersState, type AnnotationState } from '../../store.ts';
 import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
 import type { OnProgressProps } from 'react-player/base';
-import type FilePlayer from 'react-player/file';
 
 interface Props {
   end?: number;
