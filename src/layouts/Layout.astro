@@ -11,14 +11,9 @@ const projectData = await getEntry('project', 'project');
 interface Props {
   background?: string;
   title?: string;
-  projectName?: string;
 }
 
-const {
-  background,
-  title = projectData.data.project.title,
-  projectName = projectData.data.project.title,
-} = Astro.props;
+const { background, title = projectData.data.project.title } = Astro.props;
 
 const projectBy =
   projectData.data.project.authors || projectData.data.project.creator;
@@ -43,7 +38,7 @@ const projectBy =
     <title>{title}</title>
   </head>
   <body class='flex h-full flex-col mx-auto' transition:animate='initial'>
-    <Header projectName={projectName} pages={[]} />
+    <Header />
     <main class=`min-h-[calc(100dvh_-160px)] text-black bg-${background}`>
       <slot />
     </main>

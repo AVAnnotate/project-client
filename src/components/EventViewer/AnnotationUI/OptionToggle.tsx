@@ -29,7 +29,7 @@ const OptionToggle: React.FC<OptionToggleProps> = (props) => {
     });
   };
 
-  const switchPosition = props.switchPosition || 'left';
+  const switchPosition = props.switchPosition || 'right';
 
   return (
     <Field className='flex flex-row gap-4'>

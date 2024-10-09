@@ -22,12 +22,34 @@ export interface OrderCollectionEntry
 export const getPages = async (
   filterCallback?: (page: PageCollectionEntry) => boolean
 ) => {
+  const pageOrder = await getOrder();
+
   const results = await getCollection('pages', (page) => {
     if (page.id === 'order') {
       return false;
     }
 
+    // skip pages that aren't mentioned in the order file
+    // something has gone terribly wrong if this happens!
+    if (!pageOrder.data.includes(page.id)) {
+      return false;
+    }
+
     return filterCallback ? filterCallback(page as PageCollectionEntry) : true;
+  });
+
+  // sort to match the order from pageOrder
+  results.sort((a, b) => {
+    const aIndex = pageOrder.data.indexOf(a.id);
+    const bIndex = pageOrder.data.indexOf(b.id);
+
+    if (aIndex > bIndex) {
+      return 1;
+    } else if (aIndex < bIndex) {
+      return -1;
+    }
+
+    return 0;
   });
 
   return results as PageCollectionEntry[];
