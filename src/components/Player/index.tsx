@@ -78,7 +78,7 @@ const Player: React.FC<Props> = (props) => {
         player.current.seekTo(val[0] * duration);
       }
     },
-    [player, setSeeking]
+    [player, setSeeking, duration]
   );
 
   // whether a given timestamp has a corresponding annotation

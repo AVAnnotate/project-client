@@ -6,7 +6,6 @@ import RichText from '../RichText/index.astro';
 import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
-import { randomUUID } from 'crypto';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -17,6 +16,7 @@ export interface Props {
   includes?: Includes[];
   file?: string;
   embed?: boolean;
+  playerId: string;
 }
 
 const {
@@ -28,9 +28,8 @@ const {
   end,
   sticky,
   file,
+  playerId,
 } = Astro.props;
-
-const playerId = randomUUID();
 ---
 
 <Container className='flex flex-col gap-6 bg-gray-100 py-6'>

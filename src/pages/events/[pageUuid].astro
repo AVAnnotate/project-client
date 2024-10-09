@@ -35,5 +35,7 @@ if (!page.data.autogenerate.type_id) {
 ---
 
 <Layout title={page.data.title} background='gray-100'>
-  <EventViewer uuids={page.data.autogenerate.type_id} />
+  <div class='eventContainer'>
+    <EventViewer uuids={page.data.autogenerate.type_id} />
+  </div>
 </Layout>

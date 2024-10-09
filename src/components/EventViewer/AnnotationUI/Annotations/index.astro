@@ -8,9 +8,10 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
+  embed?: boolean;
 }
 
-const { playerId, annotationSets, type } = Astro.props;
+const { annotationSets, embed, playerId, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
   .map((set) =>
@@ -26,7 +27,7 @@ const sortedAnnotations = annotationSets
   ) as DisplayedAnnotation[];
 ---
 
-<div class={`flex flex-col`}>
+<div class='flex flex-col'>
   <div
     class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
   >
@@ -36,7 +37,7 @@ const sortedAnnotations = annotationSets
       client:only='react'
     />
     <div
-      class={`${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
+      class={` ${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
       id={playerId}
     >
       {
@@ -57,12 +58,6 @@ const sortedAnnotations = annotationSets
 <script>
   import { $pagePlayersState } from 'src/store.ts';
 
-  const annotationPlayNodes = document.getElementsByClassName('playAnnotation');
-  const annotationNodes = document.getElementsByClassName('annotationNode');
-  const annotationTagNodes = document.getElementsByClassName('annotationTags');
-
-  const activeBackground = '!bg-blue-hover';
-
   const hideNode = (node: HTMLElement | Element) => {
     node.classList.add('hidden');
     node.classList.remove('flex');
@@ -73,15 +68,17 @@ const sortedAnnotations = annotationSets
     node.classList.remove('hidden');
   };
 
+  const activeBackground = '!bg-blue-hover';
+
+  const annotationPlayNodes = document.querySelectorAll(`.playAnnotation`);
+
   for (let i = 0; i < annotationPlayNodes.length; i++) {
-    const thisNode = annotationPlayNodes[i];
-    if (
-      thisNode instanceof HTMLElement &&
-      thisNode.dataset.start &&
-      thisNode.dataset.playerId
-    ) {
+    const thisNode = annotationPlayNodes[i] as HTMLElement;
+
+    if (thisNode.dataset.start && thisNode.dataset.playerId) {
       const annotationStartsNew =
-        $pagePlayersState.get()[thisNode.dataset.playerId].annotationStarts;
+        $pagePlayersState.get()[thisNode.dataset.playerId]?.annotationStarts;
+
       if (annotationStartsNew) {
         annotationStartsNew.push({
           start: Math.floor(Number(thisNode.dataset.start)),
@@ -113,6 +110,26 @@ const sortedAnnotations = annotationSets
       return null;
     }
 
+    const eventContainerEl = document.querySelector(
+      `.eventContainer[data-player-id="${changed}"]`
+    );
+
+    console.log(
+      document
+        .querySelector(`.eventContainer[data-player-id]`)
+        ?.getAttribute('data-player-id')
+    );
+
+    if (!eventContainerEl) {
+      console.error(`No event container found for ${changed}`);
+      return null;
+    }
+
+    const annotationNodes =
+      eventContainerEl.querySelectorAll(`.annotationNode`);
+    const annotationTagNodes =
+      eventContainerEl.querySelectorAll(`.annotationTags`);
+
     const startTimes = state[changed].annotationStarts;
     const current = startTimes?.findIndex((time, idx) => {
       if (typeof time.end === 'number') {
@@ -127,11 +144,15 @@ const sortedAnnotations = annotationSets
         : time.start <= state[changed].position;
     });
     if (typeof current === 'number' && current >= 0) {
-      const activeNode = annotationNodes[current];
-      if (state[changed].autoScroll) {
-        activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const activeNode = annotationNodes[current] as HTMLElement;
+
+      if (state[changed].autoScroll && activeNode.parentElement) {
+        const offsetTop = activeNode.offsetTop;
+        eventContainerEl.scroll({ top: offsetTop - 200, behavior: 'smooth' });
       }
+
       activeNode.classList.add(activeBackground);
+
       for (let i = 0; i < annotationNodes.length; i++) {
         if (i !== current) {
           annotationNodes[i].classList.remove(activeBackground);
@@ -152,7 +173,7 @@ const sortedAnnotations = annotationSets
       }
     }
 
-    //filter on sets, text, and tags
+    // filter on sets, text, and tags
     for (let i = 0; i < annotationNodes.length; i++) {
       const node = annotationNodes[i];
 

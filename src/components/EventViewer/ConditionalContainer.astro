@@ -1,0 +1,22 @@
+---
+import Container from '@components/Container.astro';
+
+// What if we want to put something in a container, but only when
+// a certain condition is satisfied? That's a job for ConditionaContainer!
+
+interface Props {
+  condition?: boolean;
+}
+
+const { condition } = Astro.props;
+---
+
+{
+  condition ? (
+    <Container>
+      <slot />
+    </Container>
+  ) : (
+    <slot />
+  )
+}
