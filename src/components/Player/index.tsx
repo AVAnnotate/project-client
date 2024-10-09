@@ -119,7 +119,14 @@ const Player: React.FC<Props> = (props) => {
   const onProgress = (data: OnProgressProps) => {
     // don't move the point if the user is currently dragging it
     if (!seeking) {
-      if (
+      // stop playing if we've reached the end of a clip
+      if (props.end && data.playedSeconds >= props.end) {
+        $pagePlayersState.setKey(props.id, {
+          ...playerState,
+          isPlaying: false,
+          position: data.playedSeconds,
+        });
+      } else if (
         playerState.snapToAnnotations &&
         !isContainedInSegment(segments, data.playedSeconds)
       ) {
@@ -157,7 +164,6 @@ const Player: React.FC<Props> = (props) => {
       <ReactPlayer
         controls={props.type === 'Video'}
         playing={playerState.isPlaying}
-        played={playerState.position / duration || 0}
         muted={muted}
         onDuration={(dur) => {
           if (props.start && props.end) {
@@ -171,7 +177,7 @@ const Player: React.FC<Props> = (props) => {
           }
         }}
         onProgress={onProgress}
-        progressInterval={500}
+        progressInterval={250}
         ref={player}
         url={props.url}
         height={props.type === 'Video' ? '100%' : 0}
