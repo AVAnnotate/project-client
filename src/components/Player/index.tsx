@@ -2,7 +2,7 @@
 import { default as _ReactPlayer } from 'react-player';
 import type { ReactPlayerProps } from 'react-player/types/lib';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import '../style/player.css';
+import './player.css';
 import { Button } from '@radix-ui/themes';
 import {
   PauseFill,
@@ -11,19 +11,28 @@ import {
   VolumeUpFill,
 } from 'react-bootstrap-icons';
 import * as Slider from '@radix-ui/react-slider';
-import { $pagePlayersState } from '../store.ts';
+import { $pagePlayersState, type AnnotationState } from '../../store.ts';
 import { useStore } from '@nanostores/react';
-import { formatTimestamp } from '../utils/player.ts';
+import { formatTimestamp } from '../../utils/player.ts';
 
 interface Props {
   url: string;
   // optional props for controlling the
   // player from a parent component
-  playing?: boolean;
-  position?: number;
   id: string;
   type: 'Audio' | 'Video';
 }
+
+const getSegments = (playerState: AnnotationState): [number, number][] => {
+  const annotations =
+    playerState.tags.length === 0
+      ? playerState.annotations
+      : playerState.annotations.filter((ann) =>
+          playerState.filteredAnnotations.includes(ann.uuid)
+        );
+
+  return annotations.map((ann) => [ann.start_time, ann.end_time]);
+};
 
 const ReactPlayer = _ReactPlayer as unknown as React.FC<ReactPlayerProps>;
 
@@ -34,10 +43,10 @@ const Player: React.FC<Props> = (props) => {
   const [muted, setMuted] = useState(false);
 
   const pagePlayers = useStore($pagePlayersState);
-  const thisPlayerState = useMemo(
-    () => pagePlayers[props.id],
-    [pagePlayers[props.id], props.id]
-  );
+
+  const playerState = pagePlayers[props.id];
+
+  const segments = useMemo(() => getSegments(playerState), [playerState]);
 
   // store the player itself in state instead of a ref
   // because there's something weird in their packaging
@@ -48,35 +57,18 @@ const Player: React.FC<Props> = (props) => {
   const [seeking, setSeeking] = useState(false);
 
   useEffect(() => {
-    // we need to use typeof here instead of a null
-    // check because 0 is falsy!
-    if (player && typeof props.position === 'number') {
-      player.seekTo(props.position);
-    }
-  }, [props.position]);
-
-  useEffect(() => {
     if (player) {
-      player.seekTo(thisPlayerState.seekTo);
+      player.seekTo(playerState.seekTo);
     }
-  }, [thisPlayerState.seekTo]);
-
-  useEffect(() => {
-    if (props.playing) {
-      $pagePlayersState.setKey(props.id, {
-        ...thisPlayerState,
-        isPlaying: props.playing,
-      });
-    }
-  }, [props.playing]);
+  }, [playerState.seekTo]);
 
   const formattedPosition = useMemo(
-    () => formatTimestamp(thisPlayerState.position),
-    [thisPlayerState.position]
+    () => formatTimestamp(playerState.position, false),
+    [playerState.position]
   );
 
   const formattedDuration = useMemo(
-    () => formatTimestamp(duration),
+    () => formatTimestamp(duration, false),
     [duration]
   );
 
@@ -90,21 +82,82 @@ const Player: React.FC<Props> = (props) => {
     [player, setSeeking]
   );
 
+  // whether a given timestamp has a corresponding annotation
+  const isContainedInSegment = useCallback(
+    (segments: [number, number][], timestamp: number) => {
+      const timestampInt = Math.floor(timestamp);
+
+      const match = segments.find(
+        (seg) => timestampInt >= seg[0] && timestampInt <= seg[1]
+      );
+
+      return !!match;
+    },
+    []
+  );
+
+  // gets the next valid segment based on a timestamp that doesn't appear within one
+  const getNextSegment = useCallback(
+    (segments: [number, number][], timestamp: number) => {
+      const timestampInt = Math.floor(timestamp);
+
+      // segments are sorted by start time already so we can trust that sorting here
+      return segments.find((seg) => seg[0] >= timestampInt);
+    },
+    []
+  );
+
+  // disable annotation playback snapping when the user manually seeks
+  useEffect(() => {
+    if (playerState.snapToAnnotations && seeking) {
+      $pagePlayersState.setKey(props.id, {
+        ...playerState,
+        snapToAnnotations: false,
+      });
+    }
+  }, [seeking]);
+
   return (
     <div className='player'>
       <ReactPlayer
         controls={props.type === 'Video'}
-        playing={thisPlayerState.isPlaying}
-        played={thisPlayerState.position / duration || 0}
+        playing={playerState.isPlaying}
+        played={playerState.position / duration || 0}
         muted={muted}
         onDuration={(dur) => setDuration(dur)}
         onProgress={(data) => {
           // don't move the point if the user is currently dragging it
           if (!seeking) {
-            $pagePlayersState.setKey(props.id, {
-              ...thisPlayerState,
-              position: data.playedSeconds,
-            });
+            if (
+              playerState.snapToAnnotations &&
+              !isContainedInSegment(segments, data.playedSeconds)
+            ) {
+              // skip forward to the next segment if we've moved out of one
+              const nextSegment = getNextSegment(segments, data.playedSeconds);
+
+              $pagePlayersState.setKey(props.id, {
+                ...playerState,
+                isPlaying: false,
+              });
+
+              // if there's no next segment, leave the player paused (i.e. we've reached the end)
+              if (nextSegment) {
+                // leave a short (500ms) pause between segments
+                setTimeout(() => {
+                  $pagePlayersState.setKey(props.id, {
+                    ...playerState,
+                    seekTo: nextSegment[0],
+                    position: nextSegment[0],
+                    isPlaying: true,
+                  });
+                }, 500);
+              }
+            } else {
+              $pagePlayersState.setKey(props.id, {
+                ...playerState,
+                position: data.playedSeconds,
+              });
+            }
           }
         }}
         onReady={(player) => setPlayer(player)}
@@ -120,12 +173,12 @@ const Player: React.FC<Props> = (props) => {
               className='audio-button unstyled'
               onClick={() => {
                 $pagePlayersState.setKey(props.id, {
-                  ...thisPlayerState,
-                  isPlaying: !thisPlayerState.isPlaying,
+                  ...playerState,
+                  isPlaying: !playerState.isPlaying,
                 });
               }}
             >
-              {thisPlayerState.isPlaying ? (
+              {playerState.isPlaying ? (
                 <PauseFill color='black' />
               ) : (
                 <PlayFill color='black' />
@@ -145,13 +198,13 @@ const Player: React.FC<Props> = (props) => {
                 onValueChange={(val) => {
                   setSeeking(true);
                   $pagePlayersState.setKey(props.id, {
-                    ...thisPlayerState,
+                    ...playerState,
                     position: val[0] * duration,
                   });
                 }}
                 onValueCommit={onSeek}
                 step={0.0001}
-                value={[thisPlayerState.position / duration]}
+                value={[playerState.position / duration]}
               >
                 <Slider.Track className='seek-bar-slider-track !bg-gray-400'>
                   <Slider.Range className='seek-bar-slider-range' />

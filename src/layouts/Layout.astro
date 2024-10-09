@@ -53,25 +53,28 @@ const projectBy =
 
 <script>
   import { $pagePlayersState } from 'src/store.ts';
-  //initially, reset the loaded players to none
+  // initially, reset the loaded players to none
   $pagePlayersState.set({});
   const players = document.getElementsByClassName('mediaContainer');
   for (let i = 0; i < players.length; i++) {
     const thisNode = players[i];
     if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
       $pagePlayersState.setKey(thisNode.dataset.playerId, {
-        id: thisNode.dataset.playerUrl || '',
-        position: 0,
-        seekTo: 0,
-        isPlaying: false,
-        autoScroll: true,
-        showTags: true,
-        currentAnnotation: 0,
-        searchQuery: '',
-        activeFilters: [],
+        annotations: [],
         annotationStarts: [],
-        setUuid: '',
+        autoScroll: true,
         avFileUuid: '',
+        currentAnnotation: 0,
+        id: thisNode.dataset.playerUrl || '',
+        isPlaying: false,
+        filteredAnnotations: [],
+        position: 0,
+        searchQuery: '',
+        seekTo: 0,
+        sets: [],
+        snapToAnnotations: false,
+        showTags: true,
+        tags: [],
       });
     }
   }

@@ -5,9 +5,7 @@ import Container from '@components/Container.astro';
 import RichText from '@components/RichText/index.astro';
 import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
-import AnnotationHeader from './AnnotationUI/Annotations/AnnotationHeader.astro';
-import { useStore } from '@nanostores/react';
-import { $pagePlayersState } from 'src/store';
+import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -29,18 +27,12 @@ const {
 } = Astro.props;
 
 const avFileUuid = file || Object.keys(event.data.audiovisual_files)[0];
-
-const currentSet = annotationSets[0];
-
-if (!currentSet) {
-  throw new Error('Set not found.');
-}
 ---
 
 <div>
   <div class={`sticky top-[80px] z-10 ${!embed ? 'shadow' : ''}`}>
     <div class='flex flex-col gap-6 bg-gray-100 py-6'>
-      <Container className='w-full'>
+      <Container>
         {includes.includes('label') && <h1>{event.data.label}</h1>}
         {
           includes.includes('description') && event.data.description && (
@@ -60,7 +52,7 @@ if (!currentSet) {
                 data-player-url={url}
               >
                 {includes.includes('media') && (
-                  <Container className='w-full'>
+                  <Container>
                     <Player
                       url={url}
                       id={file}
@@ -73,10 +65,10 @@ if (!currentSet) {
             );
           })
       }
-      <Container className='w-full'>
+      <Container>
         <AnnotationHeader
-          annotationSet={currentSet}
           playerId={avFileUuid}
+          annotationSets={annotationSets}
           type={event.data.item_type}
         />
       </Container>
@@ -84,7 +76,7 @@ if (!currentSet) {
   </div>
   <Container>
     <Annotations
-      annotationSet={currentSet}
+      annotationSets={annotationSets}
       playerId={avFileUuid}
       type={event.data.item_type}
     />

@@ -1,5 +1,6 @@
 ---
 import EventViewer from '@components/EventViewer/index.astro';
+import TableOfContents from '@components/TableOfContents.astro';
 
 const { attributes, element } = Astro.props;
 
@@ -62,6 +63,13 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         return (
           <div {...attributes} style={style}>
             <img src={element.url} class={getImageClass(element.size)} />
+            <slot />
+          </div>
+        );
+      case 'table-of-contents':
+        return (
+          <div {...attributes} style={style}>
+            <TableOfContents />
             <slot />
           </div>
         );

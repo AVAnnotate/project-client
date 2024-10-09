@@ -1,0 +1,60 @@
+---
+import AnnotationSettingsMenu from "./AnnotationSettingsMenu";
+import OptionToggle from "./OptionToggle";
+import TagFilter from "./TagFilter";
+import TextSearch from "./TextSearch";
+import { getEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  annotationSets: CollectionEntry<'annotations'>[],
+  playerId: string,
+  type: 'Audio' | 'Video'
+}
+
+const projectData = await getEntry('project', 'project');
+
+const { annotationSets, playerId, type } = Astro.props;
+
+---
+<div>
+  <div
+    class={`flex flex-row w-full justify-between items-center ${type === 'Video' ? 'flex-col gap-3' : 'flex-row items-center'}`}
+  >
+    <div class={`flex flex-row justify-between ${type === 'Video' ? 'w-full' : ''}`}>
+      <h3 class='font-bold text-lg'>Annotations</h3>
+      {
+        type === 'Video' && (
+          <AnnotationSettingsMenu playerId={playerId} client:only="react" />
+        )
+      }
+    </div>
+    { type === 'Video' && <div class="h-1 border-t border-gray-200 w-full" />}
+    <div class={`flex flex-row gap-8 items-center ${type === 'Video' ? 'w-full justify-between pb-4 z-10 shadow-[0px_4px_2px_-2px_#00000040]' : ''}`}>
+    {
+      type === 'Audio' && (
+        <OptionToggle
+          client:only="react"
+          label="Autoscroll"
+          playerId={playerId}
+          property="autoScroll"
+        />
+        <OptionToggle
+          client:only="react"
+          label="Show Tags"
+          playerId={playerId}
+          property="showTags"
+        />
+        <OptionToggle
+          client:only="react"
+          label="Snap to Annotations"
+          playerId={playerId}
+          property="snapToAnnotations"
+        />
+      )
+    }
+      <TextSearch playerId={playerId} client:only='react' />
+      <TagFilter annotationSets={annotationSets} playerId={playerId} projectData={projectData} client:only='react' />
+    </div>
+  </div>
+</div>

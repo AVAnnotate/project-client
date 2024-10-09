@@ -98,6 +98,14 @@ export type Annotation = {
   annotation: Node[];
 
   tags: Tag[];
+
+  uuid: string;
+};
+
+export type DisplayedAnnotation = Annotation & {
+  set: string;
+
+  setName: string;
 };
 
 export type AnnotationFile = {
