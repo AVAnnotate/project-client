@@ -9,6 +9,18 @@ interface SidebarProps {
   pageUuid?: string;
 }
 
+const getHref = (page: PageCollectionEntry, baseUrl: string) => {
+  if (page.data.autogenerate.type === 'home') {
+    return `/${baseUrl}`;
+  }
+
+  if (page.data.autogenerate.enabled) {
+    return `/${baseUrl}/events/${page.id}`;
+  }
+
+  return `/${baseUrl}/pages/${page.id}`;
+};
+
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const [show, setShow] = useState(false);
 
@@ -43,9 +55,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             </button>
           </div>
           {props.pages.map((page) => (
-            <a
-              href={`/${props.baseUrl}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.id}`}
-            >
+            <a href={getHref(page, props.baseUrl)} key={page.id}>
               <div className='p-4 hover:bg-blue-hover'>
                 <p
                   key={page.id}
