@@ -15,7 +15,7 @@ export interface Props {
   start?: number;
   includes?: Includes[];
   file?: string;
-  embed?: boolean;
+  isEmbed?: boolean;
   playerId: string;
 }
 
@@ -29,6 +29,7 @@ const {
   sticky,
   file,
   playerId,
+  isEmbed,
 } = Astro.props;
 ---
 
@@ -79,6 +80,7 @@ const {
                 <Annotations
                   playerId={playerId}
                   annotationSets={annotationSets}
+                  isEmbed={isEmbed}
                   type={event.data.item_type}
                 />
               </div>

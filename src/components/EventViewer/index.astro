@@ -3,16 +3,14 @@ import { getCollection } from 'astro:content';
 import type { SlateEventNodeProps } from '@ty/slate';
 import AudioEvent from './AudioEvent.astro';
 import VideoEvent from './VideoEvent.astro';
-import { randomUUID } from 'crypto';
 
 export interface Props extends Omit<SlateEventNodeProps, 'uuid'> {
   end?: number;
   start?: number;
   sticky?: boolean;
   uuids: string | string[];
-  embed?: boolean;
-  // player ID needs to be set in RichTextElement for embeds
-  playerId?: string;
+  isEmbed?: boolean;
+  playerId: string;
 }
 
 const {
@@ -22,7 +20,7 @@ const {
   start,
   end,
   sticky,
-  embed,
+  isEmbed,
   playerId,
 } = Astro.props;
 
@@ -45,7 +43,6 @@ const annotationData = await getCollection('annotations');
           <AudioEvent
             annotationSets={annotationSets}
             event={event}
-            playerId={playerId || randomUUID()}
             {...Astro.props}
           />
         )}
@@ -53,7 +50,6 @@ const annotationData = await getCollection('annotations');
           <VideoEvent
             annotationSets={annotationSets}
             event={event}
-            playerId={playerId || randomUUID()}
             {...Astro.props}
           />
         )}

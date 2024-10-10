@@ -5,6 +5,7 @@ import Layout from '@layouts/Layout.astro';
 import { getEntry } from 'astro:content';
 import EventViewer from '@components/EventViewer/index.astro';
 import { getPage, getPages } from 'src/utils/pages';
+import { randomUUID } from 'crypto';
 
 const projectData = await getEntry('project', 'project');
 
@@ -32,10 +33,12 @@ const page = await getPage(pageUuid);
 if (!page.data.autogenerate.type_id) {
   return Astro.redirect(`/${baseUrl}`);
 }
+
+const playerId = randomUUID();
 ---
 
 <Layout title={page.data.title} background='gray-100'>
-  <div class='eventContainer'>
-    <EventViewer uuids={page.data.autogenerate.type_id} />
+  <div class='eventContainer' data-player-id={playerId}>
+    <EventViewer playerId={playerId} uuids={page.data.autogenerate.type_id} />
   </div>
 </Layout>

@@ -12,7 +12,7 @@ interface Props extends SlateEventNodeProps {
   event: CollectionEntry<'events'>;
   // UUID of the audiovisual file, for embedded events
   file?: string;
-  embed?: boolean;
+  isEmbed?: boolean;
   playerId: string;
 }
 
@@ -24,17 +24,17 @@ const {
   event,
   file,
   annotationSets,
-  embed,
+  isEmbed,
   playerId,
 } = Astro.props;
 ---
 
 <div>
   <div
-    class={`sticky ${includes.includes('label') ? 'top-[80px]' : 'top-0'} z-10 ${!embed ? 'shadow' : ''}`}
+    class={`sticky ${includes.includes('label') ? 'top-[80px]' : 'top-0'} z-10 ${!isEmbed ? 'shadow' : ''}`}
   >
     <div class='flex flex-col gap-6 bg-gray-100 py-6'>
-      <ConditionalContainer condition={!embed}>
+      <ConditionalContainer condition={!isEmbed}>
         {includes.includes('label') && <h1>{event.data.label}</h1>}
         {
           includes.includes('description') && event.data.description && (
@@ -54,7 +54,7 @@ const {
                 data-player-url={url}
               >
                 {includes.includes('media') && (
-                  <ConditionalContainer condition={!embed}>
+                  <ConditionalContainer condition={!isEmbed}>
                     <Player
                       url={url}
                       id={playerId}
@@ -69,7 +69,7 @@ const {
             );
           })
       }
-      <ConditionalContainer condition={!embed}>
+      <ConditionalContainer condition={!isEmbed}>
         <AnnotationHeader
           playerId={playerId}
           annotationSets={annotationSets}
@@ -78,9 +78,10 @@ const {
       </ConditionalContainer>
     </div>
   </div>
-  <ConditionalContainer condition={!embed}>
+  <ConditionalContainer condition={!isEmbed}>
     <Annotations
       annotationSets={annotationSets}
+      isEmbed={isEmbed}
       playerId={playerId}
       type={event.data.item_type}
     />

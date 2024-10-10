@@ -8,10 +8,10 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  embed?: boolean;
+  isEmbed?: boolean;
 }
 
-const { annotationSets, embed, playerId, type } = Astro.props;
+const { annotationSets, isEmbed, playerId, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
   .map((set) =>
@@ -34,6 +34,7 @@ const sortedAnnotations = annotationSets
     <AnnotationNanostorePopulator
       annotations={sortedAnnotations}
       playerId={playerId}
+      isEmbed={isEmbed}
       client:only='react'
     />
     <div
@@ -114,12 +115,6 @@ const sortedAnnotations = annotationSets
       `.eventContainer[data-player-id="${changed}"]`
     );
 
-    console.log(
-      document
-        .querySelector(`.eventContainer[data-player-id]`)
-        ?.getAttribute('data-player-id')
-    );
-
     if (!eventContainerEl) {
       console.error(`No event container found for ${changed}`);
       return null;
@@ -146,9 +141,18 @@ const sortedAnnotations = annotationSets
     if (typeof current === 'number' && current >= 0) {
       const activeNode = annotationNodes[current] as HTMLElement;
 
-      if (state[changed].autoScroll && activeNode.parentElement) {
-        const offsetTop = activeNode.offsetTop;
-        eventContainerEl.scroll({ top: offsetTop - 200, behavior: 'smooth' });
+      if (state[changed].autoScroll) {
+        // scroll the parent element if we're in an embed
+        if (state[changed].isEmbed) {
+          const offsetTop = activeNode.offsetTop;
+          eventContainerEl.scroll({
+            top: offsetTop - eventContainerEl.clientHeight / 3,
+            behavior: 'smooth',
+          });
+        // otherwise, scroll the whole page
+        } else {
+          activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
 
       activeNode.classList.add(activeBackground);

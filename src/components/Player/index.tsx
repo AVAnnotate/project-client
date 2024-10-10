@@ -10,7 +10,11 @@ import {
   VolumeUpFill,
 } from 'react-bootstrap-icons';
 import * as Slider from '@radix-ui/react-slider';
-import { $pagePlayersState, type AnnotationState } from '../../store.ts';
+import {
+  $pagePlayersState,
+  setClip,
+  type AnnotationState,
+} from '../../store.ts';
 import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
 import type { OnProgressProps } from 'react-player/base';
@@ -60,6 +64,18 @@ const Player: React.FC<Props> = (props) => {
       player.current.seekTo(playerState.seekTo);
     }
   }, [playerState.seekTo]);
+
+  // populate the clip's start/end times in the nanostore
+  useEffect(() => {
+    if (props.start || props.end) {
+      const clip = {
+        start: props.start || 0,
+        end: props.end || 0,
+      };
+
+      setClip(clip, props.id);
+    }
+  }, [props.start, props.end]);
 
   const formattedPosition = useMemo(
     () => formatTimestamp(playerState.position, false),
@@ -120,7 +136,7 @@ const Player: React.FC<Props> = (props) => {
     // don't move the point if the user is currently dragging it
     if (!seeking) {
       // stop playing if we've reached the end of a clip
-      if (props.end && data.playedSeconds >= props.end) {
+      if (data.playedSeconds >= duration) {
         $pagePlayersState.setKey(props.id, {
           ...playerState,
           isPlaying: false,
@@ -177,6 +193,16 @@ const Player: React.FC<Props> = (props) => {
           }
         }}
         onProgress={onProgress}
+        onReady={() => {
+          if (player.current && props.start) {
+            // we need to check whether the current timestamp is 0,
+            // because onReady is called on every seek for some reason
+            // so if we don't do this check, it will go into an endless loop!
+            if (player.current.getCurrentTime() === 0) {
+              player.current?.seekTo(props.start);
+            }
+          }
+        }}
         progressInterval={250}
         ref={player}
         url={props.url}
@@ -209,8 +235,8 @@ const Player: React.FC<Props> = (props) => {
             <div className='seek-bar'>
               <Slider.Root
                 className='seek-bar-slider'
-                defaultValue={[0]}
-                min={0}
+                defaultValue={[props.start ? props.start / duration : 0]}
+                min={props.start ? props.start / duration : 0}
                 max={0.999999999}
                 onValueChange={(val) => {
                   setSeeking(true);
