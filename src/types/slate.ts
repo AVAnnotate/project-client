@@ -8,9 +8,10 @@ export interface SlateEventNodeData {
   uuid: string;
 }
 
-export interface SlateEventNodeProps extends Omit<SlateEventNodeData, 'file' | 'includes' | 'uuid'> {
+export interface SlateEventNodeProps
+  extends Omit<SlateEventNodeData, 'file' | 'includes' | 'uuid'> {
   file?: string;
-  includes?: Includes[]
+  includes: Includes[];
 }
 
 export interface SlateCompareEventData {

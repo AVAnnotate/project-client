@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 interface Props {
   annotations: DisplayedAnnotation[];
   playerId: string;
+  isEmbed?: boolean;
 }
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
@@ -19,8 +20,9 @@ const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
       ...store[props.playerId],
       annotations: [...props.annotations],
       filteredAnnotations: [...props.annotations.map((ann) => ann.uuid)],
+      isEmbed: props.isEmbed,
     });
-  }, [props.annotations, props.playerId]);
+  }, [props.annotations, props.playerId, props.isEmbed]);
 
   return <></>;
 };
