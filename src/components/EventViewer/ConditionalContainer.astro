@@ -6,14 +6,15 @@ import Container from '@components/Container.astro';
 
 interface Props {
   condition?: boolean;
+  className?: string;
 }
 
-const { condition } = Astro.props;
+const { className, condition } = Astro.props;
 ---
 
 {
   condition ? (
-    <Container>
+    <Container className={className}>
       <slot />
     </Container>
   ) : (

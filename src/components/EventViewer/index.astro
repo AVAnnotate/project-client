@@ -1,59 +1,68 @@
 ---
 import { getCollection } from 'astro:content';
-import type { SlateEventNodeProps } from '@ty/slate';
+import type { Includes, SlateEventNodeProps } from '@ty/slate';
 import AudioEvent from './AudioEvent.astro';
 import VideoEvent from './VideoEvent.astro';
+import { getEntry } from 'astro:content';
 
-export interface Props extends Omit<SlateEventNodeProps, 'uuid'> {
+export interface Props extends Omit<SlateEventNodeProps, 'uuid' | 'includes'> {
   end?: number;
   start?: number;
   sticky?: boolean;
-  uuids: string | string[];
+  uuid: string;
   isEmbed?: boolean;
   playerId: string;
+  file?: string;
+  includes?: Includes[];
 }
 
-const {
-  uuids,
-  // include everything by default
-  includes = ['media', 'annotations', 'label', 'description'],
-  start,
-  end,
-  sticky,
-  isEmbed,
-  playerId,
-} = Astro.props;
+const { file, uuid } = Astro.props;
 
-const associatedEvents = await getCollection('events', (ev) =>
-  Array.isArray(uuids) ? uuids.includes(ev.id) : ev.id === uuids
-);
+const event = await getEntry('events', uuid);
+
+if (!event) {
+  return null;
+}
 
 const annotationData = await getCollection('annotations');
+
+const annotationSets = annotationData.filter(
+  (an) => an.data.event_id === event.id
+);
+
+// allow a default file to be configured via props
+// otherwise, use the first file in the list
+const defaultFile = file || Object.keys(event.data.audiovisual_files)[0];
+
+const childProps = {
+  ...Astro.props,
+  includes: Astro.props.includes || [
+    'media',
+    'annotations',
+    'label',
+    'description',
+  ],
+  file: defaultFile,
+};
 ---
 
 {
-  associatedEvents.map((event) => {
-    const annotationSets = annotationData.filter(
-      (an) => an.data.event_id === event.id
-    );
-
-    return (
-      <div>
-        {event.data.item_type === 'Audio' && (
-          <AudioEvent
-            annotationSets={annotationSets}
-            event={event}
-            {...Astro.props}
-          />
-        )}
-        {event.data.item_type === 'Video' && (
-          <VideoEvent
-            annotationSets={annotationSets}
-            event={event}
-            {...Astro.props}
-          />
-        )}
-      </div>
-    );
-  })
+  (
+    <div>
+      {event.data.item_type === 'Audio' && (
+        <AudioEvent
+          annotationSets={annotationSets}
+          event={event}
+          {...childProps}
+        />
+      )}
+      {event.data.item_type === 'Video' && (
+        <VideoEvent
+          annotationSets={annotationSets}
+          event={event}
+          {...childProps}
+        />
+      )}
+    </div>
+  )
 }

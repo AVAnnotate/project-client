@@ -35,10 +35,14 @@ if (!page.data.autogenerate.type_id) {
 }
 
 const playerId = randomUUID();
+
+const eventUuids = Array.isArray(page.data.autogenerate.type_id)
+  ? page.data.autogenerate.type_id
+  : [page.data.autogenerate.type_id];
 ---
 
 <Layout title={page.data.title} background='gray-100'>
   <div class='eventContainer' data-player-id={playerId}>
-    <EventViewer playerId={playerId} uuids={page.data.autogenerate.type_id} />
+    {eventUuids.map((uuid) => <EventViewer playerId={playerId} uuid={uuid} />)}
   </div>
 </Layout>

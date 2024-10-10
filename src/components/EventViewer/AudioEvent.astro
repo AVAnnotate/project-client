@@ -10,15 +10,14 @@ import ConditionalContainer from './ConditionalContainer.astro';
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
   event: CollectionEntry<'events'>;
-  // UUID of the audiovisual file, for embedded events
-  file?: string;
+  file: string;
   isEmbed?: boolean;
   playerId: string;
 }
 
 const {
   // include everything by default
-  includes = ['media', 'annotations', 'label', 'description'],
+  includes,
   start,
   end,
   event,
@@ -27,6 +26,8 @@ const {
   isEmbed,
   playerId,
 } = Astro.props;
+
+const url = event.data.audiovisual_files[file].file_url;
 ---
 
 <div>
@@ -42,33 +43,26 @@ const {
           )
         }
       </ConditionalContainer>
-      {
-        (includes.includes('annotations') || includes.includes('media')) &&
-          Object.keys(event.data.audiovisual_files).map((file: string) => {
-            const url: string = event.data.audiovisual_files[file].file_url;
-
-            return (
-              <div
-                class='mediaContainer gap-4 flex flex-col'
-                data-player-id={playerId}
-                data-player-url={url}
-              >
-                {includes.includes('media') && (
-                  <ConditionalContainer condition={!isEmbed}>
-                    <Player
-                      url={url}
-                      id={playerId}
-                      client:only='react'
-                      type={event.data.item_type}
-                      start={start}
-                      end={end}
-                    />
-                  </ConditionalContainer>
-                )}
-              </div>
-            );
-          })
-      }
+      <div
+        class='mediaContainer gap-4 flex flex-col'
+        data-player-id={playerId}
+        data-player-url={url}
+      >
+        {
+          includes.includes('media') && (
+            <ConditionalContainer condition={!isEmbed}>
+              <Player
+                url={url}
+                id={playerId}
+                client:only='react'
+                type={event.data.item_type}
+                start={start}
+                end={end}
+              />
+            </ConditionalContainer>
+          )
+        }
+      </div>
       <ConditionalContainer condition={!isEmbed}>
         <AnnotationHeader
           playerId={playerId}

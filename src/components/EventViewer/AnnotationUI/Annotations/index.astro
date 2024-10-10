@@ -38,8 +38,9 @@ const sortedAnnotations = annotationSets
       client:only='react'
     />
     <div
-      class={` ${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
+      class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
       id={playerId}
+      data-player-id={playerId}
     >
       {
         sortedAnnotations.map((ann) => {
@@ -144,12 +145,24 @@ const sortedAnnotations = annotationSets
       if (state[changed].autoScroll) {
         // scroll the parent element if we're in an embed
         if (state[changed].isEmbed) {
+          const videoContainerEl = document.querySelector(
+            `.videoAnnotationContainer[data-player-id="${changed}"]`
+          );
           const offsetTop = activeNode.offsetTop;
-          eventContainerEl.scroll({
-            top: offsetTop - eventContainerEl.clientHeight / 3,
-            behavior: 'smooth',
-          });
-        // otherwise, scroll the whole page
+
+          // we need to scroll a different container if we're in an embedded video event
+          if (videoContainerEl) {
+            videoContainerEl.scroll({
+              top: offsetTop - videoContainerEl.clientHeight,
+              behavior: 'smooth',
+            });
+          } else {
+            eventContainerEl.scroll({
+              top: offsetTop - eventContainerEl.clientHeight / 3,
+              behavior: 'smooth',
+            });
+          }
+          // otherwise, scroll the whole page
         } else {
           activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }

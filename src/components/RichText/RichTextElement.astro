@@ -98,16 +98,17 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
 
         return (
           <div
-            class='bg-gray-100 px-4 pb-4 max-h-[600px] overflow-y-auto eventContainer'
+            class='bg-gray-100 p-4 max-h-[700px] overflow-y-auto eventContainer'
             data-player-id={playerId}
           >
             <EventViewer
               end={element.end}
               start={element.start}
               includes={element.includes}
-              uuids={element.uuid}
+              uuid={element.uuid}
               isEmbed
               playerId={playerId}
+              file={element.file}
             />
           </div>
         );
