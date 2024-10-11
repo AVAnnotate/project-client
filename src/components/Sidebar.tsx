@@ -15,10 +15,10 @@ const getHref = (page: PageCollectionEntry, baseUrl: string) => {
   }
 
   if (page.data.autogenerate.enabled) {
-    return `/${baseUrl}/events/${page.id}`;
+    return `/${baseUrl}/events/${page.data.slug || page.id}`;
   }
 
-  return `/${baseUrl}/pages/${page.id}`;
+  return `/${baseUrl}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -59,7 +59,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               <div className='p-4 hover:bg-blue-hover'>
                 <p
                   key={page.id}
-                  className={`${isSelected(page) ? 'font-bold' : ''} ${page.data.parent ? 'ml-6' : ''}`}
+                  className={`${isSelected(page) ? 'font-bold' : ''} ${
+                    page.data.parent ? 'ml-6' : ''
+                  }`}
                   title={page.data.title}
                 >
                   {page.data.title}
