@@ -1,6 +1,7 @@
 ---
 import EventViewer from '@components/EventViewer/index.astro';
 import TableOfContents from '@components/TableOfContents.astro';
+import { randomUUID } from 'crypto';
 
 const { attributes, element } = Astro.props;
 
@@ -93,14 +94,21 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
           </div>
         );
       case 'event':
+        const playerId = randomUUID();
+
         return (
-          <div class='bg-gray-100 p-4'>
+          <div
+            class='bg-gray-100 px-4 pb-4 max-h-[700px] overflow-y-auto eventContainer'
+            data-player-id={playerId}
+          >
             <EventViewer
               end={element.end}
               start={element.start}
               includes={element.includes}
-              uuids={element.uuid}
-              embed
+              uuid={element.uuid}
+              isEmbed
+              playerId={playerId}
+              file={element.file}
             />
           </div>
         );

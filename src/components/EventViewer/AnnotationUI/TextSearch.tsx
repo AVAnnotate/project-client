@@ -1,7 +1,7 @@
 import { Input } from '@headlessui/react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
-import { $pagePlayersState } from 'src/store.ts';
+import { $pagePlayersState, setSearchFilter } from 'src/store.ts';
 
 export interface TextSearchProps {
   playerId: string;
@@ -10,12 +10,11 @@ export interface TextSearchProps {
 const TextSearch = (props: TextSearchProps) => {
   const { playerId } = props;
   const pagePlayers = useStore($pagePlayersState);
+
   const handleChange = (e: any) => {
-    $pagePlayersState.setKey(playerId, {
-      ...pagePlayers[playerId],
-      searchQuery: e.target.value,
-    });
+    setSearchFilter(e.target.value, playerId);
   };
+
   return (
     <div className='flex flex-row rounded-lg py-1.5 px-3 bg-white items-center gap-3 border-solid border border-gray-200'>
       <MagnifyingGlassIcon className='h-6 w-6' />
