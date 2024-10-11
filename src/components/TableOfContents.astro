@@ -24,7 +24,7 @@ if (!homePage) {
   </a>
   {
     pages
-      .filter((page) => page.id !== (homePage.data.slug || homePage.id))
+      .filter((page) => page.id !== homePage.id)
       .map((page) => (
         <a
           class={`underline ${page.data.parent ? 'ml-4' : ''}`}
