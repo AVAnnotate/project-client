@@ -16,12 +16,10 @@ const homePage = pages.find((p) => p.data.autogenerate.type === 'home');
 if (!homePage) {
   throw new Error('No homepage found?!?');
 }
-
-console.log('baseUrl: ', baseUrl);
 ---
 
 <div class='py-4 flex flex-col gap-2'>
-  <a class='underline' href={baseUrl}>
+  <a class='underline' href={'/'}>
     {homePage.data.title}
   </a>
   {
