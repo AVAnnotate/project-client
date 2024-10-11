@@ -74,28 +74,32 @@ export const getPage = async (uuid: string) => {
     return (await getEntry('pages', uuid)) as PageCollectionEntry;
   } else {
     // using slugs
-    const results = await getCollection('pages', (page) => {
-      if (page.id === 'order') {
+    const pageOrder = await getOrder();
+    const results = await getCollection(
+      'pages',
+      (page: PageCollectionEntry) => {
+        if (page.id === 'order') {
+          return false;
+        }
+
+        // skip pages that aren't mentioned in the order file
+        // something has gone terribly wrong if this happens!
+        if (!pageOrder.data.includes(page.id)) {
+          return false;
+        }
+
+        // Look for the slug
+        if (page.data.slug === uuid) {
+          return true;
+        }
+
         return false;
       }
-
-      // skip pages that aren't mentioned in the order file
-      // something has gone terribly wrong if this happens!
-      if (!pageOrder.data.includes(page.id)) {
-        return false;
-      }
-
-      // Look for the slug
-      if (page.data.slug === uuid) {
-        return true;
-      }
-
-      return false;
-    });
+    );
 
     // assume there is only one...
     console.log('Results: ', results[0]);
-    return results[0];
+    return results[0] as PageCollectionEntry;
   }
 };
 
