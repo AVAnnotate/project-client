@@ -5,13 +5,18 @@ import '@fontsource-variable/inter';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { getEntry } from 'astro:content';
-
-const projectData = await getEntry('project', 'project');
+import { dynamicConfig } from 'dynamic-astro-config';
 
 interface Props {
   background?: string;
   title?: string;
 }
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
 
 const { background, title = projectData.data.project.title } = Astro.props;
 
@@ -25,7 +30,7 @@ const projectBy =
     <meta charset='UTF-8' />
     <meta name='description' content='Astro description' />
     <meta name='viewport' content='width=device-width' />
-    <link rel='icon' type='image/svg+xml' href='/my-repo/dist/favicon.svg' />
+    <link rel='icon' type='image/svg+xml' href=`/${baseUrl}/favicon.svg` />
     <meta name='generator' content={Astro.generator} />
 
     <!-- google font links -->
