@@ -65,7 +65,7 @@ const pageCollection = defineCollection({
       parent: z.string().nullish(),
       updated_at: z.string(),
       updated_by: z.string(),
-      slug: z.string(),
+      slug: z.string().nullish(),
       autogenerate: z.object({
         enabled: z.boolean(),
         type: z.string(),
