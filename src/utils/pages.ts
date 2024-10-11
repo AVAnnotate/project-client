@@ -95,7 +95,6 @@ export const getPage = async (uuid: string) => {
     });
 
     // assume there is only one...
-    console.log('Results: ', results[0]);
     return results[0] as PageCollectionEntry;
   }
 };
