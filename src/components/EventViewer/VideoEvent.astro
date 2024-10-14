@@ -7,7 +7,6 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
-import type { EventCollectionEntry } from 'src/utils/pages';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -37,9 +36,12 @@ const {
 // @ts-ignore
 const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
-const captionSets: string[] = (
-  event as CollectionEntry<'events'>
-).data.audiovisual_files[file].caption_set.map((s: string) => `/${s}.vtt`);
+const captionSets: string[] = (event as CollectionEntry<'events'>).data
+  .audiovisual_files[file].caption_set
+  ? (event as CollectionEntry<'events'>).data.audiovisual_files[
+      file
+    ].caption_set.map((s: any) => `/${s.annotation_page_id}.vtt`)
+  : [];
 ---
 
 <ConditionalContainer
