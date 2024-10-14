@@ -35,13 +35,13 @@ const {
 } = Astro.props;
 
 // @ts-ignore
-const url = (event as EventCollectionEntry).data.audiovisual_files[file]
+const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
-const captionSets: string[] = (
-  event as EventCollectionEntry
-).data.audiovisual_files[file].caption_set.map((s) => {
-  return `/${s.annotation_page_id}.vtt`;
-});
+const captionSets: string[] = (event as EventCollectionEntry)//@ts-ignore
+.data.audiovisual_files[file].caption_set
+  .map((s) => {
+    return `/${s.annotation_page_id}.vtt`;
+  });
 ---
 
 <ConditionalContainer
