@@ -36,12 +36,16 @@ const {
 // @ts-ignore
 const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
-const captionSets: string[] = (event as CollectionEntry<'events'>).data
-  .audiovisual_files[file].caption_set
-  ? (event as CollectionEntry<'events'>).data.audiovisual_files[
-      file
-    ].caption_set?.map((s: any) => `/${s.annotation_page_id}.vtt`)
-  : [];
+let captionSets: string[];
+if (
+  (event as CollectionEntry<'events'>).data.audiovisual_files[file].caption_set
+) {
+  captionSets = (event as CollectionEntry<'events'>).data.audiovisual_files[
+    file
+  ].caption_set.map((s: any) => `/${s.annotation_page_id}.vtt`);
+} else {
+  captionSets = [];
+}
 ---
 
 <ConditionalContainer
