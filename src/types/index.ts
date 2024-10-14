@@ -5,7 +5,7 @@ export type EventFile = {
     label: string;
     file_url: string;
     duration: number;
-    caption_set: { annotation_page_id: string; speaker_category?: string };
+    caption_set?: { annotation_page_id: string; speaker_category?: string }[];
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
@@ -69,6 +69,7 @@ export type Event = {
     label: string;
     file_url: string;
     duration: number;
+    caption_set?: { annotation_page_id: string; speaker_category?: string }[];
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
