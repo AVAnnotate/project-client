@@ -79,6 +79,8 @@ const Player: React.FC<Props> = (props) => {
           default: idx === 0 ? true : false,
         };
       });
+
+      return config;
     } else {
       return {};
     }
