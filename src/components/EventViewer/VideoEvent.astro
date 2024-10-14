@@ -44,7 +44,7 @@ const baseUrl = import.meta.env.PROD
 // @ts-ignore
 const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
-let captionSets: string[];
+let captionSets: { url: string; label: string }[];
 if (
   // @ts-ignore
   (event as CollectionEntry<'events'>).data.audiovisual_files[file].caption_set

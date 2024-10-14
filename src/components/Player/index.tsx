@@ -74,8 +74,8 @@ const Player: React.FC<Props> = (props) => {
       config.file.tracks = props.vttURLs.map((u, idx) => {
         return {
           kind: 'captions',
-          src: u,
-          label: 'en',
+          src: u.url,
+          label: u.label,
           default: idx === 0 ? true : false,
         };
       });
