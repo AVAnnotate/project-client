@@ -25,6 +25,7 @@ interface Props {
   start?: number;
   type: 'Audio' | 'Video';
   url: string;
+  vttURLs?: string[];
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -53,6 +54,35 @@ const Player: React.FC<Props> = (props) => {
       return [];
     }
   }, [playerState]);
+
+  const tracksConfig = useMemo(() => {
+    if (props.vttURLs && props.vttURLs.length > 0) {
+      const config: {
+        file: {
+          tracks: {
+            kind: string;
+            src: string;
+            srcLang: string;
+            default?: boolean;
+          }[];
+        };
+      } = {
+        file: {
+          tracks: [],
+        },
+      };
+      config.file.tracks = props.vttURLs.map((u, idx) => {
+        return {
+          kind: 'subtitles',
+          src: u,
+          srcLang: 'en',
+          default: idx === 0 ? true : false,
+        };
+      });
+    } else {
+      return {};
+    }
+  }, [props.vttURLs]);
 
   const player = useRef<ReactPlayerType>(null);
 
@@ -181,6 +211,7 @@ const Player: React.FC<Props> = (props) => {
         controls={props.type === 'Video'}
         playing={playerState.isPlaying}
         muted={muted}
+        config={tracksConfig}
         onDuration={(dur) => {
           if (props.start && props.end) {
             setDuration(props.end - props.start);
