@@ -1,0 +1,44 @@
+---
+import { getEntry } from 'astro:content';
+
+interface Props {
+  category: string;
+  set: string;
+}
+
+const { category, set } = Astro.props;
+
+const setData = await getEntry('annotations', set);
+const projectData = await getEntry('project', 'project');
+
+const tags = projectData.data.project.tags;
+
+const categoryColors: { [cat: string]: string } = {};
+
+tags.tagGroups.forEach((tg) => {
+  categoryColors[tg.category] = tg.color;
+});
+
+if (!setData || setData.data.annotations.length === 0) {
+  return null;
+}
+---
+
+<div class='flex flex-row overflow-x-auto w-full h-[50px] gap-1'>
+  {
+    setData.data.annotations.map((ann: any) => {
+      const tags = ann.tags.filter(
+        (tag: any) => tag.category.toLowerCase() === category.toLowerCase()
+      );
+
+      return (
+        <div
+          class='h-[42px] w-3 flex-shrink-0'
+          style={{
+            backgroundColor: tags.length ? categoryColors[category] : 'black',
+          }}
+        />
+      );
+    })
+  }
+</div>

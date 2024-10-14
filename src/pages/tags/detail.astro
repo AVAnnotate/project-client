@@ -5,12 +5,16 @@ import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
+import TagSpectrum from '@components/Tags/TagSpectrum.astro';
+import TagPill from '@components/Tags/TagPill';
+import React from 'react';
 
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
   ? projectData.data.project.slug
   : dynamicConfig.base;
+
 const crumbs = [
   {
     label: 'Home',
@@ -25,12 +29,10 @@ const crumbs = [
   },
 ];
 
-const tags = projectData.data.project.tags;
-
 const annotationSets = await getCollection('annotations');
 
-//check whether there actually are any annotation files
-if (!annotationSets.length) {
+// check whether there actually are any annotation files
+if (annotationSets.length === 0) {
   return Astro.redirect(`/${baseUrl}`);
 }
 
@@ -47,47 +49,31 @@ const labeledSets = annotationSets.map((set) => {
   };
 });
 
-for (let i = 0; i < annotationSets.length; i++) {}
-const detectTag = (
-  tag: { tag: string; category: string },
-  ann: { tag: string; category: string }[]
-) => {
-  const lowerCaseAnn = ann.map((t) => ({
-    tag: t.tag.toLowerCase(),
-    category: t.category.toLowerCase(),
-  }));
-  const lowerCaseTag = {
-    tag: tag.tag.toLowerCase(),
-    category: tag.category.toLowerCase(),
+const tagData: {
+  [category: string]: {
+    color: string;
+    tags: {
+      tag: string;
+    }[];
   };
-  return !!lowerCaseAnn.find((t) => t.tag === lowerCaseTag.tag); //should also match the category but for now the data is bugged so all the categories are speaker
-};
-const getTagCount = (tag: { tag: string; category: string }) => {
-  let count = 0;
-  annotationSets.forEach((set) => {
-    const setAnnotations = set.data.annotations;
-    setAnnotations.forEach((ann: any) => {
-      if (detectTag(tag, ann.tags)) {
-        count = count + 1;
-      }
+} = {};
+
+projectData.data.project.tags.tagGroups.forEach(
+  (group: { category: string; color: string }) => {
+    tagData[group.category] = {
+      color: group.color,
+      tags: [],
+    };
+  }
+);
+
+projectData.data.project.tags.tags.forEach(
+  (tag: { tag: string; category: string }) => {
+    tagData[tag.category].tags.push({
+      tag: tag.tag,
     });
-  });
-  return count;
-};
-let tagData: any = {};
-tags.tagGroups.forEach((group: { category: string; color: string }) => {
-  tagData[group.category] = {
-    color: group.color,
-    tags: [],
-  };
-});
-tags.tags.forEach((tag: { tag: string; category: string }) => {
-  const count = getTagCount(tag);
-  tagData[tag.category].tags.push({
-    tag: tag.tag,
-    count: count,
-  });
-});
+  }
+);
 ---
 
 <Layout title={`Tag Detail - ${projectData.data.project.title}`}>
@@ -95,48 +81,24 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
     <Breadcrumbs crumbs={crumbs} />
   </div>
   <Container className='py-12 flex flex-col gap-8 font-inter'>
-    <h1>Tag Groups used in Events</h1>
+    <h1 class='text-2xl'>Tag Groups used in Events</h1>
     <div class='flex flex-row gap-2'>
       {
         Object.keys(tagData).map((cat) => (
-          <div
-            class='rounded-full flex flex-row justify-between px-4 py-2 gap-4 hover:scale-105 transition'
-            style={{ backgroundColor: tagData[cat].color }}
-          >
-            <span class='font-semibold capitalize'>
-              {cat.replaceAll('_', '')}
-            </span>
-          </div>
+          <TagPill color={tagData[cat].color} tag={cat.replaceAll('_', '')} />
         ))
       }
     </div>
     {
       Object.keys(tagData).map((cat) => (
         <>
-          {tagData[cat].tags.length ? (
+          {tagData[cat].tags.length > 0 ? (
             <div class='w-full py-6 flex flex-col gap-6'>
               <h3 class='text-lg capitalize'>{cat.replaceAll('_', '')}</h3>
               {labeledSets.map((set) => (
                 <div class='flex flex-col gap-4'>
                   <p>{set.eventLabel}</p>
-                  <div class='flex flex-row overflow-x-auto w-full h-[50px] gap-1'>
-                    {set.data.annotations.map((ann: any) => {
-                      const tags = ann.tags.filter(
-                        (tag: any) =>
-                          tag.category.toLowerCase() === cat.toLowerCase()
-                      );
-                      return (
-                        <div
-                          class='h-[42px] w-3 flex-shrink-0'
-                          style={{
-                            backgroundColor: tags.length
-                              ? tagData[cat].color
-                              : 'black',
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
+                  <TagSpectrum set={set.id} category={cat} />
                 </div>
               ))}
             </div>
