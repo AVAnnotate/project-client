@@ -9,6 +9,7 @@ import { getPage, getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
 
+// @ts-ignore
 const baseUrl = import.meta.env.PROD
   ? projectData.data.project.slug
   : dynamicConfig.base;

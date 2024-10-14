@@ -30,15 +30,6 @@ export const createAnnotationPage = (
         fs.readFileSync(`${dataPath}/annotations/${file}`, 'utf8')
       );
 
-      // Read in the matching Event file
-      // All Event files are assumed to be in ./events
-      const eventData: EventFile = JSON.parse(
-        fs.readFileSync(
-          `${dataPath}/events/${annotationData.event_id}.json`,
-          'utf8'
-        )
-      );
-
       if (annotationData.event_id === eventUUID) {
         const obj: IIIFAnnotationPage = {
           '@context': 'http://iiif.io/api/presentation/3/context.json',
