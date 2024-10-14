@@ -18,7 +18,7 @@ export interface OrderCollectionEntry
 }
 
 export interface EventCollectionEntry
-  extends Omit<CollectionEntry<'event'>, 'data'> {
+  extends Omit<CollectionEntry<'events'>, 'data'> {
   data: EventFile;
 }
 
