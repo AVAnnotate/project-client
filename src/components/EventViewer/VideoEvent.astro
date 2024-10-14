@@ -8,6 +8,7 @@ import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
 import { getEntry } from 'astro:content';
+import { dynamicConfig } from 'dynamic-astro-config';
 
 export interface Props {
   event: CollectionEntry<'events'>;
