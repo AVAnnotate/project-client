@@ -207,7 +207,6 @@ const Player: React.FC<Props> = (props) => {
     }
   };
 
-  console.log('Config: ', tracksConfig);
   return (
     <div className='player'>
       <ReactPlayer
