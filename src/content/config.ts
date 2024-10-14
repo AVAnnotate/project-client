@@ -35,6 +35,14 @@ const eventCollection = defineCollection({
         is_offline: z.boolean().nullish(),
         file_url: z.string(),
         duration: z.number(),
+        caption_set: z
+          .array(
+            z.object({
+              annotation_page_id: z.string(),
+              speaker_category: z.string().nullish(),
+            })
+          )
+          .nullish(),
       })
     ),
     auto_generate_web_page: z.boolean(),
