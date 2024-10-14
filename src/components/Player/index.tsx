@@ -25,7 +25,7 @@ interface Props {
   start?: number;
   type: 'Audio' | 'Video';
   url: string;
-  vttURLs?: string[];
+  vttURLs?: { url: string; label: string }[];
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -60,9 +60,9 @@ const Player: React.FC<Props> = (props) => {
       const config: {
         file: {
           tracks: {
-            kind: string;
+            kind: 'captions';
             src: string;
-            srcLang: string;
+            label: string;
             default?: boolean;
           }[];
         };
@@ -73,9 +73,9 @@ const Player: React.FC<Props> = (props) => {
       };
       config.file.tracks = props.vttURLs.map((u, idx) => {
         return {
-          kind: 'subtitles',
+          kind: 'captions',
           src: u,
-          srcLang: 'en',
+          label: 'en',
           default: idx === 0 ? true : false,
         };
       });

@@ -53,7 +53,13 @@ if (
   captionSets = (event as CollectionEntry<'events'>).data.audiovisual_files[
     file
     // @ts-ignore
-  ].caption_set.map((s: any) => `/${baseUrl}/${s.annotation_page_id}.vtt`);
+  ].caption_set.map((s: any) => {
+    const set = annotationSets.find((set) => set.id === s.annotation_page_id);
+    return {
+      url: `/${baseUrl}/${s.annotation_page_id}.vtt`,
+      label: set?.data.set || '',
+    };
+  });
 } else {
   captionSets = [];
 }
