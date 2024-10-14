@@ -1,0 +1,49 @@
+---
+import type { Annotation, TagGroup } from '@ty/index.ts';
+import TagPill from './TagPill.tsx';
+import { formatTimestamp } from 'src/utils/player.ts';
+import RichText from '../RichText/index.astro';
+
+interface Props {
+  annotation: Annotation;
+  tagGroup: TagGroup;
+}
+
+const { annotation, tagGroup } = Astro.props;
+
+const tags = annotation.tags.filter(
+  (tag) => tag.category.toLowerCase() === tagGroup.category.toLowerCase()
+);
+---
+
+<div
+  class='annotation-band h-full basis-3 group border-r-2 border-white flex-shrink-0 grow'
+  style={{
+    backgroundColor: tags.length > 0 ? tagGroup.color : '#000000',
+  }}
+>
+  <div class='annotation-band-popup hidden group-hover:block w-96 absolute'>
+    <div class='shadow bg-white'>
+      <div class='p-2' style={{ backgroundColor: tagGroup.color }}>
+        {tagGroup.category}
+      </div>
+      <div class='p-2 flex flex-col gap-4'>
+        <div class='flex flex-wrap gap-4 w-full'>
+          {
+            annotation.tags.map((tag) => (
+              <TagPill color='gray-200' tag={tag.tag} />
+            ))
+          }
+        </div>
+        <p class='text-sm'>{formatTimestamp(annotation.start_time)}</p>
+        <div class='max-h-32 overflow-y-auto text-sm'>
+          <RichText nodes={annotation.annotation} />
+        </div>
+      </div>
+    </div>
+    <div
+      class='relative left-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray overflow-hidden after:shadow after:absolute after:content-[""]'
+    >
+    </div>
+  </div>
+</div>

@@ -5,9 +5,8 @@ import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import TagSpectrum from '@components/Tags/TagSpectrum.astro';
+import AnnotationSpectrum from '@components/Tags/AnnotationSpectrum.astro';
 import TagPill from '@components/Tags/TagPill';
-import React from 'react';
 
 const projectData = await getEntry('project', 'project');
 
@@ -37,43 +36,6 @@ if (annotationSets.length === 0) {
 }
 
 const events = await getCollection('events');
-
-// create a sets array that includes the label for the corresponding event
-const labeledSets = annotationSets.map((set) => {
-  const event = events.find((ev) => ev.id === set.data.event_id);
-  const eventLabel = event ? event.data.label : '';
-
-  return {
-    ...set,
-    eventLabel,
-  };
-});
-
-const tagData: {
-  [category: string]: {
-    color: string;
-    tags: {
-      tag: string;
-    }[];
-  };
-} = {};
-
-projectData.data.project.tags.tagGroups.forEach(
-  (group: { category: string; color: string }) => {
-    tagData[group.category] = {
-      color: group.color,
-      tags: [],
-    };
-  }
-);
-
-projectData.data.project.tags.tags.forEach(
-  (tag: { tag: string; category: string }) => {
-    tagData[tag.category].tags.push({
-      tag: tag.tag,
-    });
-  }
-);
 ---
 
 <Layout title={`Tag Detail - ${projectData.data.project.title}`}>
@@ -84,27 +46,80 @@ projectData.data.project.tags.tags.forEach(
     <h1 class='text-2xl'>Tag Groups used in Events</h1>
     <div class='flex flex-row gap-2'>
       {
-        Object.keys(tagData).map((cat) => (
-          <TagPill color={tagData[cat].color} tag={cat.replaceAll('_', '')} />
+        projectData.data.project.tags.tagGroups.map((tg) => (
+          <TagPill color={tg.color} tag={tg.category.replaceAll('_', '')} />
         ))
       }
     </div>
     {
-      Object.keys(tagData).map((cat) => (
-        <>
-          {tagData[cat].tags.length > 0 ? (
-            <div class='w-full py-6 flex flex-col gap-6'>
-              <h3 class='text-lg capitalize'>{cat.replaceAll('_', '')}</h3>
-              {labeledSets.map((set) => (
-                <div class='flex flex-col gap-4'>
-                  <p>{set.eventLabel}</p>
-                  <TagSpectrum set={set.id} category={cat} />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </>
-      ))
+      projectData.data.project.tags.tagGroups.map((tg) => {
+        const tags = projectData.data.project.tags.tags.filter(
+          (t) => t.category === tg.category
+        );
+
+        return (
+          <>
+            {tags.length > 0 ? (
+              <div class='w-full py-6 flex flex-col gap-6'>
+                <h3 class='text-lg capitalize'>
+                  {tg.category.replaceAll('_', '')}
+                </h3>
+                {annotationSets.map((set) => {
+                  if (set.data.annotations.length > 0) {
+                    const event = events.find(
+                      (ev) => ev.id === set.data.event_id
+                    );
+
+                    if (event) {
+                      return (
+                        <AnnotationSpectrum
+                          set={set}
+                          tagGroup={tg}
+                          label={event.data.label}
+                        />
+                      );
+                    }
+                  }
+                })}
+              </div>
+            ) : null}
+          </>
+        );
+      })
     }
   </Container>
 </Layout>
+
+<script>
+  const bands = document.querySelectorAll('.annotation-band');
+
+  for (let i = 0; i < bands.length; i++) {
+    const band = bands[i] as HTMLDivElement;
+
+    band.onmouseover = () => {
+      const popup = band.querySelector(
+        '.annotation-band-popup'
+      ) as HTMLDivElement;
+
+      const parent = band.parentElement! as HTMLElement;
+
+      // get the position within the container (important if there's horizontally scrolling overflow)
+      const xPos = band.offsetLeft - parent.scrollLeft - popup.clientWidth / 2;
+
+      // get the vertical position while taking scrolling into account
+      const yPos =
+        document.body.clientHeight -
+        (band.getBoundingClientRect().top + window.scrollY) +
+        window.scrollY;
+
+      // todo: calculate distance from bottom somehow
+      //       this still gives weird results!
+      console.log(yPos);
+
+      popup.style.left = `${xPos}px`;
+      popup.style.bottom = `${yPos}px`;
+
+      console.log(popup.style);
+    };
+  }
+</script>

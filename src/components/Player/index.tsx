@@ -78,12 +78,12 @@ const Player: React.FC<Props> = (props) => {
   }, [props.start, props.end]);
 
   const formattedPosition = useMemo(
-    () => formatTimestamp(playerState.position, false),
+    () => formatTimestamp(playerState.position),
     [playerState.position]
   );
 
   const formattedDuration = useMemo(
-    () => formatTimestamp(duration, false),
+    () => formatTimestamp(duration),
     [duration]
   );
 
