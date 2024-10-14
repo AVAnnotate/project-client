@@ -40,7 +40,7 @@ const captionSets: string[] = (event as CollectionEntry<'events'>).data
   .audiovisual_files[file].caption_set
   ? (event as CollectionEntry<'events'>).data.audiovisual_files[
       file
-    ].caption_set.map((s: any) => `/${s.annotation_page_id}.vtt`)
+    ].caption_set?.map((s: any) => `/${s.annotation_page_id}.vtt`)
   : [];
 ---
 
