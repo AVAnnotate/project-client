@@ -38,10 +38,13 @@ const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
 let captionSets: string[];
 if (
+  // @ts-ignore
   (event as CollectionEntry<'events'>).data.audiovisual_files[file].caption_set
 ) {
+  // @ts-ignore
   captionSets = (event as CollectionEntry<'events'>).data.audiovisual_files[
     file
+    // @ts-ignore
   ].caption_set.map((s: any) => `/${s.annotation_page_id}.vtt`);
 } else {
   captionSets = [];
