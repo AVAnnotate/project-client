@@ -7,6 +7,7 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
+import { getEntry } from 'astro:content';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -33,6 +34,12 @@ const {
   isEmbed,
 } = Astro.props;
 
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
+
 // @ts-ignore
 const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
   .file_url;
@@ -45,7 +52,7 @@ if (
   captionSets = (event as CollectionEntry<'events'>).data.audiovisual_files[
     file
     // @ts-ignore
-  ].caption_set.map((s: any) => `/${s.annotation_page_id}.vtt`);
+  ].caption_set.map((s: any) => `/${baseUrl}/${s.annotation_page_id}.vtt`);
 } else {
   captionSets = [];
 }
