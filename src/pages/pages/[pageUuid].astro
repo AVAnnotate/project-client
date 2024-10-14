@@ -17,7 +17,7 @@ export const getStaticPaths = (async () => {
   const eventPages = await getPages((p) => !p.data.autogenerate.enabled);
 
   return eventPages.map((page) => ({
-    params: { pageUuid: page.id },
+    params: { pageUuid: page.data.slug || page.id },
   }));
 }) satisfies GetStaticPaths;
 

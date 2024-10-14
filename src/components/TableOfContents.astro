@@ -19,7 +19,7 @@ if (!homePage) {
 ---
 
 <div class='py-4 flex flex-col gap-2'>
-  <a class='underline' href={baseUrl}>
+  <a class='underline' href={`/${baseUrl}`}>
     {homePage.data.title}
   </a>
   {
@@ -28,7 +28,7 @@ if (!homePage) {
       .map((page) => (
         <a
           class={`underline ${page.data.parent ? 'ml-4' : ''}`}
-          href={`/${baseUrl}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.id}`}
+          href={`/${baseUrl}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
         >
           <p>{page.data.title}</p>
         </a>

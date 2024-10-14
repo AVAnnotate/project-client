@@ -25,13 +25,13 @@ export const getPages = async (
   const pageOrder = await getOrder();
 
   const results = await getCollection('pages', (page) => {
-    if (page.id === 'order') {
+    if ((page as PageCollectionEntry).id === 'order') {
       return false;
     }
 
     // skip pages that aren't mentioned in the order file
     // something has gone terribly wrong if this happens!
-    if (!pageOrder.data.includes(page.id)) {
+    if (!pageOrder.data.includes((page as PageCollectionEntry).id)) {
       return false;
     }
 
@@ -55,6 +55,12 @@ export const getPages = async (
   return results as PageCollectionEntry[];
 };
 
+function isValidUUID(uuid: string) {
+  const regex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return regex.test(uuid);
+}
+
 // fetch a single page and typecast it as
 export const getPage = async (uuid: string) => {
   if (uuid === 'order') {
@@ -63,7 +69,34 @@ export const getPage = async (uuid: string) => {
     );
   }
 
-  return (await getEntry('pages', uuid)) as PageCollectionEntry;
+  // Determine if UUID
+  if (isValidUUID(uuid)) {
+    return (await getEntry('pages', uuid)) as PageCollectionEntry;
+  } else {
+    // using slugs
+    const pageOrder = await getOrder();
+    const results = await getCollection('pages', (page) => {
+      if ((page as PageCollectionEntry).id === 'order') {
+        return false;
+      }
+
+      // skip pages that aren't mentioned in the order file
+      // something has gone terribly wrong if this happens!
+      if (!pageOrder.data.includes((page as PageCollectionEntry).id)) {
+        return false;
+      }
+
+      // Look for the slug
+      if ((page as PageCollectionEntry).data.slug === uuid) {
+        return true;
+      }
+
+      return false;
+    });
+
+    // assume there is only one...
+    return results[0] as PageCollectionEntry;
+  }
 };
 
 export const getOrder = async () =>
