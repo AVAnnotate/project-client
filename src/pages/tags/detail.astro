@@ -123,7 +123,10 @@ const events = await getCollection('events');
         8;
 
       const arrowXpos =
-        band.offsetLeft + (band.clientWidth - 2) / 2 - parent.scrollLeft - 7;
+        band.offsetLeft +
+        band.clientWidth / 2 -
+        popupArrow.offsetWidth / 2 -
+        parent.scrollLeft;
       const arrowYpos = yPos + popup.clientHeight;
 
       popupArrow.style.left = `${arrowXpos}px`;
