@@ -104,20 +104,20 @@ const events = await getCollection('events');
       const parent = band.parentElement! as HTMLElement;
 
       // get the position within the container (important if there's horizontally scrolling overflow)
-      const xPos = band.offsetLeft - parent.scrollLeft - popup.clientWidth / 2;
+      // subtract 2 from popup.clientWidth because it has a right border 2px wide
+      const xPos =
+        band.offsetLeft - parent.scrollLeft - (popup.clientWidth - 2) / 2;
 
       // get the vertical position while taking scrolling into account
       const yPos =
-        document.body.clientHeight -
-        (band.getBoundingClientRect().top + window.scrollY) +
-        window.scrollY;
+        band.getBoundingClientRect().top + window.scrollY - popup.clientHeight;
 
       // todo: calculate distance from bottom somehow
       //       this still gives weird results!
       console.log(yPos);
 
       popup.style.left = `${xPos}px`;
-      popup.style.bottom = `${yPos}px`;
+      popup.style.top = `${yPos}px`;
 
       console.log(popup.style);
     };
