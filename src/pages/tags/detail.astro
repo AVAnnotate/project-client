@@ -100,26 +100,47 @@ const events = await getCollection('events');
       const popup = band.querySelector(
         '.annotation-band-popup'
       ) as HTMLDivElement;
+      const popupArrow = band.querySelector(
+        '.annotation-band-popup-arrow'
+      ) as HTMLDivElement;
 
       const parent = band.parentElement! as HTMLElement;
 
       // get the position within the container (important if there's horizontally scrolling overflow)
       // subtract 2 from popup.clientWidth because it has a right border 2px wide
-      const xPos =
-        band.offsetLeft - parent.scrollLeft - (popup.clientWidth - 2) / 2;
+      let xPos =
+        band.offsetLeft -
+        parent.scrollLeft -
+        popup.clientWidth / 2 +
+        (band.clientWidth - 2) / 2;
 
       // get the vertical position while taking scrolling into account
       const yPos =
-        band.getBoundingClientRect().top + window.scrollY - popup.clientHeight;
+        band.getBoundingClientRect().top +
+        window.scrollY -
+        popup.clientHeight -
+        // 8px leaves a margin for the bottom arrow
+        8;
 
-      // todo: calculate distance from bottom somehow
-      //       this still gives weird results!
-      console.log(yPos);
+      const arrowXpos =
+        band.offsetLeft + (band.clientWidth - 2) / 2 - parent.scrollLeft - 7;
+      const arrowYpos = yPos + popup.clientHeight;
+
+      popupArrow.style.left = `${arrowXpos}px`;
+      popupArrow.style.top = `${arrowYpos}px`;
+
+      //  snap to left edge (with a 10px margin) if the popup would have ended up outside the left side of the page
+      if (xPos < 10) {
+        xPos = 10;
+      }
+
+      // snap to right edge (with a 10px margin) if the popup would have ended up outside the right bounds of the page
+      if (xPos + popup.clientWidth > document.body.clientWidth - 10) {
+        xPos = document.body.clientWidth - popup.clientWidth - 10;
+      }
 
       popup.style.left = `${xPos}px`;
       popup.style.top = `${yPos}px`;
-
-      console.log(popup.style);
     };
   }
 </script>
