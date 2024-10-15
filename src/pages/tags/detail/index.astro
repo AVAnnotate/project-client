@@ -1,0 +1,99 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Container from '@components/Container.astro';
+import { dynamicConfig } from '../../../../dynamic-astro-config';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import { getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import AnnotationSpectrum from '@components/Tags/AnnotationSpectrum.astro';
+import TagPill from '@components/Tags/TagPill';
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
+
+const crumbs = [
+  {
+    label: 'Home',
+    link: `/${baseUrl}`,
+  },
+  {
+    label: 'Index',
+    link: `/${baseUrl}/tags`,
+  },
+  {
+    label: 'Tag Groups',
+  },
+];
+
+const annotationSets = await getCollection('annotations');
+
+// check whether there actually are any annotation files
+if (annotationSets.length === 0) {
+  return Astro.redirect(`/${baseUrl}`);
+}
+
+const events = await getCollection('events');
+---
+
+<Layout title={`Tag Detail - ${projectData.data.project.title}`}>
+  <Breadcrumbs crumbs={crumbs} />
+  <div class='bg-gray-100'>
+    <Container className='py-12 flex flex-col gap-8 font-inter'>
+      <h1 class='text-2xl'>Tag Groups used in Events</h1>
+      <div class='flex flex-row gap-2'>
+        {
+          projectData.data.project.tags.tagGroups.map((tg) => (
+            <TagPill color={tg.color} tag={tg.category.replaceAll('_', '')} />
+          ))
+        }
+      </div>
+      {
+        projectData.data.project.tags.tagGroups.map((category) => {
+          const tags = projectData.data.project.tags.tags.filter(
+            (t) => t.category === category.category
+          );
+
+          return (
+            <>
+              {tags.length > 0 ? (
+                <div class='w-full py-6 flex flex-col gap-6'>
+                  <div class='w-full flex justify-between'>
+                    <h3 class='text-lg capitalize'>
+                      {category.category.replaceAll('_', '')}
+                    </h3>
+                    <a
+                      class='rounded-lg bg-secondary text-white flex items-center justify-center py-2 px-3 hover:scale-105 transition'
+                      href={`/${baseUrl}/tags/detail/${category.category.toLocaleLowerCase()}`}
+                    >
+                      View Details
+                    </a>
+                  </div>
+                  {annotationSets.map((set) => {
+                    if (set.data.annotations.length > 0) {
+                      const event = events.find(
+                        (ev) => ev.id === set.data.event_id
+                      );
+
+                      if (event) {
+                        return (
+                          <AnnotationSpectrum
+                            set={set}
+                            category={category}
+                            label={event.data.label}
+                          />
+                        );
+                      }
+                    }
+                  })}
+                </div>
+              ) : null}
+            </>
+          );
+        })
+      }
+    </Container>
+  </div>
+</Layout>

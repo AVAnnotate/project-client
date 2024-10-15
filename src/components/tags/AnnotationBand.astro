@@ -6,26 +6,26 @@ import RichText from '../RichText/index.astro';
 
 interface Props {
   annotation: Annotation;
-  tagGroup: TagGroup;
+  category: TagGroup;
 }
 
-const { annotation, tagGroup } = Astro.props;
+const { annotation, category } = Astro.props;
 
 const tags = annotation.tags.filter(
-  (tag) => tag.category.toLowerCase() === tagGroup.category.toLowerCase()
+  (tag) => tag.category.toLowerCase() === category.category.toLowerCase()
 );
 ---
 
 <div
   class='annotation-band h-full basis-3 group border-r-2 border-white flex-shrink-0 grow'
   style={{
-    backgroundColor: tags.length > 0 ? tagGroup.color : '#000000',
+    backgroundColor: tags.length > 0 ? category.color : '#000000',
   }}
 >
   <div class='annotation-band-popup hidden group-hover:block w-96 absolute'>
     <div class='shadow bg-white'>
-      <div class='p-2' style={{ backgroundColor: tagGroup.color }}>
-        {tagGroup.category}
+      <div class='p-2' style={{ backgroundColor: category.color }}>
+        {category.category}
       </div>
       <div class='p-2 flex flex-col gap-4'>
         <div class='flex flex-wrap gap-4 w-full'>

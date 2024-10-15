@@ -1,0 +1,102 @@
+---
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import Container from '@components/Container.astro';
+import AnnotationSpectrum from '@components/Tags/AnnotationSpectrum.astro';
+import TagPill from '@components/Tags/TagPill';
+import Layout from '@layouts/Layout.astro';
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { dynamicConfig } from 'dynamic-astro-config';
+import { ArrowLeft } from 'react-bootstrap-icons';
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
+
+export const getStaticPaths = (async () => {
+  const projectData = await getEntry('project', 'project');
+
+  return projectData.data.project.tags.tagGroups.map((tg) => ({
+    params: { category: tg.category.toLocaleLowerCase() },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.params;
+
+const crumbs = [
+  {
+    label: 'Home',
+    link: `/${baseUrl}`,
+  },
+  {
+    label: 'Index',
+    link: `/${baseUrl}/tags`,
+  },
+  {
+    label: 'Tag Groups',
+    link: `/${baseUrl}/tags/detail`,
+  },
+  {
+    label: category,
+  },
+];
+
+const capitalizedCategory = `${category[0].toLocaleUpperCase()}${category.slice(1)}`;
+const title = `${capitalizedCategory} Tags Used in Events`;
+
+const annotationSets = await getCollection('annotations');
+const events = await getCollection('events');
+
+const categoryData = projectData.data.project.tags.tagGroups.find(
+  (tg) => tg.category.toLocaleLowerCase() === category.toLocaleLowerCase()
+);
+
+if (!categoryData) {
+  return Astro.redirect('/');
+}
+
+const tags = projectData.data.project.tags.tags
+  .filter(
+    (t) => t.category.toLocaleLowerCase() === category.toLocaleLowerCase()
+  )
+  .map((t) => t.tag);
+---
+
+<Layout title={`${projectData.data.project.title} - ${title}`}>
+  <Breadcrumbs crumbs={crumbs} />
+  <div class='bg-gray-100'>
+    <Container className='py-12 flex flex-col gap-8 font-inter'>
+      <div class='flex items-center gap-4'>
+        <a href={`/${baseUrl}/tags/detail`}>
+          <ArrowLeft className='w-8 h-8' />
+        </a>
+        <h1 class='text-2xl'>{title}</h1>
+      </div>
+      <div class='flex flex-wrap gap-4'>
+        {tags.map((tag) => <TagPill color={categoryData.color} tag={tag} />)}
+      </div>
+      <div class='w-full py-6 flex flex-col gap-6'>
+        {
+          annotationSets.map((set) => {
+            if (set.data.annotations.length > 0) {
+              const event = events.find((ev) => ev.id === set.data.event_id);
+
+              if (event) {
+                return (
+                  <AnnotationSpectrum
+                    set={set}
+                    category={categoryData}
+                    label={event.data.label}
+                  />
+                );
+              }
+            }
+          })
+        }
+      </div>
+    </Container>
+  </div>
+</Layout>
