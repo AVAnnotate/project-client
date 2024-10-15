@@ -14,13 +14,15 @@ const { annotation, category } = Astro.props;
 const tags = annotation.tags.filter(
   (tag) => tag.category.toLowerCase() === category.category.toLowerCase()
 );
+
+const backgroundColor = tags.length > 0 ? category.color : '#000000';
 ---
 
 <div
   class='annotation-band h-full basis-3 group border-r-2 border-white flex-shrink-0 grow'
-  style={{
-    backgroundColor: tags.length > 0 ? category.color : '#000000',
-  }}
+  style={{ backgroundColor }}
+  data-initial-bg-color={backgroundColor}
+  data-tags={tags.map((t) => t.tag).join(',')}
 >
   <div class='annotation-band-popup hidden group-hover:block w-96 absolute'>
     <div class='shadow bg-white'>
