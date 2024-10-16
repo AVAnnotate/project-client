@@ -7,18 +7,32 @@ interface Props {
   category: TagGroup;
   set: CollectionEntry<'annotations'>;
   label: string;
+  tagColors?: {
+    [tag: string]: string;
+  };
 }
 
-const { category, set, label } = Astro.props;
+const { category, set, label, tagColors } = Astro.props;
 ---
 
-<div class='flex flex-col gap-4'>
+<div class='flex flex-col gap-4 pt-4'>
   <p>{label}</p>
   <div class='flex flex-row w-full h-[42px] overflow-x-auto'>
     {
-      set.data.annotations.map((ann) => (
-        <AnnotationBand annotation={ann} category={category} />
-      ))
+      set.data.annotations.map((ann) => {
+        const tagColor =
+          tagColors && ann.tags.length > 0
+            ? tagColors[ann.tags[0].tag]
+            : undefined;
+
+        return (
+          <AnnotationBand
+            annotation={ann}
+            category={category}
+            color={tagColor}
+          />
+        );
+      })
     }
   </div>
 </div>

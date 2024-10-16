@@ -1,15 +1,16 @@
 ---
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import Container from '@components/Container.astro';
-import AnnotationSpectrum from '@components/tags/AnnotationSpectrum.astro';
-import TagPill from '@components/Tags/TagPill';
+import AnnotationSpectrum from '@components/Tags/AnnotationSpectrum.astro';
+import TagPill from '@components/Tags/TagPill.tsx';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import Layout from '@layouts/Layout.astro';
 import type { GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
-import { ArrowLeft } from 'react-bootstrap-icons';
+import { ArrowLeft, ArrowCounterclockwise } from 'react-bootstrap-icons';
+import colors from '../../../utils/tagColors.ts';
 
 const projectData = await getEntry('project', 'project');
 
@@ -21,7 +22,7 @@ export const getStaticPaths = (async () => {
   const projectData = await getEntry('project', 'project');
 
   return projectData.data.project.tags.tagGroups.map((tg) => ({
-    params: { category: tg.category.toLocaleLowerCase() },
+    params: { category: tg.category.replaceAll('_', '').toLocaleLowerCase() },
   }));
 }) satisfies GetStaticPaths;
 
@@ -52,11 +53,13 @@ const annotationSets = await getCollection('annotations');
 const events = await getCollection('events');
 
 const categoryData = projectData.data.project.tags.tagGroups.find(
-  (tg) => tg.category.toLocaleLowerCase() === category.toLocaleLowerCase()
+  (tg) =>
+    tg.category.replaceAll('_', '').toLocaleLowerCase() ===
+    category.replaceAll('_', '').toLocaleLowerCase()
 );
 
 if (!categoryData) {
-  return Astro.redirect('/');
+  return Astro.redirect(`/${baseUrl}`);
 }
 
 const tags = projectData.data.project.tags.tags
@@ -64,6 +67,10 @@ const tags = projectData.data.project.tags.tags
     (t) => t.category.toLocaleLowerCase() === category.toLocaleLowerCase()
   )
   .map((t) => t.tag);
+
+// generate a random color for each tag on this page
+const tagColors: { [tag: string]: string } = {};
+tags.forEach((t, idx) => (tagColors[t] = colors[idx % colors.length]));
 ---
 
 <Layout
@@ -78,14 +85,25 @@ const tags = projectData.data.project.tags.tags
       </a>
       <h1 class='text-2xl'>{title}</h1>
     </div>
-    <div class='tag-list flex flex-wrap gap-4'>
+    <div
+      class='tag-list flex flex-wrap gap-4'
+      data-tag-colors={JSON.stringify(tagColors)}
+    >
       {
         tags.map((tag) => (
-          <TagPill color={categoryData.color} icon={CheckIcon} tag={tag} />
+          <TagPill color={tagColors[tag]} icon={CheckIcon} tag={tag} />
         ))
       }
+      <button
+        class='reset-button flex gap-2 items-center bg-secondary text-white rounded px-3 py-[9px] text-sm h-[28px]'
+        type='button'
+        style={{ display: 'none' }}
+      >
+        <ArrowCounterclockwise />
+        Reset
+      </button>
     </div>
-    <div class='w-full py-6 flex flex-col gap-6'>
+    <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
       {
         annotationSets.map((set) => {
           if (set.data.annotations.length > 0) {
@@ -97,6 +115,7 @@ const tags = projectData.data.project.tags.tags
                   set={set}
                   category={categoryData}
                   label={event.data.label}
+                  tagColors={tagColors}
                 />
               );
             }
@@ -108,9 +127,17 @@ const tags = projectData.data.project.tags.tags
 </Layout>
 
 <script>
-  const selectedTags: string[] = [];
+  let selectedTags: string[] = [];
 
   const pills = document.querySelectorAll('.tag-list .tag-pill');
+  const tagList = document.querySelector('.tag-list') as HTMLDivElement;
+  const tagColors = JSON.parse(
+    tagList.getAttribute('data-tag-colors') as string
+  );
+
+  const resetButton = document.querySelector(
+    '.reset-button'
+  ) as HTMLButtonElement;
 
   const selectedTagClasses = ['outline', 'outline-1', 'outline-black'];
 
@@ -150,15 +177,23 @@ const tags = projectData.data.project.tags.tags
         if (tagData) {
           const tags = tagData.split(',');
 
-          const containsTags = !!tags.find((t) => selectedTags.includes(t));
+          const matchingTag = tags.find((t) => selectedTags.includes(t));
 
-          if (containsTags) {
-            band.style.backgroundColor = initialBGColor;
+          if (matchingTag) {
+            band.style.backgroundColor = tagColors[matchingTag];
           } else {
             band.style.backgroundColor = '#000000';
           }
         }
       }
+    }
+  };
+
+  const updateResetButton = () => {
+    if (selectedTags.length > 0) {
+      resetButton.style.display = 'flex';
+    } else {
+      resetButton.style.display = 'none';
     }
   };
 
@@ -171,6 +206,15 @@ const tags = projectData.data.project.tags.tags
 
     updatePillStyles();
     updateBandColors();
+    updateResetButton();
+  };
+
+  const clearTags = () => {
+    selectedTags = [];
+
+    updatePillStyles();
+    updateBandColors();
+    updateResetButton();
   };
 
   // set up onclick handlers
@@ -186,5 +230,13 @@ const tags = projectData.data.project.tags.tags
     // when the tag is selected
     const icon = pill.querySelector('svg')!;
     icon.classList.add('hidden');
+
+    const resetButton = document.querySelector(
+      '.reset-button'
+    ) as HTMLButtonElement;
+
+    resetButton.onclick = () => {
+      clearTags();
+    };
   }
 </script>

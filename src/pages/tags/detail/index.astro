@@ -5,8 +5,10 @@ import { dynamicConfig } from '../../../../dynamic-astro-config';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import AnnotationSpectrum from '@components/tags/AnnotationSpectrum.astro';
+import AnnotationSpectrum from '@components/Tags/AnnotationSpectrum.astro';
 import TagPill from '@components/Tags/TagPill';
+import { CheckIcon } from '@heroicons/react/24/outline';
+import { getCategoryLabel } from 'src/utils/string';
 
 const projectData = await getEntry('project', 'project');
 
@@ -36,6 +38,10 @@ if (annotationSets.length === 0) {
 }
 
 const events = await getCollection('events');
+
+const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
+  (cat) => getCategoryLabel(cat.category)
+);
 ---
 
 <Layout
@@ -45,15 +51,19 @@ const events = await getCollection('events');
   <Breadcrumbs crumbs={crumbs} />
   <Container className='py-12 flex flex-col gap-8 font-inter'>
     <h1 class='text-2xl'>Tag Groups used in Events</h1>
-    <div class='flex flex-row gap-2'>
+    <div class='tag-list flex flex-row gap-2'>
       {
-        projectData.data.project.tags.tagGroups.map((tg) => (
-          <TagPill color={tg.color} tag={tg.category.replaceAll('_', '')} />
+        projectData.data.project.tags.tagGroups.map((tg, idx) => (
+          <TagPill
+            color={tg.color}
+            tag={formattedCategoryNames[idx]}
+            icon={CheckIcon}
+          />
         ))
       }
     </div>
     {
-      projectData.data.project.tags.tagGroups.map((category) => {
+      projectData.data.project.tags.tagGroups.map((category, idx) => {
         const tags = projectData.data.project.tags.tags.filter(
           (t) => t.category === category.category
         );
@@ -61,35 +71,40 @@ const events = await getCollection('events');
         return (
           <>
             {tags.length > 0 ? (
-              <div class='w-full py-6 flex flex-col gap-6'>
+              <div
+                class='category-div w-full py-6 flex flex-col gap-6'
+                data-category={formattedCategoryNames[idx]}
+              >
                 <div class='w-full flex justify-between'>
                   <h3 class='text-lg capitalize'>
-                    {category.category.replaceAll('_', '')}
+                    {formattedCategoryNames[idx]}
                   </h3>
                   <a
                     class='rounded-lg bg-secondary text-white flex items-center justify-center py-2 px-3 hover:scale-105 transition'
-                    href={`/${baseUrl}/tags/detail/${category.category.toLocaleLowerCase()}`}
+                    href={`/${baseUrl}/tags/detail/${formattedCategoryNames[idx].toLocaleLowerCase()}`}
                   >
                     View Details
                   </a>
                 </div>
-                {annotationSets.map((set) => {
-                  if (set.data.annotations.length > 0) {
-                    const event = events.find(
-                      (ev) => ev.id === set.data.event_id
-                    );
-
-                    if (event) {
-                      return (
-                        <AnnotationSpectrum
-                          set={set}
-                          category={category}
-                          label={event.data.label}
-                        />
+                <div class='w-full flex flex-col gap-6 divide-y divide-gray-300'>
+                  {annotationSets.map((set) => {
+                    if (set.data.annotations.length > 0) {
+                      const event = events.find(
+                        (ev) => ev.id === set.data.event_id
                       );
+
+                      if (event) {
+                        return (
+                          <AnnotationSpectrum
+                            set={set}
+                            category={category}
+                            label={event.data.label}
+                          />
+                        );
+                      }
                     }
-                  }
-                })}
+                  })}
+                </div>
               </div>
             ) : null}
           </>
@@ -98,3 +113,73 @@ const events = await getCollection('events');
     }
   </Container>
 </Layout>
+
+<script>
+  const selectedCategories: string[] = [];
+  const pills = document.querySelectorAll('.tag-list .tag-pill');
+  const categoryDivs = document.querySelectorAll('.category-div');
+
+  const selectedCategoryClasses = ['outline', 'outline-1', 'outline-black'];
+
+  const updateCategoryVisibility = () => {
+    for (let i = 0; i < categoryDivs.length; i++) {
+      const catDiv = categoryDivs[i] as HTMLDivElement;
+      const category = catDiv.getAttribute('data-category') as string;
+
+      if (
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(category.toLocaleLowerCase())
+      ) {
+        catDiv.style.display = 'flex';
+      } else {
+        catDiv.style.display = 'none';
+      }
+    }
+  };
+
+  // add/remove styles based on which tags are selected
+  const updatePillStyles = () => {
+    for (let i = 0; i < pills.length; i++) {
+      const pill = pills[i] as HTMLDivElement;
+      const pillIcon = pill.querySelector('svg') as SVGElement;
+
+      const textContent = pill.textContent!.toLocaleLowerCase();
+
+      if (selectedCategories.includes(textContent)) {
+        pill.classList.add(...selectedCategoryClasses);
+        pillIcon.style.display = 'initial';
+      } else {
+        pill.classList.remove(...selectedCategoryClasses);
+        pillIcon.style.display = 'none';
+      }
+    }
+  };
+
+  const toggleCategory = (category: string) => {
+    let categoryLabel = category.replaceAll('_', '').toLocaleLowerCase();
+
+    if (selectedCategories.includes(categoryLabel)) {
+      selectedCategories.splice(selectedCategories.indexOf(categoryLabel), 1);
+    } else {
+      selectedCategories.push(categoryLabel);
+    }
+
+    updateCategoryVisibility();
+    updatePillStyles();
+  };
+
+  // set up onclick handlers
+  for (let i = 0; i < pills.length; i++) {
+    const pill = pills[i] as HTMLDivElement;
+
+    pill.onclick = () => {
+      const textContent = pill.textContent!;
+      toggleCategory(textContent);
+    };
+
+    // hide the checkmark by default, to be unhidden only
+    // when the tag is selected
+    const icon = pill.querySelector('svg')!;
+    icon.style.display = 'none';
+  }
+</script>
