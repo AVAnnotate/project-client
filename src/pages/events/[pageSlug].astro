@@ -19,17 +19,17 @@ export const getStaticPaths = (async () => {
   const pages = await getPages((page) => page.data.autogenerate.enabled);
 
   return pages.map((page) => ({
-    params: { eventSlug: page.data.slug || page.id },
+    params: { pageSlug: page.data.slug || page.id },
   }));
 }) satisfies GetStaticPaths;
 
-const { eventSlug } = Astro.params;
+const { pageSlug } = Astro.params;
 
-if (!eventSlug) {
+if (!pageSlug) {
   return Astro.redirect(`/${baseUrl}`);
 }
 
-const page = await getPage(eventSlug);
+const page = await getPage(pageSlug);
 
 if (!page.data.autogenerate.type_id) {
   return Astro.redirect(`/${baseUrl}`);
