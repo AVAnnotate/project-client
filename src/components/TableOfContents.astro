@@ -36,7 +36,8 @@ if (!homePage) {
         </a>
       ))
   }
-  <a class='underline' href={`${baseUrl ? '/' : ''}${baseUrl || '/'}tags`}
-    >Index</a
+  <a
+    class='underline'
+    href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}>Index</a
   >
 </div>
