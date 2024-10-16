@@ -30,7 +30,7 @@ if (!homePage) {
       .map((page) => (
         <a
           class={`underline ${page.data.parent ? 'ml-4' : ''}`}
-          href={`${baseUrl ? '/' : ''}${baseUrl}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
+          href={`${baseUrl ? '/' : ''}${baseUrl || '/'}${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
         >
           <p>{page.data.title}</p>
         </a>
