@@ -31,10 +31,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   // highlight the current page
   // if there's no page slug, that means we're on the homepage
-  const isSelected = (page: PageCollectionEntry) => {
-    console.log(page);
-    return page.id === props.pageSlug || page.data.slug === props.pageSlug;
-  };
+  const isSelected = (page: PageCollectionEntry) =>
+    page.id === (props.pageSlug || homeUuid) ||
+    page.data.slug === props.pageSlug;
 
   return (
     <>
