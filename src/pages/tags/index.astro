@@ -72,7 +72,10 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
 });
 ---
 
-<Layout title={`Tag Index - ${projectData.data.project.title}`}>
+<Layout
+  title={`Tag Index - ${projectData.data.project.title}`}
+  class='bg-gray-100'
+>
   <div class='w-full bg-white h-[50px]'>
     <Breadcrumbs crumbs={crumbs} />
   </div>

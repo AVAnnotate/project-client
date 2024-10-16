@@ -10,6 +10,7 @@ import { dynamicConfig } from 'dynamic-astro-config';
 interface Props {
   background?: string;
   title?: string;
+  class?: string;
 }
 
 const projectData = await getEntry('project', 'project');
@@ -18,7 +19,11 @@ const baseUrl = import.meta.env.PROD
   ? projectData.data.project.slug
   : dynamicConfig.base;
 
-const { background, title = projectData.data.project.title } = Astro.props;
+const {
+  background,
+  class: className,
+  title = projectData.data.project.title,
+} = Astro.props;
 
 const projectBy =
   projectData.data.project.authors || projectData.data.project.creator;
@@ -42,7 +47,10 @@ const projectBy =
     />
     <title>{title}</title>
   </head>
-  <body class='flex h-full flex-col mx-auto' transition:animate='initial'>
+  <body
+    class={`flex h-full flex-col mx-auto ${className}`}
+    transition:animate='initial'
+  >
     <Header />
     <main class=`min-h-[calc(100dvh_-160px)] text-black bg-${background}`>
       <slot />

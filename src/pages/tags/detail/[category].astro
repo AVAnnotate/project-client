@@ -26,6 +26,7 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { category } = Astro.params;
+const capitalizedCategory = `${category[0].toLocaleUpperCase()}${category.slice(1)}`;
 
 const crumbs = [
   {
@@ -41,11 +42,10 @@ const crumbs = [
     link: `/${baseUrl}/tags/detail`,
   },
   {
-    label: category,
+    label: capitalizedCategory,
   },
 ];
 
-const capitalizedCategory = `${category[0].toLocaleUpperCase()}${category.slice(1)}`;
 const title = `${capitalizedCategory} Tags Used in Events`;
 
 const annotationSets = await getCollection('annotations');
@@ -66,44 +66,45 @@ const tags = projectData.data.project.tags.tags
   .map((t) => t.tag);
 ---
 
-<Layout title={`${projectData.data.project.title} - ${title}`}>
+<Layout
+  title={`${projectData.data.project.title} - ${title}`}
+  class='bg-gray-100'
+>
   <Breadcrumbs crumbs={crumbs} />
-  <div class='bg-gray-100'>
-    <Container className='py-12 flex flex-col gap-8 font-inter'>
-      <div class='flex items-center gap-4'>
-        <a href={`/${baseUrl}/tags/detail`}>
-          <ArrowLeft className='w-8 h-8' />
-        </a>
-        <h1 class='text-2xl'>{title}</h1>
-      </div>
-      <div class='tag-list flex flex-wrap gap-4'>
-        {
-          tags.map((tag) => (
-            <TagPill color={categoryData.color} icon={CheckIcon} tag={tag} />
-          ))
-        }
-      </div>
-      <div class='w-full py-6 flex flex-col gap-6'>
-        {
-          annotationSets.map((set) => {
-            if (set.data.annotations.length > 0) {
-              const event = events.find((ev) => ev.id === set.data.event_id);
+  <Container className='py-12 flex flex-col gap-8 font-inter'>
+    <div class='flex items-center gap-4'>
+      <a href={`/${baseUrl}/tags/detail`}>
+        <ArrowLeft className='w-8 h-8' />
+      </a>
+      <h1 class='text-2xl'>{title}</h1>
+    </div>
+    <div class='tag-list flex flex-wrap gap-4'>
+      {
+        tags.map((tag) => (
+          <TagPill color={categoryData.color} icon={CheckIcon} tag={tag} />
+        ))
+      }
+    </div>
+    <div class='w-full py-6 flex flex-col gap-6'>
+      {
+        annotationSets.map((set) => {
+          if (set.data.annotations.length > 0) {
+            const event = events.find((ev) => ev.id === set.data.event_id);
 
-              if (event) {
-                return (
-                  <AnnotationSpectrum
-                    set={set}
-                    category={categoryData}
-                    label={event.data.label}
-                  />
-                );
-              }
+            if (event) {
+              return (
+                <AnnotationSpectrum
+                  set={set}
+                  category={categoryData}
+                  label={event.data.label}
+                />
+              );
             }
-          })
-        }
-      </div>
-    </Container>
-  </div>
+          }
+        })
+      }
+    </div>
+  </Container>
 </Layout>
 
 <script>
