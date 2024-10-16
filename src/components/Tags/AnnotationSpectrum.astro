@@ -1,0 +1,96 @@
+---
+import type { TagGroup } from '@ty/index.ts';
+import type { CollectionEntry } from 'astro:content';
+import AnnotationBand from './AnnotationBand.astro';
+
+interface Props {
+  category: TagGroup;
+  set: CollectionEntry<'annotations'>;
+  label: string;
+  tagColors?: {
+    [tag: string]: string;
+  };
+}
+
+const { category, set, label, tagColors } = Astro.props;
+---
+
+<div class='flex flex-col gap-4 pt-4'>
+  <p>{label}</p>
+  <div class='flex flex-row w-full h-[42px] overflow-x-auto'>
+    {
+      set.data.annotations.map((ann) => {
+        const tagColor =
+          tagColors && ann.tags.length > 0
+            ? tagColors[ann.tags[0].tag]
+            : undefined;
+
+        return (
+          <AnnotationBand
+            annotation={ann}
+            category={category}
+            color={tagColor}
+          />
+        );
+      })
+    }
+  </div>
+</div>
+
+<script>
+  const bands = document.querySelectorAll('.annotation-band');
+
+  for (let i = 0; i < bands.length; i++) {
+    const band = bands[i] as HTMLDivElement;
+
+    band.onmouseover = () => {
+      const popup = band.querySelector(
+        '.annotation-band-popup'
+      ) as HTMLDivElement;
+      const popupArrow = band.querySelector(
+        '.annotation-band-popup-arrow'
+      ) as HTMLDivElement;
+
+      const parent = band.parentElement! as HTMLElement;
+
+      // get the position within the container (important if there's horizontally scrolling overflow)
+      // subtract 2 from popup.clientWidth because it has a right border 2px wide
+      let xPos =
+        band.offsetLeft -
+        parent.scrollLeft -
+        popup.clientWidth / 2 +
+        (band.clientWidth - 2) / 2;
+
+      // get the vertical position while taking scrolling into account
+      const yPos =
+        band.getBoundingClientRect().top +
+        window.scrollY -
+        popup.clientHeight -
+        // 8px leaves a margin for the bottom arrow
+        8;
+
+      const arrowXpos =
+        band.offsetLeft +
+        band.clientWidth / 2 -
+        popupArrow.offsetWidth / 2 -
+        parent.scrollLeft;
+      const arrowYpos = yPos + popup.clientHeight;
+
+      popupArrow.style.left = `${arrowXpos}px`;
+      popupArrow.style.top = `${arrowYpos}px`;
+
+      //  snap to left edge (with a 10px margin) if the popup would have ended up outside the left side of the page
+      if (xPos < 10) {
+        xPos = 10;
+      }
+
+      // snap to right edge (with a 10px margin) if the popup would have ended up outside the right bounds of the page
+      if (xPos + popup.clientWidth > document.body.clientWidth - 10) {
+        xPos = document.body.clientWidth - popup.clientWidth - 10;
+      }
+
+      popup.style.left = `${xPos}px`;
+      popup.style.top = `${yPos}px`;
+    };
+  }
+</script>
