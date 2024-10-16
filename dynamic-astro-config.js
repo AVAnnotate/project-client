@@ -1,5 +1,6 @@
 import react from '@astrojs/react';
 import tailwind from "@astrojs/tailwind";
+import relativeLinks from 'astro-relative-links';
 
 // Please note that this file will be updated by the AVAnnotate Admin
 // application. No changes made here to the `site` or `base` fields will be reflected in the deployed
@@ -8,7 +9,7 @@ import tailwind from "@astrojs/tailwind";
 import project from '../data/project.json'
 
 export const dynamicConfig = {
-  integrations: [react(), tailwind()],
+  integrations: [react(), tailwind(), relativeLinks()],
   site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
   base: import.meta.env.PROD ? `${project.project.slug}` : 'dist',
   srcDir: import.meta.env.PROD ? project.project.media_player === 'avannotate' ? './src' : project.project.media_player === 'aviary' ? './src-aviary' : './src' : './src'
