@@ -6,7 +6,7 @@ import type { PageCollectionEntry } from 'src/utils/pages.ts';
 interface SidebarProps {
   baseUrl: string;
   pages: PageCollectionEntry[];
-  pageSlug?: string;
+  slug?: string;
 }
 
 const getHref = (page: PageCollectionEntry, baseUrl: string) => {
@@ -31,9 +31,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   // highlight the current page
   // if there's no page slug, that means we're on the homepage
-  const isSelected = (page: PageCollectionEntry) =>
-    page.id === (props.pageSlug || homeUuid) ||
-    page.data.slug === props.pageSlug;
+  const isSelected = (page: PageCollectionEntry) => {
+    return (
+      page.id === (props.slug || homeUuid) || props.slug === page.data.slug
+    );
+  };
 
   return (
     <>

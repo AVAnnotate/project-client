@@ -21,7 +21,7 @@ const baseUrl = import.meta.env.PROD
       baseUrl={baseUrl}
       client:load
       pages={pages}
-      pageSlug={pageSlug || eventSlug}
+      slug={pageSlug || eventSlug}
     />
     <a href={`/${baseUrl}`} class='text-lg'>{projectData.data.project.title}</a>
   </Container>
