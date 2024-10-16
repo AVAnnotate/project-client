@@ -6,7 +6,7 @@ import { getPages } from 'src/utils/pages';
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.publish_pages_app
+  ? projectData.data.publish.publish_pages_app
     ? projectData.data.project.slug
     : '/'
   : dynamicConfig.base;
