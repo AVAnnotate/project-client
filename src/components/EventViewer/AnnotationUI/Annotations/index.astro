@@ -35,7 +35,7 @@ const sortedAnnotations = annotationSets
       annotations={sortedAnnotations}
       playerId={playerId}
       isEmbed={isEmbed}
-      client:only='react'
+      client:load
     />
     <div
       class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
