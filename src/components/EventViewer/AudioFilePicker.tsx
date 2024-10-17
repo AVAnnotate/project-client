@@ -17,8 +17,9 @@ const AudioFilePicker: React.FC<Props> = (props) => {
     <div className='py-2'>
       <p>{props.event.data.label}</p>
       <ol className='flex flex-col gap-2'>
-        {Object.keys(props.event.data.audiovisual_files).map((uuid) => {
+        {Object.keys(props.event.data.audiovisual_files).map((uuid, idx) => {
           const avFile = props.event.data.audiovisual_files[uuid];
+          const isCurrentFile = store[props.playerId]?.avFileUuid === uuid;
 
           return (
             <li
@@ -26,10 +27,11 @@ const AudioFilePicker: React.FC<Props> = (props) => {
               onClick={() => setAvFile(uuid, props.playerId)}
               key={uuid}
             >
-              <div className='w-4'>
-                {store[props.playerId]?.avFileUuid === uuid && <PlayFill />}
-              </div>
-              <span>{avFile.label}</span>
+              <div className='w-4'>{isCurrentFile && <PlayFill />}</div>
+              <span className={isCurrentFile ? 'font-bold' : ''}>
+                {idx + 1}. &nbsp;
+                {avFile.label}
+              </span>
               <span className='flex items-center border border-black rounded-[5px] text-xs p-2 font-semibold h-6'>
                 {formatTimestamp(avFile.duration, false)}
               </span>
