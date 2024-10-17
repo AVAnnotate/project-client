@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         />
       )}
       <Transition show={show}>
-        <div className='shadow absolute top-0 left-0 h-dvh w-80 bg-white w-10 transition duration-200 ease-in-out data-[closed]:-translate-x-full text-black text-sm'>
+        <div className='shadow absolute top-0 left-0 h-dvh w-80 bg-white w-10 transition duration-200 ease-in-out data-[closed]:-translate-x-full text-black text-sm overflow-y-auto'>
           <div className='flex w-full h-24 justify-end px-8'>
             <button type='button' onClick={() => setShow(false)}>
               <XMarkIcon className='w-8 h-8' />
