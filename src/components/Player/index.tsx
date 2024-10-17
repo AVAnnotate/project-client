@@ -18,14 +18,14 @@ import {
 import { useStore } from '@nanostores/react';
 import { formatTimestamp } from '../../utils/player.ts';
 import type { OnProgressProps } from 'react-player/base';
+import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   end?: number;
   id: string;
   start?: number;
-  type: 'Audio' | 'Video';
-  url: string;
   vttURLs?: { url: string; label: string }[];
+  event: CollectionEntry<'events'>;
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -46,6 +46,12 @@ const Player: React.FC<Props> = (props) => {
 
   const pagePlayers = useStore($pagePlayersState);
   const playerState = pagePlayers[props.id];
+
+  const fileUrl = useMemo(() => {
+    const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
+
+    return avFile.file_url;
+  }, [pagePlayers[props.id]]);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
@@ -210,7 +216,7 @@ const Player: React.FC<Props> = (props) => {
   return (
     <div className='player'>
       <ReactPlayer
-        controls={props.type === 'Video'}
+        controls={props.event.data.item_type === 'Video'}
         playing={playerState.isPlaying}
         muted={muted}
         config={tracksConfig}
@@ -238,11 +244,11 @@ const Player: React.FC<Props> = (props) => {
         }}
         progressInterval={250}
         ref={player}
-        url={props.url}
-        height={props.type === 'Video' ? '100%' : 0}
-        width={props.type === 'Video' ? '100%' : 0}
+        url={fileUrl}
+        height={props.event.data.item_type === 'Video' ? '100%' : 0}
+        width={props.event.data.item_type === 'Video' ? '100%' : 0}
       />
-      {props.type === 'Audio' && (
+      {props.event.data.item_type === 'Audio' && (
         <div className='player-control-panel !bg-gray-200'>
           <div className='content'>
             <Button
