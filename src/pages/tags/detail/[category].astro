@@ -1,0 +1,242 @@
+---
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import Container from '@components/Container.astro';
+import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
+import TagPill from '@components/TagUtils/TagPill.tsx';
+import { CheckIcon } from '@heroicons/react/24/outline';
+import Layout from '@layouts/Layout.astro';
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { dynamicConfig } from 'dynamic-astro-config';
+import { ArrowLeft, ArrowCounterclockwise } from 'react-bootstrap-icons';
+import colors from '../../../utils/tagColors.ts';
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
+
+export const getStaticPaths = (async () => {
+  const projectData = await getEntry('project', 'project');
+
+  return projectData.data.project.tags.tagGroups.map((tg) => ({
+    params: { category: tg.category.replaceAll('_', '').toLocaleLowerCase() },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.params;
+const capitalizedCategory = `${category[0].toLocaleUpperCase()}${category.slice(1)}`;
+
+const crumbs = [
+  {
+    label: 'Home',
+    link: `/${baseUrl}`,
+  },
+  {
+    label: 'Index',
+    link: `/${baseUrl}/tags`,
+  },
+  {
+    label: 'Tag Groups',
+    link: `/${baseUrl}/tags/detail`,
+  },
+  {
+    label: capitalizedCategory,
+  },
+];
+
+const title = `${capitalizedCategory} Tags Used in Events`;
+
+const annotationSets = await getCollection('annotations');
+const events = await getCollection('events');
+
+const categoryData = projectData.data.project.tags.tagGroups.find(
+  (tg) =>
+    tg.category.replaceAll('_', '').toLocaleLowerCase() ===
+    category.replaceAll('_', '').toLocaleLowerCase()
+);
+
+if (!categoryData) {
+  return Astro.redirect(`/${baseUrl}`);
+}
+
+const tags = projectData.data.project.tags.tags
+  .filter(
+    (t) => t.category.toLocaleLowerCase() === category.toLocaleLowerCase()
+  )
+  .map((t) => t.tag);
+
+// generate a random color for each tag on this page
+const tagColors: { [tag: string]: string } = {};
+tags.forEach((t, idx) => (tagColors[t] = colors[idx % colors.length]));
+---
+
+<Layout
+  title={`${projectData.data.project.title} - ${title}`}
+  class='bg-gray-100'
+>
+  <Breadcrumbs crumbs={crumbs} />
+  <Container className='py-12 flex flex-col gap-8 font-inter'>
+    <div class='flex items-center gap-4'>
+      <a href={`/${baseUrl}/tags/detail`}>
+        <ArrowLeft className='w-8 h-8' />
+      </a>
+      <h1 class='text-2xl'>{title}</h1>
+    </div>
+    <div
+      class='tag-list flex flex-wrap gap-4'
+      data-tag-colors={JSON.stringify(tagColors)}
+    >
+      {
+        tags.map((tag) => (
+          <TagPill color={tagColors[tag]} icon={CheckIcon} tag={tag} />
+        ))
+      }
+      <button
+        class='reset-button flex gap-2 items-center bg-secondary text-white rounded px-3 py-[9px] text-sm h-[28px]'
+        type='button'
+        style={{ display: 'none' }}
+      >
+        <ArrowCounterclockwise />
+        Reset
+      </button>
+    </div>
+    <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
+      {
+        annotationSets.map((set) => {
+          if (set.data.annotations.length > 0) {
+            const event = events.find((ev) => ev.id === set.data.event_id);
+
+            if (event) {
+              return (
+                <AnnotationSpectrum
+                  set={set}
+                  category={categoryData}
+                  label={event.data.label}
+                  tagColors={tagColors}
+                />
+              );
+            }
+          }
+        })
+      }
+    </div>
+  </Container>
+</Layout>
+
+<script>
+  let selectedTags: string[] = [];
+
+  const pills = document.querySelectorAll('.tag-list .tag-pill');
+  const tagList = document.querySelector('.tag-list') as HTMLDivElement;
+  const tagColors = JSON.parse(
+    tagList.getAttribute('data-tag-colors') as string
+  );
+
+  const resetButton = document.querySelector(
+    '.reset-button'
+  ) as HTMLButtonElement;
+
+  const selectedTagClasses = ['outline', 'outline-1', 'outline-black'];
+
+  // add/remove styles based on which tags are selected
+  const updatePillStyles = () => {
+    for (let i = 0; i < pills.length; i++) {
+      const pill = pills[i] as HTMLDivElement;
+      const pillIcon = pill.querySelector('svg') as SVGElement;
+
+      const textContent = pill.textContent!;
+
+      if (selectedTags.includes(textContent)) {
+        pill.classList.add(...selectedTagClasses);
+        pillIcon.classList.add('block');
+        pillIcon.classList.remove('hidden');
+      } else {
+        pill.classList.remove(...selectedTagClasses);
+        pillIcon.classList.add('hidden');
+        pillIcon.classList.remove('block');
+      }
+    }
+  };
+
+  // updates the colors of the bands based on the selected tags
+  const updateBandColors = () => {
+    const bands = document.querySelectorAll('.annotation-band');
+
+    for (let i = 0; i < bands.length; i++) {
+      const band = bands[i] as HTMLDivElement;
+      const initialBGColor = band.getAttribute('data-initial-bg-color')!;
+
+      if (selectedTags.length === 0) {
+        band.style.backgroundColor = initialBGColor;
+      } else {
+        const tagData = band.getAttribute('data-tags');
+
+        if (tagData) {
+          const tags = tagData.split(',');
+
+          const matchingTag = tags.find((t) => selectedTags.includes(t));
+
+          if (matchingTag) {
+            band.style.backgroundColor = tagColors[matchingTag];
+          } else {
+            band.style.backgroundColor = '#000000';
+          }
+        }
+      }
+    }
+  };
+
+  const updateResetButton = () => {
+    if (selectedTags.length > 0) {
+      resetButton.style.display = 'flex';
+    } else {
+      resetButton.style.display = 'none';
+    }
+  };
+
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      selectedTags.splice(selectedTags.indexOf(tag), 1);
+    } else {
+      selectedTags.push(tag);
+    }
+
+    updatePillStyles();
+    updateBandColors();
+    updateResetButton();
+  };
+
+  const clearTags = () => {
+    selectedTags = [];
+
+    updatePillStyles();
+    updateBandColors();
+    updateResetButton();
+  };
+
+  // set up onclick handlers
+  for (let i = 0; i < pills.length; i++) {
+    const pill = pills[i] as HTMLDivElement;
+
+    pill.onclick = () => {
+      const textContent = pill.textContent!;
+      toggleTag(textContent);
+    };
+
+    // hide the checkmark by default, to be unhidden only
+    // when the tag is selected
+    const icon = pill.querySelector('svg')!;
+    icon.classList.add('hidden');
+
+    const resetButton = document.querySelector(
+      '.reset-button'
+    ) as HTMLButtonElement;
+
+    resetButton.onclick = () => {
+      clearTags();
+    };
+  }
+</script>

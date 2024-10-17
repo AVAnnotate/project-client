@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Container from '../../components/Container.astro';
 import { dynamicConfig } from '../../../dynamic-astro-config';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import TagPill from '@components/tags/TagPill';
+import TagPill from '@components/TagUtils/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 
@@ -72,7 +72,10 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
 });
 ---
 
-<Layout title={`Tag Index - ${projectData.data.project.title}`}>
+<Layout
+  title={`Tag Index - ${projectData.data.project.title}`}
+  class='bg-gray-100'
+>
   <div class='w-full bg-white h-[50px]'>
     <Breadcrumbs crumbs={crumbs} />
   </div>

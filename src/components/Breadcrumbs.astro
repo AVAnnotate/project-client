@@ -3,28 +3,29 @@ import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import Container from './Container.astro';
 
 export interface Props {
-    crumbs: {
-        link?: string,
-        label: string
-    }[]
+  crumbs: {
+    link?: string;
+    label: string;
+  }[];
 }
 
 const { crumbs } = Astro.props;
 ---
-<div class="w-full bg-white h-[50px]">
-    <Container className="flex flex-row gap-2 items-center h-full">
-        {
-            crumbs.map((crumb, idx) => ( 
-                <>
-                    {
-                        idx > 0 && 
-                        <ChevronRightIcon className="text-gray-500 h-4 w-4" />
-                    }
-                    <a href={crumb.link} class={`${crumb.link ? 'font-semibold' : 'cursor-default'}`}>
-                        { crumb.label }
-                    </a>
-                </>
-            ))
-        }
-    </Container>
+
+<div class='w-full bg-white h-[50px]'>
+  <Container className='flex flex-row gap-2 items-center h-full'>
+    {
+      crumbs.map((crumb, idx) => (
+        <>
+          {idx > 0 && <ChevronRightIcon className='text-gray-500 h-4 w-4' />}
+          <a
+            href={crumb.link}
+            class={`${crumb.link ? 'font-semibold' : 'cursor-default'}`}
+          >
+            {crumb.label}
+          </a>
+        </>
+      ))
+    }
+  </Container>
 </div>
