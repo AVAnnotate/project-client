@@ -1,6 +1,5 @@
 import { useStore } from '@nanostores/react';
 import type { CollectionEntry } from 'astro:content';
-import { useEffect } from 'react';
 import { PlayFill } from 'react-bootstrap-icons';
 import { $pagePlayersState, setAvFile } from 'src/store.ts';
 import { formatTimestamp } from 'src/utils/player.ts';
