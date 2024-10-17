@@ -105,8 +105,8 @@ export type Annotation = {
 };
 
 export type DisplayedAnnotation = Annotation & {
+  file: string;
   set: string;
-
   setName: string;
 };
 

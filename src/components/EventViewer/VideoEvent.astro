@@ -41,10 +41,8 @@ const baseUrl = import.meta.env.PROD
   ? projectData.data.project.slug
   : dynamicConfig.base;
 
-// @ts-ignore
-const url = (event as CollectionEntry<'events'>).data.audiovisual_files[file]
-  .file_url;
 let captionSets: { url: string; label: string }[];
+
 if (
   // @ts-ignore
   (event as CollectionEntry<'events'>).data.audiovisual_files[file].caption_set
@@ -74,7 +72,6 @@ if (
       <div
         class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
         data-player-id={playerId}
-        data-player-url={url}
       >
         {includes.includes('media') && (
           <div>
@@ -82,10 +79,9 @@ if (
               <h1 class='py-4'>{event.data.label}</h1>
             )}
             <Player
-              url={url}
               id={playerId}
               client:only='react'
-              type={event.data.item_type}
+              event={event}
               start={start}
               end={end}
               vttURLs={captionSets}
@@ -113,6 +109,7 @@ if (
             <Annotations
               playerId={playerId}
               annotationSets={annotationSets}
+              initialFile={file}
               isEmbed={isEmbed}
               type={event.data.item_type}
             />
