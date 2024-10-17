@@ -51,6 +51,10 @@ const { category, set, label, tagColors } = Astro.props;
         '.annotation-band-popup-arrow'
       ) as HTMLDivElement;
 
+      if (!popup) {
+        return null;
+      }
+
       const parent = band.parentElement! as HTMLElement;
 
       // get the position within the container (important if there's horizontally scrolling overflow)

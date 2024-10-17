@@ -18,6 +18,10 @@ const tags = annotation.tags.filter(
 );
 
 const backgroundColor = tags.length > 0 ? color || category.color : '#000000';
+
+const categoryTags = annotation.tags.filter(
+  (tag) => tag.category === category.category
+);
 ---
 
 <div
@@ -26,28 +30,30 @@ const backgroundColor = tags.length > 0 ? color || category.color : '#000000';
   data-initial-bg-color={backgroundColor}
   data-tags={tags.map((t) => t.tag).join(',')}
 >
-  <div class='annotation-band-popup hidden group-hover:block w-96 absolute'>
-    <div class='shadow bg-white'>
-      <div class='p-2' style={{ backgroundColor: category.color }}>
-        {getCategoryLabel(category.category)}
-      </div>
-      <div class='p-2 flex flex-col gap-4'>
-        <div class='flex flex-wrap gap-4 w-full'>
-          {
-            annotation.tags
-              .filter((tag) => tag.category === category.category)
-              .map((tag) => <TagPill color='gray-200' tag={tag.tag} />)
-          }
+  <!-- only show the popup if the annotation has tags in the selected category -->
+  {
+    categoryTags.length > 0 && (
+      <>
+        <div class='annotation-band-popup hidden group-hover:block w-96 absolute'>
+          <div class='shadow bg-white'>
+            <div class='p-2' style={{ backgroundColor: category.color }}>
+              {getCategoryLabel(category.category)}
+            </div>
+            <div class='p-2 flex flex-col gap-4'>
+              <div class='flex flex-wrap gap-4 w-full'>
+                {categoryTags.map((tag) => (
+                  <TagPill color='gray-200' tag={tag.tag} />
+                ))}
+              </div>
+              <p class='text-sm'>{formatTimestamp(annotation.start_time)}</p>
+              <div class='max-h-32 overflow-y-auto text-sm'>
+                <RichText nodes={annotation.annotation} />
+              </div>
+            </div>
+          </div>
         </div>
-        <p class='text-sm'>{formatTimestamp(annotation.start_time)}</p>
-        <div class='max-h-32 overflow-y-auto text-sm'>
-          <RichText nodes={annotation.annotation} />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    class='hidden group-hover:block annotation-band-popup-arrow absolute w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray overflow-hidden after:shadow after:absolute after:content-[""]'
-  >
-  </div>
+        <div class='hidden group-hover:block annotation-band-popup-arrow absolute w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray overflow-hidden after:shadow after:absolute after:content-[""]'></div>
+      </>
+    )
+  }
 </div>
