@@ -4,10 +4,10 @@ import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import TagPill from '@components/tags/TagPill';
 import { formatTimestamp } from 'src/utils/player';
 import { getEntry } from 'astro:content';
-import type { Annotation } from '@ty/index';
+import type { Annotation, DisplayedAnnotation } from '@ty/index';
 
 interface Props {
-  ann: Annotation & { set: string };
+  ann: DisplayedAnnotation;
   playerId: string;
   setName?: string;
 }
@@ -22,6 +22,7 @@ const tagGroups = projectData.data.project.tags.tagGroups;
   class='annotationNode flex flex-row justify-between gap-4 p-4 my-4 rounded-md bg-white'
   data-start={ann.start_time}
   data-end={ann.end_time}
+  data-file={ann.file}
   data-tags={JSON.stringify(ann.tags)}
   data-set={ann.set}
   data-uuid={ann.uuid}

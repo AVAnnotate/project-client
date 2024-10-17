@@ -9,9 +9,10 @@ export interface Props {
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
   isEmbed?: boolean;
+  initialFile: string;
 }
 
-const { annotationSets, isEmbed, playerId, type } = Astro.props;
+const { annotationSets, initialFile, isEmbed, playerId, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
   .map((set) =>
@@ -19,6 +20,7 @@ const sortedAnnotations = annotationSets
       ...ann,
       set: set.id,
       setName: set.data.set,
+      file: set.data.source_id,
     }))
   )
   .flat()
@@ -27,33 +29,32 @@ const sortedAnnotations = annotationSets
   ) as DisplayedAnnotation[];
 ---
 
-<div class='flex flex-col'>
+<div
+  class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+>
+  <AnnotationNanostorePopulator
+    annotations={sortedAnnotations}
+    playerId={playerId}
+    isEmbed={isEmbed}
+    initialFile={initialFile}
+    client:only='react'
+  />
   <div
-    class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
+    id={playerId}
+    data-player-id={playerId}
   >
-    <AnnotationNanostorePopulator
-      annotations={sortedAnnotations}
-      playerId={playerId}
-      isEmbed={isEmbed}
-      client:only='react'
-    />
-    <div
-      class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
-      id={playerId}
-      data-player-id={playerId}
-    >
-      {
-        sortedAnnotations.map((ann) => {
-          return (
-            <Annotation
-              ann={ann}
-              playerId={playerId}
-              setName={annotationSets.length > 1 ? ann.setName : undefined}
-            />
-          );
-        })
-      }
-    </div>
+    {
+      sortedAnnotations.map((ann) => {
+        return (
+          <Annotation
+            ann={ann}
+            playerId={playerId}
+            setName={annotationSets.length > 1 ? ann.setName : undefined}
+          />
+        );
+      })
+    }
   </div>
 </div>
 
@@ -164,7 +165,7 @@ const sortedAnnotations = annotationSets
           }
           // otherwise, scroll the whole page
         } else {
-          activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
       }
 
@@ -177,7 +178,7 @@ const sortedAnnotations = annotationSets
       }
     }
 
-    //show or hide tags if necessary
+    // show or hide tags if necessary
     if (state[changed].showTags !== oldState[changed].showTags) {
       if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {

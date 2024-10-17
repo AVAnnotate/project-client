@@ -10,6 +10,7 @@ interface Props {
   annotations: DisplayedAnnotation[];
   playerId: string;
   isEmbed?: boolean;
+  initialFile: string;
 }
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
@@ -21,6 +22,7 @@ const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
       annotations: [...props.annotations],
       filteredAnnotations: [...props.annotations.map((ann) => ann.uuid)],
       isEmbed: props.isEmbed,
+      avFileUuid: props.initialFile,
     });
   }, [props.annotations, props.playerId, props.isEmbed]);
 

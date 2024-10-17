@@ -33,6 +33,11 @@ export const $pagePlayersState = deepMap<{ [key: string]: AnnotationState }>(
 const getFilteredAnnotations = (newState: AnnotationState) =>
   newState.annotations
     .filter((ann) => {
+      // hide if its AV file is hidden
+      if (newState.avFileUuid && ann.file !== newState.avFileUuid) {
+        return false;
+      }
+
       // hide if its set is hidden
       if (newState.sets.length > 0) {
         const setFiltersEmpty = newState.sets.length === 0;
@@ -42,7 +47,7 @@ const getFilteredAnnotations = (newState: AnnotationState) =>
         }
       }
 
-      // hide if its sets are hidden
+      // hide if its tags are hidden
       if (newState.tags.length > 0) {
         let match = false;
 
@@ -209,6 +214,19 @@ export const toggleSetFilter = (set: string, playerId: string) => {
       sets: [...thisPlayer.sets, set],
     };
   }
+
+  newState.filteredAnnotations = getFilteredAnnotations(newState);
+
+  $pagePlayersState.setKey(playerId, newState);
+};
+
+export const setAvFile = (avFileUuid: string, playerId: string) => {
+  const oldState = $pagePlayersState.get()[playerId];
+
+  const newState = {
+    ...oldState,
+    avFileUuid,
+  };
 
   newState.filteredAnnotations = getFilteredAnnotations(newState);
 

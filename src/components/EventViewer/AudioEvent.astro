@@ -6,6 +6,7 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
+import AudioFilePicker from './AudioFilePicker';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -26,8 +27,6 @@ const {
   isEmbed,
   playerId,
 } = Astro.props;
-
-const url = event.data.audiovisual_files[file].file_url;
 ---
 
 <div>
@@ -43,19 +42,26 @@ const url = event.data.audiovisual_files[file].file_url;
           )
         }
       </ConditionalContainer>
-      <div
-        class='mediaContainer gap-4 flex flex-col'
-        data-player-id={playerId}
-        data-player-url={url}
-      >
+      <div class='mediaContainer gap-4 flex flex-col' data-player-id={playerId}>
         {
           includes.includes('media') && (
             <ConditionalContainer condition={!isEmbed}>
+              {/* only show the picker if
+                  1. there's more than AV file
+                  2. this is not an embed of a single AV file */}
+              {!start &&
+                !end &&
+                Object.keys(event.data.audiovisual_files).length > 1 && (
+                  <AudioFilePicker
+                    event={event}
+                    playerId={playerId}
+                    client:load
+                  />
+                )}
               <Player
-                url={url}
                 id={playerId}
                 client:only='react'
-                type={event.data.item_type}
+                event={event}
                 start={start}
                 end={end}
               />
@@ -78,6 +84,7 @@ const url = event.data.audiovisual_files[file].file_url;
       isEmbed={isEmbed}
       playerId={playerId}
       type={event.data.item_type}
+      initialFile={file}
     />
   </ConditionalContainer>
 </div>
