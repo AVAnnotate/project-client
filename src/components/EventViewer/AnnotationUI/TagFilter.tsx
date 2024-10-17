@@ -1,4 +1,4 @@
-import TagPill from '@components/Tags/TagPill.tsx';
+import TagPill from '@components/tags/TagPill.tsx';
 import {
   Checkbox,
   Popover,
