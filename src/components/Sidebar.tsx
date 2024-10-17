@@ -6,7 +6,7 @@ import type { PageCollectionEntry } from 'src/utils/pages.ts';
 interface SidebarProps {
   baseUrl: string;
   pages: PageCollectionEntry[];
-  pageUuid?: string;
+  slug?: string;
 }
 
 const getHref = (page: PageCollectionEntry, baseUrl: string) => {
@@ -33,8 +33,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   // if there's no page slug, that means we're on the homepage
   const isSelected = (page: PageCollectionEntry) => {
     return (
-      page.id === (props.pageUuid || homeUuid) ||
-      props.pageUuid === page.data.slug
+      page.id === (props.slug || homeUuid) || props.slug === page.data.slug
     );
   };
 
