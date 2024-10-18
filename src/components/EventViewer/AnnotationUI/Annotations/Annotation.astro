@@ -10,16 +10,17 @@ interface Props {
   ann: DisplayedAnnotation;
   playerId: string;
   setName?: string;
+  initialFile: string;
 }
 
-const { ann, playerId, setName } = Astro.props;
+const { ann, initialFile, playerId, setName } = Astro.props;
 
 const projectData = await getEntry('project', 'project');
 const tagGroups = projectData.data.project.tags.tagGroups;
 ---
 
 <div
-  class='annotationNode flex flex-row justify-between gap-4 p-4 my-4 rounded-md bg-white'
+  class={`annotationNode flex flex-row justify-between gap-4 p-4 my-4 rounded-md bg-white ${ann.file === initialFile ? '' : 'hidden'}`}
   data-start={ann.start_time}
   data-end={ann.end_time}
   data-file={ann.file}
