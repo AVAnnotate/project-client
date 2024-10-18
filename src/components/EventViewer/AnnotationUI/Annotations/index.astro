@@ -49,6 +49,7 @@ const sortedAnnotations = annotationSets
         return (
           <Annotation
             ann={ann}
+            initialFile={initialFile}
             playerId={playerId}
             setName={annotationSets.length > 1 ? ann.setName : undefined}
           />

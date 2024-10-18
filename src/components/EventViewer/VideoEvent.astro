@@ -9,6 +9,7 @@ import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
 import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
+import VideoFilePicker from './VideoFilePicker';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -86,16 +87,34 @@ if (
               end={end}
               vttURLs={captionSets}
             />
-            {includes.includes('description') && event.data.description && (
-              <div class='my-4'>
-                <RichText nodes={event.data.description} />
-              </div>
-            )}
-            <div class='h-1 border-t border-gray-200 w-full' />
-            {event.data.citation && (
-              <Container>
-                <p>{event.data.citation}</p>
-              </Container>
+            {includes.includes('description') ? (
+              <>
+                {!start &&
+                !end &&
+                Object.keys(event.data.audiovisual_files).length > 1 ? (
+                  <VideoFilePicker
+                    event={event}
+                    playerId={playerId}
+                    client:load
+                  >
+                    <RichText nodes={event.data.description} />
+                  </VideoFilePicker>
+                ) : (
+                  <RichText nodes={event.data.description} />
+                )}
+              </>
+            ) : (
+              <>
+                {!start &&
+                  !end &&
+                  Object.keys(event.data.audiovisual_files).length > 1 && (
+                    <VideoFilePicker
+                      event={event}
+                      playerId={playerId}
+                      client:load
+                    />
+                  )}
+              </>
             )}
           </div>
         )}
