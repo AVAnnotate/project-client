@@ -7,6 +7,7 @@ interface SidebarProps {
   baseUrl: string;
   pages: PageCollectionEntry[];
   slug?: string;
+  url: URL;
 }
 
 const getHref = (page: PageCollectionEntry, baseUrl: string) => {
@@ -29,12 +30,24 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     [props.pages]
   );
 
+  const isIndex = useMemo(
+    () => `/${props.baseUrl}/tags` === props.url.pathname,
+    [props.baseUrl, props.url]
+  );
+
   // highlight the current page
   // if there's no page slug, that means we're on the homepage
   const isSelected = (page: PageCollectionEntry) => {
-    return (
-      page.id === (props.slug || homeUuid) || props.slug === page.data.slug
-    );
+    // the index has its own check below
+    if (isIndex) {
+      return false;
+    }
+
+    if (!props.slug && page.id === homeUuid) {
+      return true;
+    }
+
+    return props.slug && props.slug === page.data.slug;
   };
 
   return (
@@ -50,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         />
       )}
       <Transition show={show}>
-        <div className='shadow absolute top-0 left-0 h-dvh w-80 bg-white w-10 transition duration-200 ease-in-out data-[closed]:-translate-x-full text-black text-sm'>
+        <div className='shadow absolute top-0 left-0 h-dvh w-80 bg-white w-10 transition duration-200 ease-in-out data-[closed]:-translate-x-full text-black text-sm overflow-y-auto'>
           <div className='flex w-full h-24 justify-end px-8'>
             <button type='button' onClick={() => setShow(false)}>
               <XMarkIcon className='w-8 h-8' />
@@ -71,6 +84,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </div>
             </a>
           ))}
+          <a href={`/${props.baseUrl}/tags`}>
+            <div className='p-4 hover:bg-blue-hover'>
+              <p className={isIndex ? 'font-bold' : ''}>Index</p>
+            </div>
+          </a>
         </div>
       </Transition>
     </>
