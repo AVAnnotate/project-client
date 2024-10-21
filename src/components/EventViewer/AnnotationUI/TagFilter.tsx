@@ -1,4 +1,4 @@
-import TagPill from '@components/tags/TagPill.tsx';
+import TagPill from '@components/TagUtils/TagPill.tsx';
 import {
   Checkbox,
   Popover,
@@ -93,7 +93,9 @@ const TagFilter = (props: TagFilterProps) => {
                 <p className='text-sm font-semibold'>Annotation Sets</p>
                 {thisPlayer.sets.length > 0 && (
                   <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
-                    <p>{`${thisPlayer.sets.length} filter${thisPlayer.sets.length > 1 ? 's' : ''} applied`}</p>
+                    <p>{`${thisPlayer.sets.length} filter${
+                      thisPlayer.sets.length > 1 ? 's' : ''
+                    } applied`}</p>
                     <XMarkIcon
                       className='size-4 text-white hover:scale-105 cursor-pointer'
                       onClick={() => clearFilter('sets', playerId)}
@@ -111,11 +113,11 @@ const TagFilter = (props: TagFilterProps) => {
                       onChange={() => {
                         toggleSetFilter(set.id, playerId);
                       }}
-                      className='group size-4 bg-white rounded-sm data-[checked]:bg-primary p-0.5 ring-1 ring-gray-300 ring-inset data-[checked]:ring-primary'
+                      className='min-w-4 group size-4 bg-white rounded-sm data-[checked]:bg-primary p-0.5 ring-1 ring-gray-300 ring-inset data-[checked]:ring-primary'
                     >
                       <CheckIcon className='hidden size-3 group-data-[checked]:block text-white' />
                     </Checkbox>
-                    <p className='capitalize font-semibold text-xs'>
+                    <p className='grow-0 capitalize font-semibold text-xs'>
                       {set.data.set.replaceAll('_', '')}
                     </p>
                   </div>
@@ -125,10 +127,12 @@ const TagFilter = (props: TagFilterProps) => {
           )}
         </div>
         <div className='flex flex-row justify-between w-full pb-2'>
-          <p className='text-sm  font-semibold'>Tags</p>
+          <p className='text-sm font-semibold'>Tags</p>
           {thisPlayer.tags.length > 0 && (
             <div className='bg-primary rounded-lg flex items-center justify-center gap-2 py-1 px-2 text-white cursor-default text-xs font-semibold'>
-              <p>{`${thisPlayer.tags.length} filter${thisPlayer.tags.length > 1 ? 's' : ''} applied`}</p>
+              <p>{`${thisPlayer.tags.length} filter${
+                thisPlayer.tags.length > 1 ? 's' : ''
+              } applied`}</p>
               <XMarkIcon
                 className='size-4 text-white hover:scale-105 cursor-pointer'
                 onClick={() => clearFilter('tags', playerId)}

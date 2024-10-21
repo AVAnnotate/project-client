@@ -5,19 +5,24 @@ import '@fontsource-variable/inter';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { getEntry } from 'astro:content';
-
-const projectData = await getEntry('project', 'project');
+import { dynamicConfig } from 'dynamic-astro-config';
 
 interface Props {
   background?: string;
   title?: string;
-  projectName?: string;
+  class?: string;
 }
+
+const projectData = await getEntry('project', 'project');
+
+const baseUrl = import.meta.env.PROD
+  ? projectData.data.project.slug
+  : dynamicConfig.base;
 
 const {
   background,
+  class: className,
   title = projectData.data.project.title,
-  projectName = projectData.data.project.title,
 } = Astro.props;
 
 const projectBy =
@@ -30,7 +35,7 @@ const projectBy =
     <meta charset='UTF-8' />
     <meta name='description' content='Astro description' />
     <meta name='viewport' content='width=device-width' />
-    <link rel='icon' type='image/svg+xml' href='/my-repo/dist/favicon.svg' />
+    <link rel='icon' type='image/svg+xml' href=`/${baseUrl}/favicon.svg` />
     <meta name='generator' content={Astro.generator} />
 
     <!-- google font links -->
@@ -42,8 +47,11 @@ const projectBy =
     />
     <title>{title}</title>
   </head>
-  <body class='flex h-full flex-col mx-auto' transition:animate='initial'>
-    <Header projectName={projectName} pages={[]} />
+  <body
+    class={`flex h-full flex-col mx-auto ${className}`}
+    transition:animate='initial'
+  >
+    <Header />
     <main class=`min-h-[calc(100dvh_-160px)] text-black bg-${background}`>
       <slot />
     </main>

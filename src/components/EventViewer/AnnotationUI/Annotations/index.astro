@@ -8,9 +8,11 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
+  isEmbed?: boolean;
+  initialFile: string;
 }
 
-const { playerId, annotationSets, type } = Astro.props;
+const { annotationSets, initialFile, isEmbed, playerId, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
   .map((set) =>
@@ -18,6 +20,7 @@ const sortedAnnotations = annotationSets
       ...ann,
       set: set.id,
       setName: set.data.set,
+      file: set.data.source_id,
     }))
   )
   .flat()
@@ -26,42 +29,38 @@ const sortedAnnotations = annotationSets
   ) as DisplayedAnnotation[];
 ---
 
-<div class={`flex flex-col`}>
+<div
+  class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+>
+  <AnnotationNanostorePopulator
+    annotations={sortedAnnotations}
+    playerId={playerId}
+    isEmbed={isEmbed}
+    initialFile={initialFile}
+    client:load
+  />
   <div
-    class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
+    id={playerId}
+    data-player-id={playerId}
   >
-    <AnnotationNanostorePopulator
-      annotations={sortedAnnotations}
-      playerId={playerId}
-      client:only='react'
-    />
-    <div
-      class={`${type === 'Video' ? 'overflow-y-scroll max-h-[calc(100dvh_-360px)]' : ''}`}
-      id={playerId}
-    >
-      {
-        sortedAnnotations.map((ann) => {
-          return (
-            <Annotation
-              ann={ann}
-              playerId={playerId}
-              setName={annotationSets.length > 1 ? ann.setName : undefined}
-            />
-          );
-        })
-      }
-    </div>
+    {
+      sortedAnnotations.map((ann) => {
+        return (
+          <Annotation
+            ann={ann}
+            initialFile={initialFile}
+            playerId={playerId}
+            setName={annotationSets.length > 1 ? ann.setName : undefined}
+          />
+        );
+      })
+    }
   </div>
 </div>
 
 <script>
   import { $pagePlayersState } from 'src/store.ts';
-
-  const annotationPlayNodes = document.getElementsByClassName('playAnnotation');
-  const annotationNodes = document.getElementsByClassName('annotationNode');
-  const annotationTagNodes = document.getElementsByClassName('annotationTags');
-
-  const activeBackground = '!bg-blue-hover';
 
   const hideNode = (node: HTMLElement | Element) => {
     node.classList.add('hidden');
@@ -73,15 +72,17 @@ const sortedAnnotations = annotationSets
     node.classList.remove('hidden');
   };
 
+  const activeBackground = '!bg-blue-hover';
+
+  const annotationPlayNodes = document.querySelectorAll(`.playAnnotation`);
+
   for (let i = 0; i < annotationPlayNodes.length; i++) {
-    const thisNode = annotationPlayNodes[i];
-    if (
-      thisNode instanceof HTMLElement &&
-      thisNode.dataset.start &&
-      thisNode.dataset.playerId
-    ) {
+    const thisNode = annotationPlayNodes[i] as HTMLElement;
+
+    if (thisNode.dataset.start && thisNode.dataset.playerId) {
       const annotationStartsNew =
-        $pagePlayersState.get()[thisNode.dataset.playerId].annotationStarts;
+        $pagePlayersState.get()[thisNode.dataset.playerId]?.annotationStarts;
+
       if (annotationStartsNew) {
         annotationStartsNew.push({
           start: Math.floor(Number(thisNode.dataset.start)),
@@ -113,38 +114,72 @@ const sortedAnnotations = annotationSets
       return null;
     }
 
-    if (
-      Math.floor(state[changed].position * 1000) % 7 ===
-      0 //this is just meant to get it firing at a reasonable interval...should find a less random way
-    ) {
-      const startTimes = state[changed].annotationStarts;
-      const current = startTimes?.findIndex((time, idx) => {
-        if (typeof time.end === 'number') {
-          return (
-            time.start <= state[changed].position &&
-            time.end > state[changed].position
+    const eventContainerEl = document.querySelector(
+      `.eventContainer[data-player-id="${changed}"]`
+    );
+
+    if (!eventContainerEl) {
+      console.error(`No event container found for ${changed}`);
+      return null;
+    }
+
+    const annotationNodes =
+      eventContainerEl.querySelectorAll(`.annotationNode`);
+    const annotationTagNodes =
+      eventContainerEl.querySelectorAll(`.annotationTags`);
+
+    const startTimes = state[changed].annotationStarts;
+    const current = startTimes?.findIndex((time, idx) => {
+      if (typeof time.end === 'number') {
+        return (
+          time.start <= state[changed].position &&
+          time.end > state[changed].position
+        );
+      }
+      return idx < startTimes.length - 1
+        ? time.start <= state[changed].position &&
+            startTimes[idx + 1].start > state[changed].position
+        : time.start <= state[changed].position;
+    });
+    if (typeof current === 'number' && current >= 0) {
+      const activeNode = annotationNodes[current] as HTMLElement;
+
+      if (state[changed].autoScroll) {
+        // scroll the parent element if we're in an embed
+        if (state[changed].isEmbed) {
+          const videoContainerEl = document.querySelector(
+            `.videoAnnotationContainer[data-player-id="${changed}"]`
           );
-        }
-        return idx < startTimes.length - 1
-          ? time.start <= state[changed].position &&
-              startTimes[idx + 1].start > state[changed].position
-          : time.start <= state[changed].position;
-      });
-      if (typeof current === 'number' && current >= 0) {
-        const activeNode = annotationNodes[current];
-        if (state[changed].autoScroll) {
-          activeNode.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
-        activeNode.classList.add(activeBackground);
-        for (let i = 0; i < annotationNodes.length; i++) {
-          if (i !== current) {
-            annotationNodes[i].classList.remove(activeBackground);
+          const offsetTop = activeNode.offsetTop;
+
+          // we need to scroll a different container if we're in an embedded video event
+          if (videoContainerEl) {
+            videoContainerEl.scroll({
+              top: offsetTop - videoContainerEl.clientHeight,
+              behavior: 'smooth',
+            });
+          } else {
+            eventContainerEl.scroll({
+              top: offsetTop - eventContainerEl.clientHeight / 3,
+              behavior: 'smooth',
+            });
           }
+          // otherwise, scroll the whole page
+        } else {
+          activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }
+
+      activeNode.classList.add(activeBackground);
+
+      for (let i = 0; i < annotationNodes.length; i++) {
+        if (i !== current) {
+          annotationNodes[i].classList.remove(activeBackground);
         }
       }
     }
 
-    //show or hide tags if necessary
+    // show or hide tags if necessary
     if (state[changed].showTags !== oldState[changed].showTags) {
       if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
@@ -157,7 +192,7 @@ const sortedAnnotations = annotationSets
       }
     }
 
-    //filter on sets, text, and tags
+    // filter on sets, text, and tags
     for (let i = 0; i < annotationNodes.length; i++) {
       const node = annotationNodes[i];
 

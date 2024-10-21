@@ -5,6 +5,7 @@ export type EventFile = {
     label: string;
     file_url: string;
     duration: number;
+    caption_set?: { annotation_page_id: string; speaker_category?: string }[];
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
@@ -68,6 +69,7 @@ export type Event = {
     label: string;
     file_url: string;
     duration: number;
+    caption_set?: { annotation_page_id: string; speaker_category?: string }[];
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
@@ -103,8 +105,8 @@ export type Annotation = {
 };
 
 export type DisplayedAnnotation = Annotation & {
+  file: string;
   set: string;
-
   setName: string;
 };
 
@@ -130,6 +132,7 @@ export type Page = {
   created_by: string;
   title: string;
   parent?: string;
+  slug?: string;
   updated_at: string;
   updated_by: string;
   autogenerate: AutoGenerate;

@@ -1,5 +1,5 @@
 import type { DisplayedAnnotation, Tag } from '@ty/index.ts';
-import { computed, deepMap } from 'nanostores';
+import { deepMap } from 'nanostores';
 import { Node } from 'slate';
 
 export interface AnnotationState {
@@ -18,6 +18,11 @@ export interface AnnotationState {
   annotations: DisplayedAnnotation[];
   filteredAnnotations: string[];
   snapToAnnotations: boolean;
+  clip?: {
+    start: number;
+    end: number;
+  };
+  isEmbed?: boolean;
 }
 
 // keeps track of all players on the loaded page
@@ -28,6 +33,11 @@ export const $pagePlayersState = deepMap<{ [key: string]: AnnotationState }>(
 const getFilteredAnnotations = (newState: AnnotationState) =>
   newState.annotations
     .filter((ann) => {
+      // hide if its AV file is hidden
+      if (newState.avFileUuid && ann.file !== newState.avFileUuid) {
+        return false;
+      }
+
       // hide if its set is hidden
       if (newState.sets.length > 0) {
         const setFiltersEmpty = newState.sets.length === 0;
@@ -37,7 +47,7 @@ const getFilteredAnnotations = (newState: AnnotationState) =>
         }
       }
 
-      // hide if its sets are hidden
+      // hide if its tags are hidden
       if (newState.tags.length > 0) {
         let match = false;
 
@@ -56,6 +66,22 @@ const getFilteredAnnotations = (newState: AnnotationState) =>
         }
 
         if (!match) {
+          return false;
+        }
+      }
+
+      // hide if it's not in the selected clip
+      if (newState.clip) {
+        // should show if any part of the annotation overlaps with the selected clip,
+        // even if it's partly outside the clip
+        const startTimeMatch =
+          ann.start_time >= newState.clip.start &&
+          ann.start_time <= newState.clip.end;
+        const endTimeMatch =
+          ann.end_time >= newState.clip.start &&
+          ann.end_time <= newState.clip.end;
+
+        if (!startTimeMatch && !endTimeMatch) {
           return false;
         }
       }
@@ -194,6 +220,32 @@ export const toggleSetFilter = (set: string, playerId: string) => {
   $pagePlayersState.setKey(playerId, newState);
 };
 
+export const setAvFile = (avFileUuid: string, playerId: string) => {
+  const oldState = $pagePlayersState.get()[playerId];
+
+  const newState = {
+    ...oldState,
+    avFileUuid,
+  };
+
+  newState.filteredAnnotations = getFilteredAnnotations(newState);
+
+  $pagePlayersState.setKey(playerId, newState);
+};
+
+export const setSearchFilter = (searchQuery: string, playerId: string) => {
+  const oldState = $pagePlayersState.get()[playerId];
+
+  const newState = {
+    ...oldState,
+    searchQuery,
+  };
+
+  newState.filteredAnnotations = getFilteredAnnotations(newState);
+
+  $pagePlayersState.setKey(playerId, newState);
+};
+
 export const clearFilter = (type: 'sets' | 'tags', playerId: string) => {
   const oldState = $pagePlayersState.get()[playerId];
 
@@ -207,6 +259,19 @@ export const clearFilter = (type: 'sets' | 'tags', playerId: string) => {
   if (type === 'tags') {
     newState.snapToAnnotations = false;
   }
+
+  $pagePlayersState.setKey(playerId, newState);
+};
+
+export const setClip = (
+  clip: { start: number; end: number },
+  playerId: string
+) => {
+  const oldState = $pagePlayersState.get()[playerId];
+
+  const newState = { ...oldState, clip };
+
+  newState.filteredAnnotations = getFilteredAnnotations(newState);
 
   $pagePlayersState.setKey(playerId, newState);
 };

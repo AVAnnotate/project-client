@@ -34,7 +34,11 @@ const { nodes } = Astro.props;
         }
       };
 
-      return nodes.map((node: Node) => serialize(node));
+      return (
+        <div class='[overflow-wrap:anywhere]'>
+          {nodes.map((node: Node) => serialize(node))}
+        </div>
+      );
     })()
   }
 </div>

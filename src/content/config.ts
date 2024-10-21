@@ -8,16 +8,20 @@ const annotationCollection = defineCollection({
     event_id: z.string(),
     source_id: z.string(),
     set: z.string(),
-    annotations: z.array(z.object({
-      uuid: z.string(),
-      start_time: z.number(),
-      end_time: z.number(),
-      annotation: slateNodeArray,
-      tags: z.array(z.object({
-        category: z.string(),
-        tag: z.string()
-      }))
-    }))
+    annotations: z.array(
+      z.object({
+        uuid: z.string(),
+        start_time: z.number(),
+        end_time: z.number(),
+        annotation: slateNodeArray,
+        tags: z.array(
+          z.object({
+            category: z.string(),
+            tag: z.string(),
+          })
+        ),
+      })
+    ),
   }),
 });
 
@@ -31,6 +35,14 @@ const eventCollection = defineCollection({
         is_offline: z.boolean().nullish(),
         file_url: z.string(),
         duration: z.number(),
+        caption_set: z
+          .array(
+            z.object({
+              annotation_page_id: z.string(),
+              speaker_category: z.string().nullish(),
+            })
+          )
+          .nullish(),
       })
     ),
     auto_generate_web_page: z.boolean(),
@@ -61,6 +73,7 @@ const pageCollection = defineCollection({
       parent: z.string().nullish(),
       updated_at: z.string(),
       updated_by: z.string(),
+      slug: z.string().nullish(),
       autogenerate: z.object({
         enabled: z.boolean(),
         type: z.string(),
@@ -84,32 +97,38 @@ const projectCollection = defineCollection({
       authors: z.string(),
       media_player: z.enum(['avannotate', 'universal', 'aviary']),
       auto_populate_home_page: z.boolean(),
-      additional_users: z.array(z.object({
-        login_name: z.string(),
-        avatar_url: z.string(),
-        admin: z.boolean(),
-        name: z.string().nullish(),
-      })),
+      additional_users: z.array(
+        z.object({
+          login_name: z.string(),
+          avatar_url: z.string(),
+          admin: z.boolean(),
+          name: z.string().nullish(),
+        })
+      ),
       tags: z.object({
-        tagGroups: z.array(z.object({
-          category: z.string(),
-          color: z.string()
-        })),
-        tags: z.array(z.object({
-          category: z.string(),
-          tag: z.string()
-        }))
+        tagGroups: z.array(
+          z.object({
+            category: z.string(),
+            color: z.string(),
+          })
+        ),
+        tags: z.array(
+          z.object({
+            category: z.string(),
+            tag: z.string(),
+          })
+        ),
       }),
       created_at: z.string(),
-      updated_at: z.string()
+      updated_at: z.string(),
     }),
     publish: z.object({
       publish_pages_app: z.boolean(),
       publish_sha: z.string(),
-      publish_iso_date: z.string()
+      publish_iso_date: z.string(),
     }),
     // not sure what goes in here
-    users: z.array(z.any())
+    users: z.array(z.any()),
   }),
 });
 
