@@ -87,35 +87,25 @@ if (
               end={end}
               vttURLs={captionSets}
             />
-            {includes.includes('description') ? (
-              <>
-                {!start &&
-                !end &&
-                Object.keys(event.data.audiovisual_files).length > 1 ? (
-                  <VideoFilePicker
-                    event={event}
-                    playerId={playerId}
-                    client:load
-                  >
-                    <RichText nodes={event.data.description} />
-                  </VideoFilePicker>
-                ) : (
-                  <RichText nodes={event.data.description} />
-                )}
-              </>
-            ) : (
-              <>
-                {!start &&
-                  !end &&
-                  Object.keys(event.data.audiovisual_files).length > 1 && (
-                    <VideoFilePicker
-                      event={event}
-                      playerId={playerId}
-                      client:load
-                    />
-                  )}
-              </>
-            )}
+            <>
+              {!start &&
+              !end &&
+              Object.keys(event.data.audiovisual_files).length > 1 ? (
+                <VideoFilePicker event={event} playerId={playerId} client:load>
+                  {includes.includes('description') &&
+                    event.data.description && (
+                      <RichText nodes={event.data.description} />
+                    )}
+                </VideoFilePicker>
+              ) : (
+                <>
+                  {includes.includes('description') &&
+                    event.data.description && (
+                      <RichText nodes={event.data.description} />
+                    )}
+                </>
+              )}
+            </>
           </div>
         )}
         {includes.includes('annotations') && (
