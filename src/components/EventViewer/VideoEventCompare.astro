@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import type { Includes, SlateEventNodeProps } from '@ty/slate';
+import type { CollectionEntry } from 'astro:content';
+import Player from '@components/Player';
+import { getCaptionSets } from 'src/utils/events';
+import PlayerStateNanostorePopulator from './PlayerStateNanostorePopulator';
+
+export interface Props extends Omit<SlateEventNodeProps, 'uuid' | 'includes'> {
+  end?: number;
+  start?: number;
+  event: CollectionEntry<'events'>;
+  playerId: string;
+  file?: string;
+  includes: Includes[];
+}
+
+const { file, event, includes, playerId, start, end } = Astro.props;
+
+const annotationData = await getCollection('annotations');
+
+const annotationSets = annotationData.filter(
+  (an) => an.data.event_id === event.id
+);
+
+// allow a default file to be configured via props
+// otherwise, use the first file in the list
+const defaultFile = file || Object.keys(event.data.audiovisual_files)[0];
+
+const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
+---
+
+<div>
+  {includes.includes('label') && <h2>{event.data.label}</h2>}
+  {
+    includes.includes('media') && (
+      <>
+        <PlayerStateNanostorePopulator
+          playerId={playerId}
+          initialFile={defaultFile}
+        />
+        <Player
+          id={playerId}
+          client:only='react'
+          event={event}
+          start={start}
+          end={end}
+          vttURLs={captionSets}
+        />
+      </>
+    )
+  }
+</div>

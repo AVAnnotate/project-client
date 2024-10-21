@@ -14,6 +14,7 @@ interface Props extends SlateEventNodeProps {
   file: string;
   isEmbed?: boolean;
   playerId: string;
+  isComparison?: boolean;
 }
 
 const {
@@ -25,15 +26,14 @@ const {
   file,
   annotationSets,
   isEmbed,
+  isComparison,
   playerId,
 } = Astro.props;
 ---
 
 <div>
-  <div
-    class={`sticky ${includes.includes('label') ? 'top-[80px]' : 'top-0'} z-10 ${!isEmbed ? 'shadow' : ''}`}
-  >
-    <div class='flex flex-col gap-6 bg-gray-100 py-6'>
+  <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
+    <div class='flex flex-col gap-6 bg-gray-100 py-6 [&_p]:mb-0!'>
       <ConditionalContainer condition={!isEmbed}>
         {includes.includes('label') && <h1>{event.data.label}</h1>}
         {
@@ -73,6 +73,7 @@ const {
         <AnnotationHeader
           playerId={playerId}
           annotationSets={annotationSets}
+          isComparison={isComparison}
           type={event.data.item_type}
         />
       </ConditionalContainer>

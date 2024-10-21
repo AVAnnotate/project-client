@@ -1,4 +1,5 @@
 ---
+import EventComparison from '@components/EventViewer/EventComparison.astro';
 import EventViewer from '@components/EventViewer/index.astro';
 import TableOfContents from '@components/TableOfContents.astro';
 import { randomUUID } from 'crypto';
@@ -113,7 +114,13 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
           </div>
         );
       case 'event-comparison':
-      // todo
+        return (
+          <EventComparison
+            event1={element.event1}
+            event2={element.event2}
+            includes={element.includes}
+          />
+        );
       default:
         return (
           <p style={style} {...attributes}>
@@ -123,8 +130,3 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
     }
   })()
 }
-<style>
-  p {
-    margin-bottom: 1em;
-  }
-</style>

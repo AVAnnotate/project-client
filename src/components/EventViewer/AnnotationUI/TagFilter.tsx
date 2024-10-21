@@ -83,7 +83,7 @@ const TagFilter = (props: TagFilterProps) => {
       </PopoverButton>
       <PopoverPanel
         anchor='bottom end'
-        className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4'
+        className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4 z-10'
       >
         <p className='text-md font-semibold mb-4'>Filters</p>
         <div className='flex flex-row justify-between w-full pb-2'>
