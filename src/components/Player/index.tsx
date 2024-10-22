@@ -53,7 +53,11 @@ const Player: React.FC<Props> = (props) => {
       const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
       setUrl(avFile.file_url);
     } else {
-      setUrl(Object.keys(props.event.data.audiovisual_files)[0]);
+      setUrl(
+        props.event.data.audiovisual_files[
+          Object.keys(props.event.data.audiovisual_files)[0]
+        ].file_url
+      );
     }
   }, []);
 
