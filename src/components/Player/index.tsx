@@ -43,15 +43,16 @@ const Player: React.FC<Props> = (props) => {
   // total length of recording, in seconds
   const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
+  const [url, setUrl] = useState('');
 
   const pagePlayers = useStore($pagePlayersState);
   const playerState = pagePlayers[props.id];
 
-  const fileUrl = useMemo(() => {
+  useEffect(() => {
     const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
 
-    return avFile.file_url;
-  }, [pagePlayers]);
+    setUrl(avFile.file_url);
+  }, []);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
@@ -244,7 +245,7 @@ const Player: React.FC<Props> = (props) => {
         }}
         progressInterval={250}
         ref={player}
-        url={fileUrl}
+        url={url}
         height={props.event.data.item_type === 'Video' ? '100%' : 0}
         width={props.event.data.item_type === 'Video' ? '100%' : 0}
       />
