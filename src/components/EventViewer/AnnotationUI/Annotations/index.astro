@@ -8,11 +8,10 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  isEmbed?: boolean;
   initialFile: string;
 }
 
-const { annotationSets, initialFile, isEmbed, playerId, type } = Astro.props;
+const { annotationSets, initialFile, playerId, type } = Astro.props;
 
 const sortedAnnotations = annotationSets
   .map((set) =>
