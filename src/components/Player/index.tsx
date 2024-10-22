@@ -47,11 +47,12 @@ const Player: React.FC<Props> = (props) => {
   const pagePlayers = useStore($pagePlayersState);
   const playerState = pagePlayers[props.id];
 
-  const fileUrl = useMemo(() => {
+  const fileUrl = () => {
+    // @ts-ignore
     const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
 
     return avFile.file_url;
-  }, [pagePlayers[props.id]]);
+  };
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
