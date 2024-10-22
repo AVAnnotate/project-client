@@ -17,32 +17,43 @@ const ThumbCanvas: React.FC<ThumbCanvasProps> = (props) => {
       videoEl.src = props.url;
 
       videoEl.onloadeddata = () => {
-        // set the internal canvas dimensions to 2x for better image quality
-        // this doesn't affect CSS, just the canvas's own drawing surface
-        canvasRef.current.height = 180;
-        canvasRef.current.width = 240;
-        const ctx = canvasRef.current.getContext('2d', { alpha: false });
+        if (canvasRef.current) {
+          // set the internal canvas dimensions to 2x for better image quality
+          // this doesn't affect CSS, just the canvas's own drawing surface
+          canvasRef.current.height = 180;
+          canvasRef.current.width = 240;
+          const ctx = canvasRef.current.getContext('2d', { alpha: false });
 
-        // draw black background
-        ctx.beginPath();
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          if (ctx) {
+            // draw black background
+            ctx.beginPath();
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(
+              0,
+              0,
+              canvasRef.current.width,
+              canvasRef.current.height
+            );
 
-        const videoRatio = videoEl.videoHeight / videoEl.videoWidth;
-        const canvasRatio = canvasRef.current.height / canvasRef.current.width;
+            const videoRatio = videoEl.videoHeight / videoEl.videoWidth;
+            const canvasRatio =
+              canvasRef.current.height / canvasRef.current.width;
 
-        if (videoRatio > canvasRatio) {
-          const height = canvasRef.current.width * videoRatio;
-          ctx.drawImage(
-            videoEl,
-            0,
-            Math.floor(canvasRef.current.height - height / 2),
-            canvasRef.current.width,
-            height
-          );
-        } else {
-          const width = (canvasRef.current.width * canvasRatio) / videoRatio;
-          ctx.drawImage(videoEl, 0, 0, width, canvasRef.current.height);
+            if (videoRatio > canvasRatio) {
+              const height = canvasRef.current.width * videoRatio;
+              ctx.drawImage(
+                videoEl,
+                0,
+                Math.floor(canvasRef.current.height - height / 2),
+                canvasRef.current.width,
+                height
+              );
+            } else {
+              const width =
+                (canvasRef.current.width * canvasRatio) / videoRatio;
+              ctx.drawImage(videoEl, 0, 0, width, canvasRef.current.height);
+            }
+          }
         }
       };
     }
