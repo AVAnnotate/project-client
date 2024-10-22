@@ -47,7 +47,7 @@ const Player: React.FC<Props> = (props) => {
   const pagePlayers = useStore($pagePlayersState);
   const playerState = pagePlayers[props.id];
 
-  const fileUrl = () => {
+  const fileUrl = (): string => {
     // @ts-ignore
     const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
 
@@ -245,7 +245,7 @@ const Player: React.FC<Props> = (props) => {
         }}
         progressInterval={250}
         ref={player}
-        url={fileUrl}
+        url={fileUrl()}
         height={props.event.data.item_type === 'Video' ? '100%' : 0}
         width={props.event.data.item_type === 'Video' ? '100%' : 0}
       />
