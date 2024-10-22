@@ -48,28 +48,28 @@ const childProps = {
 };
 ---
 
-{
-  (
-    <div>
-      <PlayerStateNanostorePopulator
-        playerId={playerId}
-        isEmbed={isEmbed}
-        initialFile={defaultFile}
+<div>
+  <PlayerStateNanostorePopulator
+    playerId={playerId}
+    isEmbed={isEmbed}
+    initialFile={defaultFile}
+  />
+  {
+    event.data.item_type === 'Audio' && (
+      <AudioEvent
+        annotationSets={annotationSets}
+        event={event}
+        {...childProps}
       />
-      {event.data.item_type === 'Audio' && (
-        <AudioEvent
-          annotationSets={annotationSets}
-          event={event}
-          {...childProps}
-        />
-      )}
-      {event.data.item_type === 'Video' && (
-        <VideoEvent
-          annotationSets={annotationSets}
-          event={event}
-          {...childProps}
-        />
-      )}
-    </div>
-  )
-}
+    )
+  }
+  {
+    event.data.item_type === 'Video' && (
+      <VideoEvent
+        annotationSets={annotationSets}
+        event={event}
+        {...childProps}
+      />
+    )
+  }
+</div>

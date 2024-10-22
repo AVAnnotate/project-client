@@ -4,7 +4,6 @@ import { getEntry } from 'astro:content';
 import { randomUUID } from 'node:crypto';
 import EventViewer from './index.astro';
 import VideoEventCompare from './VideoEventCompare.astro';
-import { getCaptionSets } from 'src/utils/events';
 
 interface Props {
   includes: Includes[];
@@ -30,6 +29,10 @@ const { includes, event1, event2 } = Astro.props;
     [event1, event2].map(async (event) => {
       const playerId = randomUUID();
       const eventObj = await getEntry('events', event.uuid);
+
+      if (!eventObj) {
+        return <p>Event not found!</p>;
+      }
 
       return (
         <div
