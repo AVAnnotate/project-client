@@ -2,7 +2,7 @@
   "extends": "astro/tsconfigs/strict",
   // "exclude": ["**/*.astro"],
   "compilerOptions": {
-    "strict": false,
+    "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
