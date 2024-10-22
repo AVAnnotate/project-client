@@ -50,8 +50,12 @@ const Player: React.FC<Props> = (props) => {
   const fileUrl = useMemo(() => {
     const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
 
-    return avFile.file_url;
-  }, [pagePlayers[props.id]]);
+    if (avFile) {
+      return avFile.file_url;
+    }
+
+    return undefined;
+  }, [props.event, playerState]);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
