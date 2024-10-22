@@ -54,7 +54,7 @@ const Player: React.FC<Props> = (props) => {
       return avFile.file_url;
     }
 
-    return null;
+    return undefined;
   }, [props.event, playerState]);
 
   const segments = useMemo(() => {
