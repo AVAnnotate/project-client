@@ -59,7 +59,7 @@ const Player: React.FC<Props> = (props) => {
         ].file_url
       );
     }
-  }, []);
+  }, [props.event, playerState]);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
