@@ -49,9 +49,12 @@ const Player: React.FC<Props> = (props) => {
   const playerState = pagePlayers[props.id];
 
   useEffect(() => {
-    const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
-
-    setUrl(avFile.file_url);
+    if (playerState.avFileUuid && playerState.avFileUuid.length > 0) {
+      const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
+      setUrl(avFile.file_url);
+    } else {
+      setUrl(Object.keys(props.event.data.audiovisual_files)[0]);
+    }
   }, []);
 
   const segments = useMemo(() => {
