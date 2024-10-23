@@ -7,6 +7,7 @@ import { getCaptionSets } from 'src/utils/events';
 import PlayerStateNanostorePopulator from './PlayerStateNanostorePopulator';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
+import ComparisonFilePicker from './ComparisonFilePicker';
 
 export interface Props extends Omit<SlateEventNodeProps, 'uuid' | 'includes'> {
   end?: number;
@@ -33,7 +34,22 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
 ---
 
 <div class='mediaContainer' data-player-id={playerId}>
-  {includes.includes('label') && <h2>{event.data.label}</h2>}
+  <div class='flex justify-between items-center py-2'>
+    {
+      includes.includes('label') && (
+        <h2 class='text-2xl font-bold'>{event.data.label}</h2>
+      )
+    }
+    {
+      Object.keys(event.data.audiovisual_files).length > 1 && (
+        <ComparisonFilePicker
+          event={event}
+          playerId={playerId}
+          client:only='react'
+        />
+      )
+    }
+  </div>
   {
     includes.includes('media') && (
       <>
@@ -59,6 +75,7 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
         <AnnotationHeader
           playerId={playerId}
           annotationSets={annotationSets}
+          isComparison
           type={event.data.item_type}
         />
         <Annotations
