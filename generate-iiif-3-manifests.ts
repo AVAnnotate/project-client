@@ -167,7 +167,9 @@ export const createManifest = (
           file.replace(/\.[^/.]+$/, ''),
           `${siteURL}/manifests/${snakeCase(
             eventData.label
-          )}-canvas${canvasCount}-${pageCount}.json`,
+          )}-canvas${canvasCount}-${pageCount}${
+            allowSubPages === 'true' || allowSubPages === 'TRUE' ? '.json' : ''
+          }`,
           eventId,
           `${eventId}/page${pageCount}`,
           `${siteURL}/manifests.json`
