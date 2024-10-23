@@ -20,7 +20,8 @@
       "@ty/*": ["src/types/*"],
       "@lib/*": ["src/lib/*"],
       "@providers/*": ["src/lib/providers/*"],
-      "@manifests/*": ["manifests/*"]
+      "@manifests/*": ["manifests/*"],
+      "@utils*": ["src/utils/*"]
     },
     "plugins": [
       {
