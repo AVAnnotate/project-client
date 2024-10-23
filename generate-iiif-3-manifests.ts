@@ -21,7 +21,7 @@ export const createAnnotationPage = (
   manifestId: string
 ) => {
   let output: IIIFAnnotationPage[] = [];
-  // Iterate all annotations and look for this event
+  // Iterate all  annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     if (file.endsWith('.json')) {
       // Read in the file
