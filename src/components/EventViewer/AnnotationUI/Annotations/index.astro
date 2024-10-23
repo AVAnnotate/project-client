@@ -12,8 +12,7 @@ export interface Props {
   initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, initialTag, isEmbed, playerId, type } =
-  Astro.props;
+const { annotationSets, initialFile, initialTag, playerId, type } = Astro.props;
 
 let sortedAnnotations = annotationSets
   .map((set) =>

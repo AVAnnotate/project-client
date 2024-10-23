@@ -14,18 +14,16 @@ export const getCaptionSets = async (
 
   let captionSets: { url: string; label: string }[];
 
-  if (event.data.audiovisual_files[file]?.caption_set) {
-    captionSets = event.data.audiovisual_files[file].caption_set.map(
-      (s: any) => {
-        const set = annotationSets.find(
-          (set) => set.id === s.annotation_page_id
-        );
-        return {
-          url: `/${baseUrl}/${s.annotation_page_id}.vtt`,
-          label: set?.data.set || '',
-        };
-      }
-    );
+  const eventCaptionSet = event.data.audiovisual_files[file]?.caption_set;
+
+  if (eventCaptionSet) {
+    captionSets = eventCaptionSet.map((s: any) => {
+      const set = annotationSets.find((set) => set.id === s.annotation_page_id);
+      return {
+        url: `/${baseUrl}/${s.annotation_page_id}.vtt`,
+        label: set?.data.set || '',
+      };
+    });
   } else {
     captionSets = [];
   }
