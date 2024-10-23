@@ -2,27 +2,68 @@
 import type { TagGroup } from '@ty/index.ts';
 import type { CollectionEntry } from 'astro:content';
 import AnnotationBand from './AnnotationBand.astro';
+import { getCollection } from 'astro:content';
+import { PlayCircleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   category: TagGroup;
+  event: CollectionEntry<'events'>;
   set: CollectionEntry<'annotations'>;
-  label: string;
+  // for tracking the spectrum in clientside JS on the single tag page
+  spectrumId?: string;
+  // label: string;
   tagColors?: {
     [tag: string]: string;
   };
+  // restrict to only this tag, if provided
+  tag?: string;
 }
 
-const { category, set, label, tagColors } = Astro.props;
+const { category, event, set, spectrumId, tagColors, tag } = Astro.props;
+
+const allSets = await getCollection(
+  'annotations',
+  (annSet) => annSet.data.event_id === event.id
+);
+
+// display the event name as the label by default,
+// then expand the label as necessary below
+let label = event.data.label;
+
+// add the AV file name if there's more than one AV file
+if (Object.keys(event.data.audiovisual_files).length > 1) {
+  label = `${label} - ${event.data.audiovisual_files[set.data.source_id].label}`;
+}
+
+// add the set name if there's more than one set for this file
+if (allSets.filter((s) => s.data.source_id === set.data.source_id).length > 1) {
+  label = `${label} - ${set.data.set}`;
+}
 ---
 
-<div class='flex flex-col gap-4 pt-4'>
-  <p>{label}</p>
+<div class='flex flex-col gap-4 pt-4' data-spectrum-id={spectrumId}>
+  <div class='flex gap-4 items-center'>
+    {
+      spectrumId && (
+        <button data-spectrum-button-id={spectrumId} type='button'>
+          <PlayCircleIcon className='w-6 h-6' />
+        </button>
+      )
+    }
+    <p>{label}</p>
+  </div>
   <div class='flex flex-row w-full h-[42px] overflow-x-auto'>
     {
       set.data.annotations.map((ann) => {
+        const matchingTags = ann.tags.filter(
+          (t) =>
+            t.category.toLocaleLowerCase() ===
+            category.category.toLocaleLowerCase()
+        );
+
         const tagColor =
-          tagColors && ann.tags.length > 0
-            ? tagColors[ann.tags[0].tag]
+          tagColors && matchingTags.length > 0
+            ? tagColors[matchingTags[0].tag]
             : undefined;
 
         return (
@@ -30,6 +71,7 @@ const { category, set, label, tagColors } = Astro.props;
             annotation={ann}
             category={category}
             color={tagColor}
+            tag={tag}
           />
         );
       })

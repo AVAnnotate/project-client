@@ -1,6 +1,6 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
 import { useStore } from '@nanostores/react';
-import { $pagePlayersState, setAvFile } from 'src/store.ts';
+import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
 
 // This component's only purpose is to populate the

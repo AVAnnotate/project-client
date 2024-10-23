@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry } from 'astro:content';
 import Annotation from './Annotation.astro';
-import type { DisplayedAnnotation } from '@ty/index';
+import type { DisplayedAnnotation, Tag } from '@ty/index';
 import AnnotationNanostorePopulator from './AnnotationNanostorePopulator';
 
 export interface Props {
@@ -10,11 +10,13 @@ export interface Props {
   type: 'Audio' | 'Video';
   isEmbed?: boolean;
   initialFile: string;
+  initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, isEmbed, playerId, type } = Astro.props;
+const { annotationSets, initialFile, initialTag, isEmbed, playerId, type } =
+  Astro.props;
 
-const sortedAnnotations = annotationSets
+let sortedAnnotations = annotationSets
   .map((set) =>
     set.data.annotations.map((ann) => ({
       ...ann,
@@ -27,6 +29,17 @@ const sortedAnnotations = annotationSets
   .sort(
     (a: any, b: any) => a.start_time - b.start_time
   ) as DisplayedAnnotation[];
+
+if (initialTag) {
+  sortedAnnotations = sortedAnnotations.filter((ann) => {
+    return !!ann.tags.find(
+      (t) =>
+        t.tag.toLocaleLowerCase() === initialTag.tag.toLocaleLowerCase() &&
+        t.category.toLocaleLowerCase() ===
+          initialTag.category.toLocaleLowerCase()
+    );
+  });
+}
 ---
 
 <div
@@ -180,7 +193,7 @@ const sortedAnnotations = annotationSets
     }
 
     // show or hide tags if necessary
-    if (state[changed].showTags !== oldState[changed].showTags) {
+    if (state[changed].showTags !== oldState[changed]?.showTags) {
       if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
           showNode(annotationTagNodes[i]);
@@ -193,15 +206,13 @@ const sortedAnnotations = annotationSets
     }
 
     // filter on sets, text, and tags
-    for (let i = 0; i < annotationNodes.length; i++) {
-      const node = annotationNodes[i];
-
+    for (const node of annotationNodes) {
       const uuid = node.getAttribute('data-uuid');
 
       if (uuid && state[changed].filteredAnnotations.includes(uuid)) {
-        showNode(annotationNodes[i]);
+        showNode(node);
       } else {
-        hideNode(annotationNodes[i]);
+        hideNode(node);
       }
     }
   });

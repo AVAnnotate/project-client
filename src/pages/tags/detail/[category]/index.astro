@@ -10,7 +10,12 @@ import { getCollection } from 'astro:content';
 import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
 import { ArrowLeft, ArrowCounterclockwise } from 'react-bootstrap-icons';
-import colors from '../../../utils/tagColors.ts';
+import {
+  tagColors as colors,
+  fromTagParam,
+  getTagDisplay,
+  toTagParam,
+} from '@utils/tags.ts';
 
 const projectData = await getEntry('project', 'project');
 
@@ -22,12 +27,12 @@ export const getStaticPaths = (async () => {
   const projectData = await getEntry('project', 'project');
 
   return projectData.data.project.tags.tagGroups.map((tg) => ({
-    params: { category: tg.category.replaceAll('_', '').toLocaleLowerCase() },
+    params: { category: toTagParam(tg.category) },
   }));
 }) satisfies GetStaticPaths;
 
 const { category } = Astro.params;
-const capitalizedCategory = `${category[0].toLocaleUpperCase()}${category.slice(1)}`;
+const capitalizedCategory = getTagDisplay(fromTagParam(category));
 
 const crumbs = [
   {
@@ -55,7 +60,7 @@ const events = await getCollection('events');
 const categoryData = projectData.data.project.tags.tagGroups.find(
   (tg) =>
     tg.category.replaceAll('_', '').toLocaleLowerCase() ===
-    category.replaceAll('_', '').toLocaleLowerCase()
+    fromTagParam(category).replaceAll('_', '').toLocaleLowerCase()
 );
 
 if (!categoryData) {
@@ -64,7 +69,9 @@ if (!categoryData) {
 
 const tags = projectData.data.project.tags.tags
   .filter(
-    (t) => t.category.toLocaleLowerCase() === category.toLocaleLowerCase()
+    (t) =>
+      t.category.toLocaleLowerCase() ===
+      fromTagParam(category).toLocaleLowerCase()
   )
   .map((t) => t.tag);
 
@@ -112,9 +119,9 @@ tags.forEach((t, idx) => (tagColors[t] = colors[idx % colors.length]));
             if (event) {
               return (
                 <AnnotationSpectrum
+                  event={event}
                   set={set}
                   category={categoryData}
-                  label={event.data.label}
                   tagColors={tagColors}
                 />
               );
