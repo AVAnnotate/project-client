@@ -1,4 +1,4 @@
-import type { DisplayedAnnotation } from '@ty/index.ts';
+import type { DisplayedAnnotation, Tag } from '@ty/index.ts';
 import { useStore } from '@nanostores/react';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
