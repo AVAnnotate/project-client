@@ -23,7 +23,7 @@ export interface IIIFAnnotationTarget {
     | {
         id: string;
         type: string;
-        partOf: IIIFClass[];
+        partOf?: IIIFClass[];
       }
     | string;
   selector?: {

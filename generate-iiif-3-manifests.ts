@@ -58,7 +58,10 @@ export const createAnnotationPage = (
               },
             ],
             target: {
-              source: manifestId,
+              source: {
+                id: targetCanvas,
+                type: 'Canvas',
+              },
               selector:
                 annotation.end_time &&
                 annotation.end_time !== annotation.start_time
