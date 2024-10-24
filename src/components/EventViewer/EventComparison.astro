@@ -1,0 +1,67 @@
+---
+import type { Includes } from '@ty/slate';
+import { getEntry } from 'astro:content';
+import { randomUUID } from 'node:crypto';
+import EventViewer from './index.astro';
+import VideoEventCompare from './VideoEventCompare.astro';
+
+interface Props {
+  includes: Includes[];
+  event1: {
+    file?: string;
+    start?: number;
+    end?: number;
+    uuid: string;
+  };
+  event2: {
+    file?: string;
+    start?: number;
+    end?: number;
+    uuid: string;
+  };
+}
+
+const { includes, event1, event2 } = Astro.props;
+---
+
+<div class='grid grid-cols-2'>
+  {
+    [event1, event2].map(async (event) => {
+      const playerId = randomUUID();
+      const eventObj = await getEntry('events', event.uuid);
+
+      if (!eventObj) {
+        return <p>Event not found!</p>;
+      }
+
+      return (
+        <div
+          class='bg-gray-100 px-4 pb-4 max-h-[700px] overflow-y-auto eventContainer'
+          data-player-id={playerId}
+        >
+          {eventObj.data.item_type === 'Audio' ? (
+            <EventViewer
+              end={event.end}
+              start={event.start}
+              includes={includes}
+              uuid={event.uuid}
+              isEmbed
+              isComparison
+              playerId={playerId}
+              file={event.file}
+            />
+          ) : (
+            <VideoEventCompare
+              end={event.end}
+              start={event.start}
+              includes={includes}
+              event={eventObj}
+              playerId={playerId}
+              file={event.file}
+            />
+          )}
+        </div>
+      );
+    })
+  }
+</div>

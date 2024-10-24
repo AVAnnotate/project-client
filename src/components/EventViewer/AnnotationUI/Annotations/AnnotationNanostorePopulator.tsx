@@ -9,7 +9,6 @@ import { useEffect } from 'react';
 interface Props {
   annotations: DisplayedAnnotation[];
   playerId: string;
-  isEmbed?: boolean;
   initialFile: string;
 }
 
@@ -25,10 +24,9 @@ const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
           .filter((ann) => ann.file === props.initialFile)
           .map((ann) => ann.uuid),
       ],
-      isEmbed: props.isEmbed,
       avFileUuid: props.initialFile,
     });
-  }, [props.annotations, props.playerId, props.isEmbed]);
+  }, [props.annotations, props.playerId]);
 
   return <></>;
 };

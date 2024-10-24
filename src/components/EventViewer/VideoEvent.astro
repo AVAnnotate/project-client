@@ -1,5 +1,4 @@
 ---
-import Container from '@components/Container.astro';
 import type { Includes } from '@ty/slate';
 import type { CollectionEntry } from 'astro:content';
 import RichText from '../RichText/index.astro';
@@ -7,9 +6,8 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
-import { getEntry } from 'astro:content';
-import { dynamicConfig } from 'dynamic-astro-config';
 import VideoFilePicker from './VideoFilePicker';
+import { getCaptionSets } from 'src/utils/events';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -36,32 +34,7 @@ const {
   isEmbed,
 } = Astro.props;
 
-const projectData = await getEntry('project', 'project');
-
-const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
-  : dynamicConfig.base;
-
-let captionSets: { url: string; label: string }[];
-
-if (
-  // @ts-ignore
-  (event as CollectionEntry<'events'>).data.audiovisual_files[file].caption_set
-) {
-  // @ts-ignore
-  captionSets = (event as CollectionEntry<'events'>).data.audiovisual_files[
-    file
-    // @ts-ignore
-  ].caption_set.map((s: any) => {
-    const set = annotationSets.find((set) => set.id === s.annotation_page_id);
-    return {
-      url: `/${baseUrl}/${s.annotation_page_id}.vtt`,
-      label: set?.data.set || '',
-    };
-  });
-} else {
-  captionSets = [];
-}
+const captionSets = await getCaptionSets(event, file, annotationSets);
 ---
 
 <ConditionalContainer
@@ -119,7 +92,6 @@ if (
               playerId={playerId}
               annotationSets={annotationSets}
               initialFile={file}
-              isEmbed={isEmbed}
               type={event.data.item_type}
             />
           </div>

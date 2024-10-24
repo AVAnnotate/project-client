@@ -7,6 +7,7 @@ import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
 import AudioFilePicker from './AudioFilePicker';
+import ComparisonFilePicker from './ComparisonFilePicker';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -14,6 +15,7 @@ interface Props extends SlateEventNodeProps {
   file: string;
   isEmbed?: boolean;
   playerId: string;
+  isComparison?: boolean;
 }
 
 const {
@@ -25,17 +27,36 @@ const {
   file,
   annotationSets,
   isEmbed,
+  isComparison,
   playerId,
 } = Astro.props;
 ---
 
 <div>
-  <div
-    class={`sticky ${includes.includes('label') ? 'top-[80px]' : 'top-0'} z-10 ${!isEmbed ? 'shadow' : ''}`}
-  >
-    <div class='flex flex-col gap-6 bg-gray-100 py-6'>
+  <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
+    <div class='flex flex-col gap-6 bg-gray-100 py-6 [&_p]:mb-0!'>
       <ConditionalContainer condition={!isEmbed}>
-        {includes.includes('label') && <h1>{event.data.label}</h1>}
+        <div class='flex justify-between'>
+          {
+            includes.includes('label') && (
+              <h1
+                class={`font-bold ${isComparison ? 'text-2xl' : 'text-[32px]'}`}
+              >
+                {event.data.label}
+              </h1>
+            )
+          }
+          {
+            isComparison &&
+              Object.keys(event.data.audiovisual_files).length > 1 && (
+                <ComparisonFilePicker
+                  event={event}
+                  playerId={playerId}
+                  client:only='react'
+                />
+              )
+          }
+        </div>
         {
           includes.includes('description') && event.data.description && (
             <RichText nodes={event.data.description} />
@@ -48,10 +69,12 @@ const {
             <ConditionalContainer condition={!isEmbed}>
               {/* only show the picker if
                   1. there's more than AV file
-                  2. this is not an embed of a single AV file */}
+                  2. this is not an embed of a single AV file
+                  3. this is not a comparison (we use a separate picker for that :/) */}
               {!start &&
                 !end &&
-                Object.keys(event.data.audiovisual_files).length > 1 && (
+                Object.keys(event.data.audiovisual_files).length > 1 &&
+                !isComparison && (
                   <AudioFilePicker
                     event={event}
                     playerId={playerId}
@@ -73,6 +96,7 @@ const {
         <AnnotationHeader
           playerId={playerId}
           annotationSets={annotationSets}
+          isComparison={isComparison}
           type={event.data.item_type}
         />
       </ConditionalContainer>
@@ -81,7 +105,6 @@ const {
   <ConditionalContainer condition={!isEmbed}>
     <Annotations
       annotationSets={annotationSets}
-      isEmbed={isEmbed}
       playerId={playerId}
       type={event.data.item_type}
       initialFile={file}

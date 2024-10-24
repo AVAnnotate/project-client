@@ -8,13 +8,11 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  isEmbed?: boolean;
   initialFile: string;
   initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, initialTag, isEmbed, playerId, type } =
-  Astro.props;
+const { annotationSets, initialFile, initialTag, playerId, type } = Astro.props;
 
 let sortedAnnotations = annotationSets
   .map((set) =>
@@ -48,7 +46,6 @@ if (initialTag) {
   <AnnotationNanostorePopulator
     annotations={sortedAnnotations}
     playerId={playerId}
-    isEmbed={isEmbed}
     initialFile={initialFile}
     client:load
   />
