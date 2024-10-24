@@ -54,11 +54,12 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
             )}
             <Player
               id={playerId}
-              client:only='react'
+              client:load
               event={event}
               start={start}
               end={end}
               vttURLs={captionSets}
+              initialFile={file}
             />
             <>
               {!start &&

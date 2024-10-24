@@ -152,7 +152,12 @@ for (const set of annotationSets) {
             <h3 class='text-lg py-4'>
               {sd.event.data.audiovisual_files[sd.set.data.source_id].label}
             </h3>
-            <Player id={sd.spectrumId} event={sd.event} client:only='react' />
+            <Player
+              id={sd.spectrumId}
+              event={sd.event}
+              initialFile={sd.set.data.source_id}
+              client:load
+            />
             <Annotations
               playerId={sd.spectrumId}
               annotationSets={[sd.set]}

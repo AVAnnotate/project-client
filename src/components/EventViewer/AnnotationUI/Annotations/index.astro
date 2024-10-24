@@ -151,36 +151,38 @@ if (initialTag) {
             startTimes[idx + 1].start > state[changed].position
         : time.start <= state[changed].position;
     });
+
     if (typeof current === 'number' && current >= 0) {
       const activeNode = annotationNodes[current] as HTMLElement;
 
-      if (state[changed].autoScroll) {
-        // scroll the parent element if we're in an embed
-        if (state[changed].isEmbed) {
-          const videoContainerEl = document.querySelector(
-            `.videoAnnotationContainer[data-player-id="${changed}"]`
-          );
-          const offsetTop = activeNode.offsetTop;
+      if (activeNode) {
+        if (state[changed].autoScroll) {
+          // scroll the parent element if we're in an embed
+          if (state[changed].isEmbed) {
+            const videoContainerEl = document.querySelector(
+              `.videoAnnotationContainer[data-player-id="${changed}"]`
+            );
+            const offsetTop = activeNode.offsetTop;
 
-          // we need to scroll a different container if we're in an embedded video event
-          if (videoContainerEl) {
-            videoContainerEl.scroll({
-              top: offsetTop - videoContainerEl.clientHeight,
-              behavior: 'smooth',
-            });
+            // we need to scroll a different container if we're in an embedded video event
+            if (videoContainerEl) {
+              videoContainerEl.scroll({
+                top: offsetTop - videoContainerEl.clientHeight,
+                behavior: 'smooth',
+              });
+            } else {
+              eventContainerEl.scroll({
+                top: offsetTop - eventContainerEl.clientHeight / 3,
+                behavior: 'smooth',
+              });
+            }
+            // otherwise, scroll the whole page
           } else {
-            eventContainerEl.scroll({
-              top: offsetTop - eventContainerEl.clientHeight / 3,
-              behavior: 'smooth',
-            });
+            activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
-          // otherwise, scroll the whole page
-        } else {
-          activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
+        activeNode.classList.add(activeBackground);
       }
-
-      activeNode.classList.add(activeBackground);
 
       for (let i = 0; i < annotationNodes.length; i++) {
         if (i !== current) {

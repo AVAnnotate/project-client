@@ -28,7 +28,7 @@ const { annotationSets, isComparison, playerId, type } = Astro.props;
         >
           {!isComparison && <h3 class='font-bold text-lg'>Annotations</h3>}
           {type === 'Video' && !isComparison && (
-            <AnnotationSettingsMenu playerId={playerId} client:only='react' />
+            <AnnotationSettingsMenu playerId={playerId} client:load />
           )}
         </div>
       )
@@ -37,13 +37,13 @@ const { annotationSets, isComparison, playerId, type } = Astro.props;
     <div
       class={`flex flex-row gap-8 items-center ${type === 'Video' ? 'w-full justify-between pb-4 z-10 shadow-[0px_4px_2px_-2px_#00000040]' : ''}`}
     >
-      <TextSearch playerId={playerId} client:only='react' />
+      <TextSearch playerId={playerId} client:load />
       <div class='flex gap-4'>
         <TagFilter
           annotationSets={annotationSets}
           playerId={playerId}
           projectData={projectData}
-          client:only='react'
+          client:load
         />
         {
           (type === 'Audio' || isComparison) && (

@@ -11,6 +11,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
+import { defaultState } from '@utils/player.ts';
 import type { CollectionEntry } from 'astro:content';
 import React, { useMemo } from 'react';
 import {
@@ -31,7 +32,7 @@ const TagFilter = (props: TagFilterProps) => {
   const { playerId } = props;
   const playerState = useStore($pagePlayersState);
   const thisPlayer = useMemo(
-    () => playerState[playerId],
+    () => playerState[playerId] || { ...defaultState },
     [playerState, playerId]
   );
 
