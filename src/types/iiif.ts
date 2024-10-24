@@ -19,12 +19,14 @@ export interface IIIFResource {
 }
 
 export interface IIIFAnnotationTarget {
-  source: {
-    id: string;
-    type: string;
-    partOf: IIIFClass[];
-  };
-  selector: {
+  source:
+    | {
+        id: string;
+        type: string;
+        partOf: IIIFClass[];
+      }
+    | string;
+  selector?: {
     type: string;
     t: string;
   };
