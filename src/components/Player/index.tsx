@@ -16,7 +16,7 @@ import {
   type AnnotationState,
 } from '../../store.ts';
 import { useStore } from '@nanostores/react';
-import { formatTimestamp } from '../../utils/player.ts';
+import { defaultState, formatTimestamp } from '../../utils/player.ts';
 import type { OnProgressProps } from 'react-player/base';
 import type { CollectionEntry } from 'astro:content';
 
@@ -25,6 +25,7 @@ interface Props {
   id: string;
   start?: number;
   vttURLs?: { url: string; label: string }[];
+  initialFile: string;
   event: CollectionEntry<'events'>;
 }
 
@@ -45,9 +46,14 @@ const Player: React.FC<Props> = (props) => {
   const [muted, setMuted] = useState(false);
 
   const pagePlayers = useStore($pagePlayersState);
-  const playerState = pagePlayers[props.id];
+  const playerState = pagePlayers[props.id] || { ...defaultState };
 
   const fileUrl = useMemo(() => {
+    // initial value for SSR
+    if (!playerState.avFileUuid) {
+      return props.event.data.audiovisual_files[props.initialFile].file_url;
+    }
+
     const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
 
     if (avFile) {

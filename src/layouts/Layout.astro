@@ -60,6 +60,7 @@ const projectBy =
 </html>
 
 <script>
+  import { defaultState } from '@utils/player.ts';
   import { $pagePlayersState } from 'src/store.ts';
   // initially, reset the loaded players to none
   $pagePlayersState.set({});
@@ -68,21 +69,8 @@ const projectBy =
     const thisNode = players[i];
     if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
       $pagePlayersState.setKey(thisNode.dataset.playerId, {
-        annotations: [],
-        annotationStarts: [],
-        autoScroll: true,
-        avFileUuid: '',
-        currentAnnotation: 0,
+        ...defaultState,
         id: thisNode.dataset.playerUrl || '',
-        isPlaying: false,
-        filteredAnnotations: [],
-        position: 0,
-        searchQuery: '',
-        seekTo: 0,
-        sets: [],
-        snapToAnnotations: false,
-        showTags: true,
-        tags: [],
       });
     }
   }

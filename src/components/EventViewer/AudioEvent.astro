@@ -52,7 +52,8 @@ const {
                 <ComparisonFilePicker
                   event={event}
                   playerId={playerId}
-                  client:only='react'
+                  initialFile={file}
+                  client:load
                 />
               )
           }
@@ -78,14 +79,15 @@ const {
                   <AudioFilePicker
                     event={event}
                     playerId={playerId}
-                    client:only='react'
+                    client:load
                   />
                 )}
               <Player
                 id={playerId}
-                client:only='react'
+                client:load
                 event={event}
                 start={start}
+                initialFile={file}
                 end={end}
               />
             </ConditionalContainer>
