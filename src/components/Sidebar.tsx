@@ -47,7 +47,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       return true;
     }
 
-    return props.slug && props.slug === page.data.slug;
+    return (
+      props.slug && (props.slug === page.data.slug || props.slug === page.id)
+    );
   };
 
   return (
