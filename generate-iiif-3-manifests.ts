@@ -1,4 +1,5 @@
 import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
+import type { AnnotationPage, Annotation } from '@iiif/presentation-3';
 import type {
   IIIFAnnotationItem,
   IIIFAnnotationPage,
@@ -20,7 +21,7 @@ export const createAnnotationPage = (
   id: string,
   manifestId: string
 ) => {
-  let output: IIIFAnnotationPage[] = [];
+  let output: AnnotationPage[] = [];
   // Iterate all  annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     if (file.endsWith('.json')) {
@@ -31,7 +32,7 @@ export const createAnnotationPage = (
       );
 
       if (annotationData.event_id === eventUUID) {
-        const obj: IIIFAnnotationPage = {
+        const obj: AnnotationPage = {
           '@context': 'http://iiif.io/api/presentation/3/context.json',
           id: pageId,
           type: 'AnnotationPage',
@@ -42,7 +43,7 @@ export const createAnnotationPage = (
         };
 
         annotationData.annotations.forEach((annotation) => {
-          const item: IIIFAnnotationItem = {
+          const item: Annotation = {
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
             id: id,
@@ -67,7 +68,8 @@ export const createAnnotationPage = (
                 annotation.end_time !== annotation.start_time
                   ? {
                       type: 'RangeSelector',
-                      t: `${annotation.start_time},${annotation.end_time}`,
+                      startSelector: annotation.start_time,
+                      endSelector: annotation.end_time,
                     }
                   : {
                       type: 'PointSelector',
@@ -77,7 +79,7 @@ export const createAnnotationPage = (
           };
 
           annotation.tags.forEach((tag) => {
-            item.body.push({
+            item.body?.push({
               type: 'TextualBody',
               value: `${tag.category}:${tag.tag}`,
               format: 'text/plain',
