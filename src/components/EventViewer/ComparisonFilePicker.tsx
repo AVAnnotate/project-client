@@ -3,31 +3,29 @@ import * as Select from '@radix-ui/react-select';
 import { ChevronDownIcon } from '@radix-ui/themes';
 import { useStore } from '@nanostores/react';
 import { $pagePlayersState, setAvFile } from 'src/store.ts';
-import { useMemo } from 'react';
+import { defaultState } from '@utils/player.ts';
 
 interface Props {
   event: CollectionEntry<'events'>;
   playerId: string;
+  initialFile: string;
 }
 
 const ComparisonFilePicker: React.FC<Props> = (props) => {
   const store = useStore($pagePlayersState);
 
-  if (!store[props.playerId]?.avFileUuid) {
-    return null;
-  }
+  const playerState = store[props.playerId] || { ...defaultState };
+
+  const avFileUuid = playerState.avFileUuid || props.initialFile;
 
   return (
     <Select.Root
       onValueChange={(val) => setAvFile(val, props.playerId)}
-      value={store[props.playerId].avFileUuid}
+      value={avFileUuid}
     >
       <Select.Trigger className='w-[280px] h-[38px] rounded border border-gray-200 bg-white flex justify-between items-center px-4'>
         <Select.Value>
-          {
-            props.event.data.audiovisual_files[store[props.playerId].avFileUuid]
-              .label
-          }
+          {props.event.data.audiovisual_files[avFileUuid].label}
         </Select.Value>
         <Select.Icon>
           <ChevronDownIcon />

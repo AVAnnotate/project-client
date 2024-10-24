@@ -47,7 +47,7 @@ const { annotationSets, isComparison, playerId, type } = Astro.props;
         />
         {
           (type === 'Audio' || isComparison) && (
-            <AnnotationSettingsMenu playerId={playerId} client:only='react' />
+            <AnnotationSettingsMenu playerId={playerId} client:load />
           )
         }
       </div>

@@ -45,7 +45,8 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
         <ComparisonFilePicker
           event={event}
           playerId={playerId}
-          client:only='react'
+          initialFile={defaultFile}
+          client:load
         />
       )
     }
@@ -60,10 +61,11 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
         />
         <Player
           id={playerId}
-          client:only='react'
+          client:load
           event={event}
           start={start}
           end={end}
+          initialFile={defaultFile}
           vttURLs={captionSets}
         />
       </>
