@@ -1,11 +1,11 @@
 import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
-import type { AnnotationPage, Annotation } from '@iiif/presentation-3';
 import type {
-  IIIFAnnotationItem,
-  IIIFAnnotationPage,
-  IIIFCanvas,
-  IIIFPresentationManifest,
-} from '@ty/iiif.ts';
+  AnnotationPage,
+  Annotation,
+  AnnotationBody,
+  Manifest,
+  Canvas,
+} from '@iiif/presentation-3';
 import { Node } from 'slate';
 import fs, { writeFileSync } from 'fs';
 import { snakeCase } from 'snake-case';
@@ -59,6 +59,7 @@ export const createAnnotationPage = (
               },
             ],
             target: {
+              type: 'SpecificResource',
               source: {
                 id: targetCanvas,
                 type: 'Canvas',
@@ -67,19 +68,19 @@ export const createAnnotationPage = (
                 annotation.end_time &&
                 annotation.end_time !== annotation.start_time
                   ? {
-                      type: 'RangeSelector',
-                      startSelector: annotation.start_time,
-                      endSelector: annotation.end_time,
+                      type: 'DataPositionSelector',
+                      start: annotation.start_time,
+                      end: annotation.end_time,
                     }
                   : {
                       type: 'PointSelector',
-                      t: `${annotation.start_time}`,
+                      t: annotation.start_time,
                     },
             },
           };
 
           annotation.tags.forEach((tag) => {
-            item.body?.push({
+            (item.body as AnnotationBody[])?.push({
               type: 'TextualBody',
               value: `${tag.category}:${tag.tag}`,
               format: 'text/plain',
@@ -107,7 +108,7 @@ export const createManifest = (
   const projectData: ProjectFile = JSON.parse(
     fs.readFileSync(`${dataDir}/project.json`, 'utf8')
   );
-  const output: IIIFPresentationManifest = {
+  const output: Manifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
     id: `${siteURL}/manifest.json`,
     type: 'Manifest',
@@ -116,7 +117,6 @@ export const createManifest = (
       {
         id: siteURL,
         type: 'Text',
-        label: { en: [projectData.project.title] },
         format: 'text/html',
       },
     ],
@@ -149,7 +149,7 @@ export const createManifest = (
         eventData.audiovisual_files
       )) {
         const type = mime.lookup(avFile.file_url);
-        const event: IIIFCanvas = {
+        const event: Canvas = {
           id: eventId,
           type: 'Canvas',
           duration: avFile.duration,
@@ -182,7 +182,7 @@ export const createManifest = (
               );
 
               event.annotations = [
-                ...event.annotations,
+                ...(event.annotations as AnnotationPage[]),
                 {
                   type: 'AnnotationPage',
                   id: `${siteURL}/manifests/${snakeCase(
@@ -193,10 +193,13 @@ export const createManifest = (
               ];
             });
           } else {
-            event.annotations = [...event.annotations, ...annos];
+            (event.annotations as AnnotationPage[]) = [
+              ...(event.annotations as AnnotationPage[]),
+              ...annos,
+            ];
           }
 
-          event.items.push({
+          event.items?.push({
             id: `${siteURL}/${snakeCase(
               eventData.label
             )}-canvas${canvasCount}/paintings`,
