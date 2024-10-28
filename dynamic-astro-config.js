@@ -8,7 +8,6 @@ import relativeLinks from 'astro-relative-links';
 
 import project from './src/content/project/project.json';
 
-console.log('Base: ', import.meta.env.PROD ? project.publish.publish_pages_app ? `${project.project.slug}` : undefined : 'dist')
 export const dynamicConfig = {
   integrations: [react(), tailwind(), relativeLinks()],
   site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
