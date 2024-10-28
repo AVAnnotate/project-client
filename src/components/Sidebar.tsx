@@ -33,7 +33,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   );
 
   const isIndex = useMemo(
-    () => `/${props.baseUrl}/tags` === props.url.pathname,
+    () =>
+      `${props.baseUrl ? `/${props.baseUrl}` : ''}/tags` === props.url.pathname,
     [props.baseUrl, props.url]
   );
 
@@ -88,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </div>
             </a>
           ))}
-          <a href={`/${props.baseUrl}/tags`}>
+          <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
             <div className='p-4 hover:bg-blue-hover'>
               <p className={isIndex ? 'font-bold' : ''}>Index</p>
             </div>
