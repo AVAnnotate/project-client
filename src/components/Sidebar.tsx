@@ -10,7 +10,7 @@ interface SidebarProps {
   url: URL;
 }
 
-const getHref = (page: PageCollectionEntry, baseUrl: string) => {
+const getHref = (page: PageCollectionEntry, baseUrl: string | undefined) => {
   if (page.data.autogenerate.type === 'home') {
     return baseUrl ? `/${baseUrl}` : '';
   }
