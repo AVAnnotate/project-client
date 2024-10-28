@@ -4,7 +4,7 @@ import { Transition } from '@headlessui/react';
 import type { PageCollectionEntry } from 'src/utils/pages.ts';
 
 interface SidebarProps {
-  baseUrl: string;
+  baseUrl: string | undefined;
   pages: PageCollectionEntry[];
   slug?: string;
   url: URL;
@@ -12,14 +12,16 @@ interface SidebarProps {
 
 const getHref = (page: PageCollectionEntry, baseUrl: string) => {
   if (page.data.autogenerate.type === 'home') {
-    return `/${baseUrl}`;
+    return baseUrl ? `/${baseUrl}` : '';
   }
 
   if (page.data.autogenerate.enabled) {
-    return `/${baseUrl}/events/${page.data.slug || page.id}`;
+    return `${baseUrl ? `/${baseUrl}` : ''}/events/${
+      page.data.slug || page.id
+    }`;
   }
 
-  return `/${baseUrl}/pages/${page.data.slug || page.id}`;
+  return `${baseUrl ? `/${baseUrl}` : ''}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
