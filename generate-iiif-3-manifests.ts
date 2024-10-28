@@ -19,7 +19,7 @@ export const createAnnotationPage = (
   pageId: string,
   targetCanvas: string,
   id: string,
-  manifestId: string
+  avFile: string
 ) => {
   let output: AnnotationPage[] = [];
   // Iterate all  annotations and look for this event
@@ -47,7 +47,6 @@ export const createAnnotationPage = (
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
             id: id,
-            motivation: ['commenting', 'tagging'],
             body: [
               {
                 type: 'TextualBody',
@@ -58,31 +57,13 @@ export const createAnnotationPage = (
                 motivation: 'commenting',
               },
             ],
-            target: {
-              type: 'SpecificResource',
-              source: {
-                id: targetCanvas,
-                type: 'Canvas',
-              },
-              selector:
-                annotation.end_time &&
-                annotation.end_time !== annotation.start_time
-                  ? {
-                      type: 'DataPositionSelector',
-                      start: annotation.start_time,
-                      end: annotation.end_time,
-                    }
-                  : {
-                      type: 'PointSelector',
-                      t: annotation.start_time,
-                    },
-            },
+            target: `${avFile}#t=${annotation.start_time},${annotation.end_time}`,
           };
 
           annotation.tags.forEach((tag) => {
             (item.body as AnnotationBody[])?.push({
               type: 'TextualBody',
-              value: `${tag.category}:${tag.tag}`,
+              value: tag.tag,
               format: 'text/plain',
               purpose: 'tagging',
               motivation: 'tagging',
@@ -168,7 +149,7 @@ export const createManifest = (
           }`,
           eventId,
           `${eventId}/page${pageCount}`,
-          `${siteURL}/manifests.json`
+          avFile.file_url
         );
 
         if (annos.length > 0) {
