@@ -21,6 +21,7 @@
     "@radix-ui/react-slider": "^1.2.0",
     "@radix-ui/themes": "^3.1.3",
     "astro": "^4.15.4",
+    "astro-relative-links": "^0.4.0",
     "aviary-iiif-player": "1.4.0",
     "clsx": "^2.1.1",
     "command-line-args": "^6.0.0",

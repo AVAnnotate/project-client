@@ -20,7 +20,9 @@ import {
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {
@@ -37,15 +39,15 @@ const capitalizedCategory = getTagDisplay(fromTagParam(category));
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',
-    link: `/${baseUrl}/tags`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags`,
   },
   {
     label: 'Tag Groups',
-    link: `/${baseUrl}/tags/detail`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags/detail`,
   },
   {
     label: capitalizedCategory,

@@ -19,7 +19,9 @@ import Annotations from '@components/EventViewer/AnnotationUI/Annotations/index.
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {
@@ -40,19 +42,19 @@ const capitalizedTag = getTagDisplay(fromTagParam(tag));
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',
-    link: `/${baseUrl}/tags`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags`,
   },
   {
     label: 'Tag Groups',
-    link: `/${baseUrl}/tags/detail`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags/detail`,
   },
   {
     label: capitalizedCategory,
-    link: `/${baseUrl}/tags/detail/${category}`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags/detail/${category}`,
   },
   {
     label: capitalizedTag,

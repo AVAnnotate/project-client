@@ -11,7 +11,9 @@ const pages = await getPages();
 const { pageSlug } = Astro.params;
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 ---
 
@@ -24,6 +26,8 @@ const baseUrl = import.meta.env.PROD
       slug={pageSlug}
       url={Astro.url}
     />
-    <a href={`/${baseUrl}`} class='text-lg'>{projectData.data.project.title}</a>
+    <a href={`${baseUrl ? `/${baseUrl}` : '/'}`} class='text-lg'
+      >{projectData.data.project.title}</a
+    >
   </Container>
 </div>
