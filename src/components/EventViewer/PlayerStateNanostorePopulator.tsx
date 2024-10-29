@@ -1,4 +1,3 @@
-import { useStore } from '@nanostores/react';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
 
@@ -12,11 +11,11 @@ interface Props {
 }
 
 const PlayerStateNanostorePopulator: React.FC<Props> = (props) => {
-  const store = useStore($pagePlayersState);
-
   useEffect(() => {
+    const state = $pagePlayersState.get()[props.playerId];
+
     $pagePlayersState.setKey(props.playerId, {
-      ...store[props.playerId],
+      ...state,
       isEmbed: props.isEmbed,
       avFileUuid: props.initialFile,
     });
