@@ -42,7 +42,7 @@ const TagFilter = (props: TagFilterProps) => {
     const tagsObj: { [key: string]: { tags: string[]; color: string } } = {};
 
     const setsToShow =
-      thisPlayer.sets.length > 0
+      thisPlayer.sets?.length > 0
         ? props.annotationSets.filter((set) => thisPlayer.sets.includes(set.id))
         : props.annotationSets;
 
