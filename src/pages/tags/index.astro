@@ -7,16 +7,19 @@ import TagPill from '@components/TagUtils/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toTagParam } from '@utils/tags';
+import { undefined } from 'astro:schema';
 
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',

@@ -13,17 +13,19 @@ import { getTagDisplay, toTagParam } from '@utils/tags';
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',
-    link: `/${baseUrl}/tags`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags`,
   },
   {
     label: 'Tag Groups',
