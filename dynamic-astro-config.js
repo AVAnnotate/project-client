@@ -11,7 +11,7 @@ import project from './src/content/project/project.json';
 export const dynamicConfig = {
   integrations: [react(), tailwind(), relativeLinks()],
   site: import.meta.env.PROD ? `https://${project.project.github_org}.github.io/${project.project.slug}` : undefined,
-  base: import.meta.env.PROD ? `${project.project.slug}` : 'dist',
+  base: import.meta.env.PROD ? project.publish.publish_pages_app ? `${project.project.slug}` : '' : 'dist',
   srcDir: import.meta.env.PROD ?
     project.project.media_player === 'avannotate' ?
       './src' : project.project.media_player === 'aviary' ?
