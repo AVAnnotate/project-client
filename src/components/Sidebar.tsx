@@ -12,7 +12,7 @@ interface SidebarProps {
 
 const getHref = (page: PageCollectionEntry, baseUrl: string | undefined) => {
   if (page.data.autogenerate.type === 'home') {
-    return baseUrl ? `/${baseUrl}` : '';
+    return baseUrl ? `/${baseUrl}` : '/';
   }
 
   if (page.data.autogenerate.enabled) {
