@@ -31,6 +31,7 @@ export interface TagFilterProps {
 const TagFilter = (props: TagFilterProps) => {
   const { playerId } = props;
   const playerState = useStore($pagePlayersState);
+
   const thisPlayer = useMemo(
     () => playerState[playerId] || { ...defaultState },
     [playerState, playerId]
