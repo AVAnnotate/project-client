@@ -1,5 +1,4 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
-import { useStore } from '@nanostores/react';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
 
@@ -13,11 +12,11 @@ interface Props {
 }
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
-  const store = useStore($pagePlayersState);
-
   useEffect(() => {
+    const state = $pagePlayersState.get()[props.playerId];
+
     $pagePlayersState.setKey(props.playerId, {
-      ...store[props.playerId],
+      ...state,
       annotations: [...props.annotations],
       filteredAnnotations: [
         ...props.annotations
