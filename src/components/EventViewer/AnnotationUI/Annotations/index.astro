@@ -70,6 +70,7 @@ if (initialTag) {
 </div>
 
 <script>
+  import { defaultState } from '@utils/player.ts';
   import { $pagePlayersState } from 'src/store.ts';
 
   const hideNode = (node: HTMLElement | Element) => {
@@ -103,14 +104,15 @@ if (initialTag) {
               : undefined,
         });
         $pagePlayersState.setKey(thisNode.dataset.playerId, {
-          ...$pagePlayersState.get()[thisNode.dataset.playerId],
+          ...($pagePlayersState.get()[thisNode.dataset.playerId] ||
+            defaultState),
           annotationStarts: annotationStartsNew,
         });
       }
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
         $pagePlayersState.setKey(playerId, {
-          ...$pagePlayersState.get()[playerId],
+          ...($pagePlayersState.get()[playerId] || defaultState),
           position: Number(thisNode.dataset.start),
           seekTo: Number(thisNode.dataset.start),
           isPlaying: true,
