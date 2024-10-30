@@ -1,6 +1,7 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
+import { defaultState } from '@utils/player.ts';
 
 // This component's only purpose is to populate the
 // list of annotations in the nanostore.
@@ -13,7 +14,7 @@ interface Props {
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
   useEffect(() => {
-    const state = $pagePlayersState.get()[props.playerId];
+    const state = $pagePlayersState.get()[props.playerId] || defaultState;
 
     $pagePlayersState.setKey(props.playerId, {
       ...state,
