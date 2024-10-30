@@ -1,7 +1,6 @@
-import { useStore } from '@nanostores/react';
 import type { CollectionEntry } from 'astro:content';
 import { useEffect, useRef, useState } from 'react';
-import { $pagePlayersState, setAvFile } from 'src/store.ts';
+import { setAvFile } from 'src/store.ts';
 import { formatTimestamp } from 'src/utils/player.ts';
 
 interface ThumbCanvasProps {
