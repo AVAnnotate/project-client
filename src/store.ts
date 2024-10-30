@@ -1,7 +1,6 @@
 import type { DisplayedAnnotation, Tag } from '@ty/index.ts';
 import { deepMap } from 'nanostores';
 import { Node } from 'slate';
-import { logger } from '@nanostores/logger';
 
 export interface AnnotationState {
   id: string;
@@ -276,7 +275,3 @@ export const setClip = (
 
   $pagePlayersState.setKey(playerId, newState);
 };
-
-let destroy = logger({
-  'Player state': $pagePlayersState,
-});
