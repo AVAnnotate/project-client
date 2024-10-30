@@ -8,22 +8,24 @@ import { getCollection } from 'astro:content';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { CheckIcon } from '@heroicons/react/24/outline';
-import { getCategoryLabel } from 'src/utils/string';
+import { getTagDisplay, toTagParam } from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',
-    link: `/${baseUrl}/tags`,
+    link: `${baseUrl ? `/${baseUrl}` : ''}/tags`,
   },
   {
     label: 'Tag Groups',
@@ -40,7 +42,7 @@ if (annotationSets.length === 0) {
 const events = await getCollection('events');
 
 const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
-  (cat) => getCategoryLabel(cat.category)
+  (cat) => getTagDisplay(cat.category)
 );
 ---
 
@@ -81,7 +83,7 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
                   </h3>
                   <a
                     class='rounded-lg bg-secondary text-white flex items-center justify-center py-2 px-3 hover:scale-105 transition'
-                    href={`/${baseUrl}/tags/detail/${formattedCategoryNames[idx].toLocaleLowerCase()}`}
+                    href={`${baseUrl ? `/${baseUrl}` : ''}/tags/detail/${toTagParam(formattedCategoryNames[idx])}`}
                   >
                     View Details
                   </a>
@@ -97,8 +99,8 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
                         return (
                           <AnnotationSpectrum
                             set={set}
+                            event={event}
                             category={category}
-                            label={event.data.label}
                           />
                         );
                       }

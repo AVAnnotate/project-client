@@ -2,7 +2,7 @@ import { useStore } from '@nanostores/react';
 import type { CollectionEntry } from 'astro:content';
 import { PlayFill } from 'react-bootstrap-icons';
 import { $pagePlayersState, setAvFile } from 'src/store.ts';
-import { formatTimestamp } from 'src/utils/player.ts';
+import { defaultState, formatTimestamp } from 'src/utils/player.ts';
 
 interface Props {
   event: CollectionEntry<'events'>;
@@ -12,13 +12,20 @@ interface Props {
 const AudioFilePicker: React.FC<Props> = (props) => {
   const store = useStore($pagePlayersState);
 
+  const playerState = store[props.playerId] || { ...defaultState };
+
+  // default to the first file for SSR
+  const currentFile =
+    playerState.avFileUuid ||
+    Object.keys(props.event.data.audiovisual_files)[0];
+
   return (
     <div className='py-2'>
       <p>{props.event.data.label}</p>
       <ol className='flex flex-col gap-2'>
         {Object.keys(props.event.data.audiovisual_files).map((uuid, idx) => {
           const avFile = props.event.data.audiovisual_files[uuid];
-          const isCurrentFile = store[props.playerId]?.avFileUuid === uuid;
+          const isCurrentFile = uuid === currentFile;
 
           return (
             <li

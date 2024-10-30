@@ -89,6 +89,8 @@ const projectCollection = defineCollection({
   schema: z.object({
     project: z.object({
       github_org: z.string(),
+      is_private: z.boolean().nullish(),
+      generate_pages_site: z.boolean().nullish(),
       title: z.string(),
       description: z.string().nullish(),
       language: z.string(),

@@ -1,20 +1,20 @@
 ---
 import { type CollectionEntry } from 'astro:content';
 import Annotation from './Annotation.astro';
-import type { DisplayedAnnotation } from '@ty/index';
+import type { DisplayedAnnotation, Tag } from '@ty/index';
 import AnnotationNanostorePopulator from './AnnotationNanostorePopulator';
 
 export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  isEmbed?: boolean;
   initialFile: string;
+  initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, isEmbed, playerId, type } = Astro.props;
+const { annotationSets, initialFile, initialTag, playerId, type } = Astro.props;
 
-const sortedAnnotations = annotationSets
+let sortedAnnotations = annotationSets
   .map((set) =>
     set.data.annotations.map((ann) => ({
       ...ann,
@@ -27,6 +27,17 @@ const sortedAnnotations = annotationSets
   .sort(
     (a: any, b: any) => a.start_time - b.start_time
   ) as DisplayedAnnotation[];
+
+if (initialTag) {
+  sortedAnnotations = sortedAnnotations.filter((ann) => {
+    return !!ann.tags.find(
+      (t) =>
+        t.tag.toLocaleLowerCase() === initialTag.tag.toLocaleLowerCase() &&
+        t.category.toLocaleLowerCase() ===
+          initialTag.category.toLocaleLowerCase()
+    );
+  });
+}
 ---
 
 <div
@@ -35,7 +46,6 @@ const sortedAnnotations = annotationSets
   <AnnotationNanostorePopulator
     annotations={sortedAnnotations}
     playerId={playerId}
-    isEmbed={isEmbed}
     initialFile={initialFile}
     client:load
   />
@@ -60,6 +70,7 @@ const sortedAnnotations = annotationSets
 </div>
 
 <script>
+  import { defaultState } from '@utils/player.ts';
   import { $pagePlayersState } from 'src/store.ts';
 
   const hideNode = (node: HTMLElement | Element) => {
@@ -93,14 +104,15 @@ const sortedAnnotations = annotationSets
               : undefined,
         });
         $pagePlayersState.setKey(thisNode.dataset.playerId, {
-          ...$pagePlayersState.get()[thisNode.dataset.playerId],
+          ...($pagePlayersState.get()[thisNode.dataset.playerId] ||
+            defaultState),
           annotationStarts: annotationStartsNew,
         });
       }
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
         $pagePlayersState.setKey(playerId, {
-          ...$pagePlayersState.get()[playerId],
+          ...($pagePlayersState.get()[playerId] || defaultState),
           position: Number(thisNode.dataset.start),
           seekTo: Number(thisNode.dataset.start),
           isPlaying: true,
@@ -141,36 +153,38 @@ const sortedAnnotations = annotationSets
             startTimes[idx + 1].start > state[changed].position
         : time.start <= state[changed].position;
     });
+
     if (typeof current === 'number' && current >= 0) {
       const activeNode = annotationNodes[current] as HTMLElement;
 
-      if (state[changed].autoScroll) {
-        // scroll the parent element if we're in an embed
-        if (state[changed].isEmbed) {
-          const videoContainerEl = document.querySelector(
-            `.videoAnnotationContainer[data-player-id="${changed}"]`
-          );
-          const offsetTop = activeNode.offsetTop;
+      if (activeNode) {
+        if (state[changed].autoScroll) {
+          // scroll the parent element if we're in an embed
+          if (state[changed].isEmbed) {
+            const videoContainerEl = document.querySelector(
+              `.videoAnnotationContainer[data-player-id="${changed}"]`
+            );
+            const offsetTop = activeNode.offsetTop;
 
-          // we need to scroll a different container if we're in an embedded video event
-          if (videoContainerEl) {
-            videoContainerEl.scroll({
-              top: offsetTop - videoContainerEl.clientHeight,
-              behavior: 'smooth',
-            });
+            // we need to scroll a different container if we're in an embedded video event
+            if (videoContainerEl) {
+              videoContainerEl.scroll({
+                top: offsetTop - videoContainerEl.clientHeight,
+                behavior: 'smooth',
+              });
+            } else {
+              eventContainerEl.scroll({
+                top: offsetTop - eventContainerEl.clientHeight / 3,
+                behavior: 'smooth',
+              });
+            }
+            // otherwise, scroll the whole page
           } else {
-            eventContainerEl.scroll({
-              top: offsetTop - eventContainerEl.clientHeight / 3,
-              behavior: 'smooth',
-            });
+            activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
-          // otherwise, scroll the whole page
-        } else {
-          activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
+        activeNode.classList.add(activeBackground);
       }
-
-      activeNode.classList.add(activeBackground);
 
       for (let i = 0; i < annotationNodes.length; i++) {
         if (i !== current) {
@@ -180,7 +194,7 @@ const sortedAnnotations = annotationSets
     }
 
     // show or hide tags if necessary
-    if (state[changed].showTags !== oldState[changed].showTags) {
+    if (state[changed].showTags !== oldState[changed]?.showTags) {
       if (state[changed].showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
           showNode(annotationTagNodes[i]);
@@ -193,15 +207,13 @@ const sortedAnnotations = annotationSets
     }
 
     // filter on sets, text, and tags
-    for (let i = 0; i < annotationNodes.length; i++) {
-      const node = annotationNodes[i];
-
+    for (const node of annotationNodes) {
       const uuid = node.getAttribute('data-uuid');
 
       if (uuid && state[changed].filteredAnnotations.includes(uuid)) {
-        showNode(annotationNodes[i]);
+        showNode(node);
       } else {
-        hideNode(annotationNodes[i]);
+        hideNode(node);
       }
     }
   });

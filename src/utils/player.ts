@@ -14,3 +14,21 @@ export const formatTimestamp = (seconds: number, includeMs = false) => {
 
   return str;
 };
+
+export const defaultState = {
+  annotations: [],
+  annotationStarts: [],
+  autoScroll: true,
+  avFileUuid: '',
+  currentAnnotation: 0,
+  id: '',
+  isPlaying: false,
+  filteredAnnotations: [],
+  position: 0,
+  searchQuery: '',
+  seekTo: 0,
+  sets: [],
+  snapToAnnotations: false,
+  showTags: true,
+  tags: [],
+};

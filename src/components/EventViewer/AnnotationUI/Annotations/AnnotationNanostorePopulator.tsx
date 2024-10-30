@@ -1,7 +1,7 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
-import { useStore } from '@nanostores/react';
-import { $pagePlayersState, setAvFile } from 'src/store.ts';
+import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
+import { defaultState } from '@utils/player.ts';
 
 // This component's only purpose is to populate the
 // list of annotations in the nanostore.
@@ -9,26 +9,24 @@ import { useEffect } from 'react';
 interface Props {
   annotations: DisplayedAnnotation[];
   playerId: string;
-  isEmbed?: boolean;
   initialFile: string;
 }
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
-  const store = useStore($pagePlayersState);
-
   useEffect(() => {
+    const state = $pagePlayersState.get()[props.playerId] || defaultState;
+
     $pagePlayersState.setKey(props.playerId, {
-      ...store[props.playerId],
+      ...state,
       annotations: [...props.annotations],
       filteredAnnotations: [
         ...props.annotations
           .filter((ann) => ann.file === props.initialFile)
           .map((ann) => ann.uuid),
       ],
-      isEmbed: props.isEmbed,
       avFileUuid: props.initialFile,
     });
-  }, [props.annotations, props.playerId, props.isEmbed]);
+  }, [props.annotations, props.playerId]);
 
   return <></>;
 };

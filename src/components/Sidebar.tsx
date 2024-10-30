@@ -4,22 +4,24 @@ import { Transition } from '@headlessui/react';
 import type { PageCollectionEntry } from 'src/utils/pages.ts';
 
 interface SidebarProps {
-  baseUrl: string;
+  baseUrl: string | undefined;
   pages: PageCollectionEntry[];
   slug?: string;
   url: URL;
 }
 
-const getHref = (page: PageCollectionEntry, baseUrl: string) => {
+const getHref = (page: PageCollectionEntry, baseUrl: string | undefined) => {
   if (page.data.autogenerate.type === 'home') {
-    return `/${baseUrl}`;
+    return baseUrl ? `/${baseUrl}` : '/';
   }
 
   if (page.data.autogenerate.enabled) {
-    return `/${baseUrl}/events/${page.data.slug || page.id}`;
+    return `${baseUrl ? `/${baseUrl}` : ''}/events/${
+      page.data.slug || page.id
+    }`;
   }
 
-  return `/${baseUrl}/pages/${page.data.slug || page.id}`;
+  return `${baseUrl ? `/${baseUrl}` : ''}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -31,7 +33,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   );
 
   const isIndex = useMemo(
-    () => `/${props.baseUrl}/tags` === props.url.pathname,
+    () =>
+      `${props.baseUrl ? `/${props.baseUrl}` : ''}/tags` === props.url.pathname,
     [props.baseUrl, props.url]
   );
 
@@ -47,7 +50,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       return true;
     }
 
-    return props.slug && props.slug === page.data.slug;
+    return (
+      props.slug && (props.slug === page.data.slug || props.slug === page.id)
+    );
   };
 
   return (
@@ -84,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </div>
             </a>
           ))}
-          <a href={`/${props.baseUrl}/tags`}>
+          <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
             <div className='p-4 hover:bg-blue-hover'>
               <p className={isIndex ? 'font-bold' : ''}>Index</p>
             </div>

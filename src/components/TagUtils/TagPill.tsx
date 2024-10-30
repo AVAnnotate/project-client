@@ -2,7 +2,7 @@ interface Props {
   // color can be a hex code or a Tailwind color name
   color: string;
   tag: string;
-  count?: string;
+  count?: number;
   className?: string;
   onClick?: (...args: any[]) => any;
   icon?: React.FC<any>;
@@ -23,7 +23,11 @@ const TagPill: React.FC<Props> = (props) => {
   if (props.onClick) {
     return (
       <button
-        className={`${isHexCode(props.color) ? '' : `bg-${props.color}`} tag-pill rounded-full text-xs flex flex-row justify-center px-3 py-1.5 gap-1 cursor-default ${props.className || ''}`}
+        className={`${
+          isHexCode(props.color) ? '' : `bg-${props.color}`
+        } tag-pill rounded-full text-xs flex flex-row justify-center px-3 py-1.5 gap-1 cursor-default ${
+          props.className || ''
+        }`}
         style={{
           backgroundColor: isHexCode(props.color) ? props.color : undefined,
         }}
@@ -36,7 +40,11 @@ const TagPill: React.FC<Props> = (props) => {
 
   return (
     <div
-      className={`${isHexCode(props.color) ? '' : `bg-${props.color}`} tag-pill rounded-full text-xs flex flex-row justify-center px-3 py-1.5 gap-1 cursor-default ${props.className || ''}`}
+      className={`${
+        isHexCode(props.color) ? '' : `bg-${props.color}`
+      } tag-pill rounded-full text-xs flex flex-row justify-center px-3 py-1.5 gap-1 cursor-default ${
+        props.className || ''
+      }`}
       style={{
         backgroundColor: isHexCode(props.color) ? props.color : undefined,
       }}

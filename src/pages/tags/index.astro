@@ -6,16 +6,19 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
+import { toTagParam } from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData.data.publish.publish_pages_app
+    ? projectData.data.project.slug
+    : undefined
   : dynamicConfig.base;
 const crumbs = [
   {
     label: 'Home',
-    link: `/${baseUrl}`,
+    link: `${baseUrl ? `/${baseUrl}` : '/'}`,
   },
   {
     label: 'Index',
@@ -56,7 +59,15 @@ const getTagCount = (tag: { tag: string; category: string }) => {
   });
   return count;
 };
-let tagData: any = {};
+let tagData: {
+  [cat: string]: {
+    color: string;
+    tags: {
+      tag: string;
+      count: number;
+    }[];
+  };
+} = {};
 tags.tagGroups.forEach((group: { category: string; color: string }) => {
   tagData[group.category] = {
     color: group.color,
@@ -84,7 +95,7 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
       <h1>Index</h1>
       <a
         class='rounded-lg bg-secondary text-white flex items-center justify-center py-2 px-3 hover:scale-105 transition'
-        href={`/${baseUrl}/tags/detail`}
+        href={`${baseUrl ? `/${baseUrl}` : ''}/tags/detail`}
       >
         View Details
       </a>
@@ -97,13 +108,18 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
               <h3 class='px-6 capitalize'>{cat.replaceAll('_', '')}</h3>
               <div class='h-[1px] bg-gray-200 w-full' />
               <div class='px-6 flex flex-row flex-wrap gap-2'>
-                {tagData[cat].tags.map((tag: any) =>
+                {tagData[cat].tags.map((tag) =>
                   tag.count ? (
-                    <TagPill
-                      color={tagData[cat].color}
-                      tag={tag.tag}
-                      count={tag.count}
-                    />
+                    <a
+                      class='[&>*]:hover:cursor-pointer'
+                      href={`/${baseUrl}/tags/detail/${toTagParam(cat)}/${toTagParam(tag.tag)}`}
+                    >
+                      <TagPill
+                        color={tagData[cat].color}
+                        tag={tag.tag}
+                        count={tag.count}
+                      />
+                    </a>
                   ) : null
                 )}
               </div>

@@ -11,6 +11,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useStore } from '@nanostores/react';
+import { defaultState } from '@utils/player.ts';
 import type { CollectionEntry } from 'astro:content';
 import React, { useMemo } from 'react';
 import {
@@ -30,8 +31,9 @@ export interface TagFilterProps {
 const TagFilter = (props: TagFilterProps) => {
   const { playerId } = props;
   const playerState = useStore($pagePlayersState);
+
   const thisPlayer = useMemo(
-    () => playerState[playerId],
+    () => playerState[playerId] || { ...defaultState },
     [playerState, playerId]
   );
 
@@ -41,7 +43,7 @@ const TagFilter = (props: TagFilterProps) => {
     const tagsObj: { [key: string]: { tags: string[]; color: string } } = {};
 
     const setsToShow =
-      thisPlayer.sets.length > 0
+      thisPlayer.sets?.length > 0
         ? props.annotationSets.filter((set) => thisPlayer.sets.includes(set.id))
         : props.annotationSets;
 
@@ -83,7 +85,7 @@ const TagFilter = (props: TagFilterProps) => {
       </PopoverButton>
       <PopoverPanel
         anchor='bottom end'
-        className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4'
+        className='flex flex-col w-[400px] bg-white drop-shadow-lg p-6 rounded-md mt-4 z-10'
       >
         <p className='text-md font-semibold mb-4'>Filters</p>
         <div className='flex flex-row justify-between w-full pb-2'>
