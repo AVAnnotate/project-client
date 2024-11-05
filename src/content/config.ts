@@ -33,7 +33,7 @@ const eventCollection = defineCollection({
       z.object({
         label: z.string(),
         is_offline: z.boolean().nullish(),
-        file_url: z.string().nullish(),
+        file_url: z.string(),
         duration: z.number(),
         caption_set: z
           .array(
