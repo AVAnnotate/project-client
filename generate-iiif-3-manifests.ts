@@ -46,6 +46,7 @@ export const createAnnotationPage = (
           const item: Annotation = {
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
+            motivation: 'supplementing',
             id: id,
             body: [
               {
