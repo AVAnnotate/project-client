@@ -123,7 +123,7 @@ const VideoFilePicker: React.FC<VideoFilePickerProps> = (props) => {
                 key={uuid}
                 onClick={() => setAvFile(uuid, props.playerId)}
               >
-                <ThumbCanvas url={avFile.file_url} />
+                {avFile.file_url && <ThumbCanvas url={avFile.file_url} />}
                 <div className='flex flex-col gap-2'>
                   <p>
                     {idx + 1}.&nbsp;{avFile.label}
