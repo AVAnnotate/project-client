@@ -54,7 +54,7 @@ export const createAnnotationPage = (
                   .map((n) => Node.string(n))
                   .join('\n'),
                 format: 'text/plain',
-                motivation: 'commenting',
+                motivation: ['commenting', 'tagging'],
               },
             ],
             target: `${avFile}#t=${annotation.start_time},${annotation.end_time}`,
@@ -98,6 +98,8 @@ export const createManifest = (
       {
         id: siteURL,
         type: 'Text',
+        // @ts-ignore
+        label: { en: [projectData.project.slug] },
         format: 'text/html',
       },
     ],
