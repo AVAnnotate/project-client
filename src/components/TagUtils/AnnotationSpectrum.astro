@@ -1,5 +1,5 @@
 ---
-import type { TagGroup } from '@ty/index.ts';
+import type { Annotation, TagGroup } from '@ty/index.ts';
 import type { CollectionEntry } from 'astro:content';
 import AnnotationBand from './AnnotationBand.astro';
 import { getCollection } from 'astro:content';
@@ -54,27 +54,29 @@ if (allSets.filter((s) => s.data.source_id === set.data.source_id).length > 1) {
   </div>
   <div class='flex flex-row w-full h-[42px] overflow-x-auto'>
     {
-      set.data.annotations.map((ann) => {
-        const matchingTags = ann.tags.filter(
-          (t) =>
-            t.category.toLocaleLowerCase() ===
-            category.category.toLocaleLowerCase()
-        );
+      set.data.annotations
+        .sort((a: Annotation, b: Annotation) => a.start_time - b.start_time)
+        .map((ann) => {
+          const matchingTags = ann.tags.filter(
+            (t) =>
+              t.category.toLocaleLowerCase() ===
+              category.category.toLocaleLowerCase()
+          );
 
-        const tagColor =
-          tagColors && matchingTags.length > 0
-            ? tagColors[matchingTags[0].tag]
-            : undefined;
+          const tagColor =
+            tagColors && matchingTags.length > 0
+              ? tagColors[matchingTags[0].tag]
+              : undefined;
 
-        return (
-          <AnnotationBand
-            annotation={ann}
-            category={category}
-            color={tagColor}
-            tag={tag}
-          />
-        );
-      })
+          return (
+            <AnnotationBand
+              annotation={ann}
+              category={category}
+              color={tagColor}
+              tag={tag}
+            />
+          );
+        })
     }
   </div>
 </div>
