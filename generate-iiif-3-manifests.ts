@@ -1,10 +1,11 @@
 import type { AnnotationFile, EventFile, ProjectFile } from '@ty/index.ts';
 import type {
-  IIIFAnnotationItem,
-  IIIFAnnotationPage,
-  IIIFCanvas,
-  IIIFPresentationManifest,
-} from '@ty/iiif.ts';
+  AnnotationPage,
+  Annotation,
+  AnnotationBody,
+  Manifest,
+  Canvas,
+} from '@iiif/presentation-3';
 import { Node } from 'slate';
 import fs, { writeFileSync } from 'fs';
 import { snakeCase } from 'snake-case';
@@ -18,10 +19,10 @@ export const createAnnotationPage = (
   pageId: string,
   targetCanvas: string,
   id: string,
-  manifestId: string
+  avFile: string
 ) => {
-  let output: IIIFAnnotationPage[] = [];
-  // Iterate all annotations and look for this event
+  let output: AnnotationPage[] = [];
+  // Iterate all  annotations and look for this event
   fs.readdirSync(`${dataPath}/annotations/`).forEach((file) => {
     if (file.endsWith('.json')) {
       // Read in the file
@@ -31,7 +32,7 @@ export const createAnnotationPage = (
       );
 
       if (annotationData.event_id === eventUUID) {
-        const obj: IIIFAnnotationPage = {
+        const obj: AnnotationPage = {
           '@context': 'http://iiif.io/api/presentation/3/context.json',
           id: pageId,
           type: 'AnnotationPage',
@@ -42,11 +43,11 @@ export const createAnnotationPage = (
         };
 
         annotationData.annotations.forEach((annotation) => {
-          const item: IIIFAnnotationItem = {
+          const item: Annotation = {
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
+            motivation: 'supplementing',
             id: id,
-            motivation: ['commenting', 'tagging'],
             body: [
               {
                 type: 'TextualBody',
@@ -54,38 +55,16 @@ export const createAnnotationPage = (
                   .map((n) => Node.string(n))
                   .join('\n'),
                 format: 'text/plain',
-                motivation: 'commenting',
+                motivation: ['commenting', 'tagging'],
               },
             ],
-            target: {
-              source: {
-                id: targetCanvas,
-                type: 'Canvas',
-                partOf: [
-                  {
-                    id: manifestId,
-                    type: 'Manifest',
-                  },
-                ],
-              },
-              selector:
-                annotation.end_time &&
-                annotation.end_time !== annotation.start_time
-                  ? {
-                      type: 'RangeSelector',
-                      t: `${annotation.start_time},${annotation.end_time}`,
-                    }
-                  : {
-                      type: 'PointSelector',
-                      t: `${annotation.start_time}`,
-                    },
-            },
+            target: `${avFile}#t=${annotation.start_time},${annotation.end_time}`,
           };
 
           annotation.tags.forEach((tag) => {
-            item.body.push({
+            (item.body as AnnotationBody[])?.push({
               type: 'TextualBody',
-              value: `${tag.category}:${tag.tag}`,
+              value: tag.tag,
               format: 'text/plain',
               purpose: 'tagging',
               motivation: 'tagging',
@@ -111,7 +90,7 @@ export const createManifest = (
   const projectData: ProjectFile = JSON.parse(
     fs.readFileSync(`${dataDir}/project.json`, 'utf8')
   );
-  const output: IIIFPresentationManifest = {
+  const output: Manifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
     id: `${siteURL}/manifest.json`,
     type: 'Manifest',
@@ -120,7 +99,8 @@ export const createManifest = (
       {
         id: siteURL,
         type: 'Text',
-        label: { en: [projectData.project.title] },
+        // @ts-ignore
+        label: { en: [projectData.project.slug] },
         format: 'text/html',
       },
     ],
@@ -153,7 +133,7 @@ export const createManifest = (
         eventData.audiovisual_files
       )) {
         const type = mime.lookup(avFile.file_url);
-        const event: IIIFCanvas = {
+        const event: Canvas = {
           id: eventId,
           type: 'Canvas',
           duration: avFile.duration,
@@ -167,10 +147,12 @@ export const createManifest = (
           file.replace(/\.[^/.]+$/, ''),
           `${siteURL}/manifests/${snakeCase(
             eventData.label
-          )}-canvas${canvasCount}-${pageCount}.json`,
+          )}-canvas${canvasCount}-${pageCount}${
+            allowSubPages === 'true' || allowSubPages === 'TRUE' ? '.json' : ''
+          }`,
           eventId,
           `${eventId}/page${pageCount}`,
-          `${siteURL}/manifests.json`
+          avFile.file_url
         );
 
         if (annos.length > 0) {
@@ -184,7 +166,7 @@ export const createManifest = (
               );
 
               event.annotations = [
-                ...event.annotations,
+                ...(event.annotations as AnnotationPage[]),
                 {
                   type: 'AnnotationPage',
                   id: `${siteURL}/manifests/${snakeCase(
@@ -195,10 +177,13 @@ export const createManifest = (
               ];
             });
           } else {
-            event.annotations = [...event.annotations, ...annos];
+            (event.annotations as AnnotationPage[]) = [
+              ...(event.annotations as AnnotationPage[]),
+              ...annos,
+            ];
           }
 
-          event.items.push({
+          event.items?.push({
             id: `${siteURL}/${snakeCase(
               eventData.label
             )}-canvas${canvasCount}/paintings`,
@@ -210,13 +195,11 @@ export const createManifest = (
                 )}-canvas${canvasCount}/paintings`,
                 type: 'Annotation',
                 motivation: 'painting',
-                body: [
-                  {
-                    id: avFile.file_url,
-                    type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                    format: type ? type : 'unknown',
-                  },
-                ],
+                body: {
+                  id: avFile.file_url,
+                  type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                  format: type ? type : 'unknown',
+                },
                 target: `${siteURL}/${snakeCase(
                   `${eventData.label}`
                 )}-canvas${canvasCount}`,
