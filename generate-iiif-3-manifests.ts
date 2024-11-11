@@ -46,6 +46,7 @@ export const createAnnotationPage = (
           const item: Annotation = {
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
+            motivation: 'supplementing',
             id: id,
             body: [
               {
@@ -194,13 +195,11 @@ export const createManifest = (
                 )}-canvas${canvasCount}/paintings`,
                 type: 'Annotation',
                 motivation: 'painting',
-                body: [
-                  {
-                    id: avFile.file_url,
-                    type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                    format: type ? type : 'unknown',
-                  },
-                ],
+                body: {
+                  id: avFile.file_url,
+                  type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                  format: type ? type : 'unknown',
+                },
                 target: `${siteURL}/${snakeCase(
                   `${eventData.label}`
                 )}-canvas${canvasCount}`,
