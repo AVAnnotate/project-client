@@ -1,5 +1,5 @@
 // @ts-ignore
-import Aviary from 'aviary-iiif-player';
+import { AviaryIIIFPlayer } from 'aviary-iiif-player';
 
 import './Player.css';
 
@@ -9,7 +9,7 @@ interface PlayerProps {
 export const Player = (props: PlayerProps) => {
   return (
     <div className='player-container'>
-      <Aviary manifest={props.manifestURL} />
+      <AviaryIIIFPlayer manifest={props.manifestURL} />
     </div>
   );
 };
