@@ -25,14 +25,18 @@ export const fromTagParam = (str: string) => {
   return str.replaceAll('_', ' ');
 };
 
-// format a tag for display by capitalizing the first character and
+// format a tag for display by capitalizing the first character of each word
 // handling the special case of the uncategorized category
 export const getTagDisplay = (str: string) => {
   if (str === '_uncategorized_') {
     return 'Uncategorized';
   }
 
-  return `${str[0].toLocaleUpperCase()}${str.slice(1)}`;
+  const split = str.split(' ');
+
+  return split
+    .map((str) => `${str[0].toLocaleUpperCase()}${str.slice(1)}`)
+    .join(' ');
 };
 
 // converts a tag or category name to a format more friendly to URLs
