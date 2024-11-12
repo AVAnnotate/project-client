@@ -28,7 +28,7 @@ const tagGroups = projectData.data.project.tags.tagGroups;
   data-set={ann.set}
   data-uuid={ann.uuid}
 >
-  <div class='flex flex-row gap-2 w-[140px] items-start'>
+  <div class='flex flex-row gap-2 w-[120px] items-start'>
     <button
       class='playAnnotation'
       data-start={ann.start_time}
@@ -37,8 +37,8 @@ const tagGroups = projectData.data.project.tags.tagGroups;
     >
       <PlayCircleIcon className='h-6 w-6' />
     </button>
-    <p class='w-[140px] font-semibold text-sm'>
-      {`${formatTimestamp(ann.start_time)}`}&nbsp;-&nbsp;{
+    <p class='font-semibold text-sm'>
+      {`${formatTimestamp(ann.start_time)}`}&nbsp;- {
         `${formatTimestamp(ann.end_time)}`
       }
     </p>
