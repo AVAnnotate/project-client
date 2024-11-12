@@ -26,7 +26,7 @@ export const fromTagParam = (str: string) => {
 };
 
 // format a tag for display by capitalizing the first character of each word
-// handling the special case of the uncategorized category
+// and handling the special case of the uncategorized category
 export const getTagDisplay = (str: string) => {
   if (str === '_uncategorized_') {
     return 'Uncategorized';
