@@ -208,7 +208,7 @@ export const createManifest = (
               body: {
                 id: avFile.file_url,
                 type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                format: mime.contentType(avFile.file_url) || 'unknown',
+                format: mime.lookup(avFile.file_url) || 'unknown',
                 duration: avFile.duration,
               },
               target: eventId,
