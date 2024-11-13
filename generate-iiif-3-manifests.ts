@@ -19,7 +19,7 @@ export const createAnnotationPage = (
   pageId: string,
   targetCanvas: string,
   id: string,
-  avFile: string
+  timeOffset: number
 ) => {
   let output: AnnotationPage[] = [];
   // Iterate all  annotations and look for this event
@@ -58,7 +58,9 @@ export const createAnnotationPage = (
                 motivation: ['commenting', 'tagging'],
               },
             ],
-            target: `${avFile}#t=${annotation.start_time},${annotation.end_time}`,
+            target: `${targetCanvas}#t=${timeOffset + annotation.start_time},${
+              timeOffset + annotation.end_time
+            }`,
           };
 
           annotation.tags.forEach((tag) => {
@@ -126,21 +128,27 @@ export const createManifest = (
 
       const eventId = `${siteURL}/${snakeCase(
         eventData.label
-      )}/canvas-${canvasCount}/canvas`;
+      )}/canvas/${canvasCount}`;
 
       let pageCount = 1;
+      const avFiles = [];
+      let duration = 0;
       for (const [_key, avFile] of Object.entries(
         eventData.audiovisual_files
       )) {
-        const type = mime.lookup(avFile.file_url);
-        const event: Canvas = {
-          id: eventId,
-          type: 'Canvas',
-          duration: avFile.duration,
-          annotations: [],
-          items: [],
-        };
+        avFiles.push(avFile);
+        duration += avFile.duration;
+      }
+      const event: Canvas = {
+        id: eventId,
+        type: 'Canvas',
+        duration: duration,
+        annotations: [],
+        items: [],
+      };
 
+      let timeOffset = 0;
+      avFiles.forEach((avFile) => {
         const annos = createAnnotationPage(
           dataDir,
           siteURL,
@@ -152,8 +160,9 @@ export const createManifest = (
           }`,
           eventId,
           `${eventId}/page${pageCount}`,
-          avFile.file_url
+          timeOffset
         );
+        timeOffset += avFile.duration;
 
         if (annos.length > 0) {
           if (allowSubPages === 'true' || allowSubPages === 'TRUE') {
@@ -182,37 +191,36 @@ export const createManifest = (
               ...annos,
             ];
           }
-
-          event.items?.push({
-            id: `${siteURL}/${snakeCase(
-              eventData.label
-            )}-canvas${canvasCount}/paintings`,
-            type: 'AnnotationPage',
-            items: [
-              {
-                id: `${siteURL}/${snakeCase(
-                  eventData.label
-                )}-canvas${canvasCount}/paintings`,
-                type: 'Annotation',
-                motivation: 'painting',
-                body: {
-                  id: avFile.file_url,
-                  type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                  format: type ? type : 'unknown',
-                },
-                target: `${siteURL}/${snakeCase(
-                  `${eventData.label}`
-                )}-canvas${canvasCount}`,
-              },
-            ],
-          });
-
-          output.items.push(event);
-          pageCount++;
         }
-      }
+
+        event.items?.push({
+          id: `${siteURL}/${snakeCase(
+            eventData.label
+          )}-canvas${canvasCount}/paintings`,
+          type: 'AnnotationPage',
+          items: [
+            {
+              id: `${siteURL}/${snakeCase(
+                eventData.label
+              )}-canvas${canvasCount}/paintings`,
+              type: 'Annotation',
+              motivation: 'painting',
+              body: {
+                id: avFile.file_url,
+                type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                format: mime.contentType(avFile.file_url) || 'unknown',
+                duration: avFile.duration,
+              },
+              target: eventId,
+            },
+          ],
+        });
+
+        output.items.push(event);
+        pageCount++;
+      });
+      canvasCount++;
     }
-    canvasCount++;
   });
 
   writeFileSync(

@@ -44,18 +44,20 @@ const TagFilter = (props: TagFilterProps) => {
 
     const setsToShow =
       thisPlayer.sets?.length > 0
-        ? props.annotationSets.filter((set) => thisPlayer.sets.includes(set.id))
+        ? props.annotationSets.filter((set: any) =>
+            thisPlayer.sets.includes(set.id)
+          )
         : props.annotationSets;
 
-    setsToShow.forEach((set) => {
-      set?.data.annotations.forEach((ann) => {
+    setsToShow.forEach((set: any) => {
+      set?.data.annotations.forEach((ann: any) => {
         if (ann.tags && ann.tags.length) {
           ann.tags.forEach((tag: { category: string; tag: string }) => {
             const cat = tag.category.toLowerCase();
             tagsObj[cat] ||= {
               tags: [],
               color:
-                tagGroups.find((grp) => grp.category.toLowerCase() === cat)
+                tagGroups.find((grp: any) => grp.category.toLowerCase() === cat)
                   ?.color || '#FFF',
             };
             if (!tagsObj[cat].tags.includes(tag.tag)) {
@@ -105,7 +107,7 @@ const TagFilter = (props: TagFilterProps) => {
                   </div>
                 )}
               </div>
-              {props.annotationSets.map((set) => (
+              {props.annotationSets.map((set: any) => (
                 <div className='block' key={set.id}>
                   <div className='flex flex-row gap-3 py-1'>
                     <Checkbox
