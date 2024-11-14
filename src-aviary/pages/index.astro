@@ -7,7 +7,7 @@ const url = `${Astro.url.origin}${Astro.url.pathname}/manifests/manifest.json`;
 
 <Layout title='Welcome to Astro.'>
   <main>
-    <Player manifestURL={url} client:load />
+    <Player manifestURL={url} client:only='react' />
   </main>
 </Layout>
 
