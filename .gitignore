@@ -30,4 +30,4 @@ test-page.json
 src/content/*
 !src/content/config.ts
 
-.client/
+client/
