@@ -193,6 +193,9 @@ export const createManifest = (
           }
         }
 
+        const source = avFile.file_url.split('?');
+        const type = mime.lookup(source[0]);
+
         event.items?.push({
           id: `${siteURL}/${snakeCase(
             eventData.label
@@ -208,7 +211,7 @@ export const createManifest = (
               body: {
                 id: avFile.file_url,
                 type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
-                format: mime.lookup(avFile.file_url) || 'unknown',
+                format: type ? type : 'unknown',
                 duration: avFile.duration,
               },
               target: eventId,
