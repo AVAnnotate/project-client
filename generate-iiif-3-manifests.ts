@@ -46,7 +46,7 @@ export const createAnnotationPage = (
           const item: Annotation = {
             '@context': 'http://www.w3.org/ns/anno.jsonld',
             type: 'Annotation',
-            motivation: 'supplementing',
+            motivation: ['commenting', 'tagging'],
             id: id,
             body: [
               {
@@ -55,7 +55,7 @@ export const createAnnotationPage = (
                   .map((n) => Node.string(n))
                   .join('\n'),
                 format: 'text/plain',
-                motivation: ['commenting', 'tagging'],
+                motivation: 'commenting',
               },
             ],
             target: `${targetCanvas}#t=${timeOffset + annotation.start_time},${
