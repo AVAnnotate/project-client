@@ -25,6 +25,8 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
     const style = { textAlign: element.align };
 
     switch (element.type) {
+      case 'line-break':
+        return <br />;
       case 'block-quote':
         return (
           <blockquote style={style} {...attributes}>

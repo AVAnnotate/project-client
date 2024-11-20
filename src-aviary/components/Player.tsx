@@ -1,7 +1,8 @@
 // @ts-ignore
-import { AviaryIIIFPlayer as Everything } from 'aviary-iiif-player';
+import AV from 'aviary-iiif-player';
 
 import './Player.css';
+const { AviaryIIIFPlayer } = AV;
 
 interface PlayerProps {
   manifestURL: string;
@@ -9,7 +10,7 @@ interface PlayerProps {
 export const Player = (props: PlayerProps) => {
   return (
     <div className='player-container'>
-      <Everything manifest={props.manifestURL} />
+      <AviaryIIIFPlayer manifest={props.manifestURL} />
     </div>
   );
 };

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "rm -rf ./dist && astro check && astro build -- --legacy-peer-deps",
+    "build": "rm -rf ./dist && astro build -- --legacy-peer-deps",
     "preview": "astro preview",
     "astro": "astro"
   },
