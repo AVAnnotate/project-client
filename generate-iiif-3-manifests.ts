@@ -94,7 +94,7 @@ export const createManifest = (
   );
   const output: Manifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
-    id: `${siteURL}/manifest.json`,
+    id: `${siteURL}/manifests/manifest.json`,
     type: 'Manifest',
     label: { en: [projectData.project.slug] },
     homepage: [
