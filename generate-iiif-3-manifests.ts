@@ -94,7 +94,7 @@ export const createManifest = (
   );
   const output: Manifest = {
     '@context': 'http://iiif.io/api/presentation/3/context.json',
-    id: `${siteURL}/manifest.json`,
+    id: `${siteURL}/manifests/manifest.json`,
     type: 'Manifest',
     label: { en: [projectData.project.slug] },
     homepage: [
@@ -193,8 +193,14 @@ export const createManifest = (
           }
         }
 
-        const source = avFile.file_url.split('?');
-        const type = mime.lookup(source[0]);
+        const source =
+          avFile.file_url && avFile.file_url.length > 0
+            ? avFile.file_url.split('?')
+            : '';
+        const type =
+          avFile.file_url && avFile.file_url.length > 0
+            ? mime.lookup(source[0])
+            : undefined;
 
         event.items?.push({
           id: `${siteURL}/${snakeCase(
