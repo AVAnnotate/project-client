@@ -35,7 +35,7 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       case 'bulleted-list':
         return (
-          <ul style={style} {...attributes}>
+          <ul class='list-disc list-inside' style={style} {...attributes}>
             <slot />
           </ul>
         );
@@ -53,13 +53,13 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       case 'list-item':
         return (
-          <li style={style} {...attributes}>
+          <li class='indent-4' style={style} {...attributes}>
             <slot />
           </li>
         );
       case 'numbered-list':
         return (
-          <ol style={style} {...attributes}>
+          <ol class='list-decimal list-inside' style={style} {...attributes}>
             <slot />
           </ol>
         );
