@@ -22,7 +22,7 @@ export const fromTagParam = (str: string) => {
     return '_uncategorized_';
   }
 
-  return str.replaceAll('_', ' ');
+  return decodeURIComponent(str);
 };
 
 // format a tag for display by capitalizing the first character of each word
@@ -45,5 +45,5 @@ export const toTagParam = (str: string) => {
     return 'uncategorized';
   }
 
-  return str.replaceAll(' ', '_').toLocaleLowerCase();
+  return encodeURIComponent(str);
 };
