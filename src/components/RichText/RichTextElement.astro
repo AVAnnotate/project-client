@@ -80,10 +80,10 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
       case 'grid':
         return (
           <div
-            className='slate-grid'
             style={{
               display: 'grid',
               gridTemplateColumns: `${element.layout[0]}fr ${element.layout[1]}fr`,
+              gap: '1rem',
             }}
             {...attributes}
           >
