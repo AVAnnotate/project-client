@@ -23,6 +23,14 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
 {
   (async () => {
     const style = { textAlign: element.align };
+    const imgStyle = {
+      margin:
+        element.align == 'center'
+          ? '0 auto'
+          : element.align == 'right'
+            ? '0 0 0 auto'
+            : '0',
+    };
 
     switch (element.type) {
       case 'line-break':
@@ -66,7 +74,11 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img src={element.url} class={getImageClass(element.size)} />
+            <img
+              src={element.url}
+              class={getImageClass(element.size)}
+              style={imgStyle}
+            />
             <slot />
           </div>
         );
