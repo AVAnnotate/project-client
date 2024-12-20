@@ -38,9 +38,6 @@ const AudioFilePicker: React.FC<Props> = (props) => {
                 {idx + 1}. &nbsp;
                 {avFile.label}
               </span>
-              <span className='flex items-center border border-black rounded-[5px] text-xs p-2 font-semibold h-6'>
-                {formatTimestamp(avFile.duration, false)}
-              </span>
             </li>
           );
         })}
