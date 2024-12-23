@@ -58,7 +58,22 @@ const title = `${capitalizedCategory} Tags Used in Events`;
 
 const annotationSets = await getCollection('annotations');
 const events = await getCollection('events');
-
+annotationSets.sort((a, b) => {
+  const event_a = events.find((ev) => ev.id == a.data.event_id);
+  const event_b = events.find((ev) => ev.id == b.data.event_id);
+  if (event_a && event_b) {
+    return event_a.data.label < event_b.data.label
+      ? -1
+      : event_a.data.label > event_b.data.label
+        ? 1
+        : a.data.set < b.data.set
+          ? -1
+          : a.data.set > b.data.set
+            ? 1
+            : 0;
+  }
+  return 0;
+});
 const categoryData = projectData.data.project.tags.tagGroups.find(
   (tg) =>
     tg.category.replaceAll('_', '').toLocaleLowerCase() ===
