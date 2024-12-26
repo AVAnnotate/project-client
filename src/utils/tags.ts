@@ -53,13 +53,13 @@ export const compareAnnotations = (a: any, b: any, events: any) => {
   const event_a = events.find((ev: any) => ev.id == a.data.event_id);
   const event_b = events.find((ev: any) => ev.id == b.data.event_id);
   if (event_a && event_b) {
-    return event_a.data.label < event_b.data.label
+    return event_a.data.label.toLowerCase() < event_b.data.label.toLowerCase()
       ? -1
-      : event_a.data.label > event_b.data.label
+      : event_a.data.label.toLowerCase() > event_b.data.label.toLowerCase()
         ? 1
-        : a.data.set < b.data.set
+        : a.data.set.toLowerCase() < b.data.set.toLowerCase()
           ? -1
-          : a.data.set > b.data.set
+          : a.data.set.toLowerCase() > b.data.set.toLowerCase()
             ? 1
             : 0;
   }
