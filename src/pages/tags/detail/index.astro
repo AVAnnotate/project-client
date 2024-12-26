@@ -8,7 +8,7 @@ import { getCollection } from 'astro:content';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { CheckIcon } from '@heroicons/react/24/outline';
-import { getTagDisplay, toTagParam } from '@utils/tags';
+import { compareAnnotations, getTagDisplay, toTagParam } from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
@@ -33,14 +33,13 @@ const crumbs = [
 ];
 
 const annotationSets = await getCollection('annotations');
+const events = await getCollection('events');
+annotationSets.sort((a, b) => compareAnnotations(a, b, events));
 
 // check whether there actually are any annotation files
 if (annotationSets.length === 0) {
   return Astro.redirect(`/${baseUrl}`);
 }
-
-const events = await getCollection('events');
-
 const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
   (cat) => getTagDisplay(cat.category)
 );

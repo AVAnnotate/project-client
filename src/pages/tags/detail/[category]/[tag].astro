@@ -65,7 +65,7 @@ const title = `Annotations for ${capitalizedCategory}: ${capitalizedTag}`;
 
 const annotationSets = await getCollection('annotations');
 const events = await getCollection('events');
-
+annotationSets.sort((a, b) => compareAnnotations(a, b, events));
 const categoryData = projectData.data.project.tags.tagGroups.find(
   (tg) =>
     tg.category.replaceAll('_', '').toLocaleLowerCase() ===
