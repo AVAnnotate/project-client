@@ -321,9 +321,9 @@ const Player: React.FC<Props> = (props) => {
             </div>
           </div>
         ) : (
-          <span className='inline-block italic h-[48px]'>
-            This file is hosted offline.
-          </span>
+          <p className='inline-flex italic h-[48px] items-end'>
+            <span>No media is available.</span>
+          </p>
         )
       ) : null}
     </div>
