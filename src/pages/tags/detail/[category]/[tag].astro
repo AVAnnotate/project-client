@@ -6,7 +6,12 @@ import Player from '@components/Player';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import Layout from '@layouts/Layout.astro';
 import type { DisplayedAnnotation } from '@ty/index';
-import { fromTagParam, getTagDisplay, toTagParam } from '@utils/tags';
+import {
+  compareAnnotations,
+  fromTagParam,
+  getTagDisplay,
+  toTagParam,
+} from '@utils/tags';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
