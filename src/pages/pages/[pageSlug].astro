@@ -33,7 +33,7 @@ const page = await getPage(pageSlug);
 
 <Layout title={page.data.title}>
   <Container className='py-16'>
-    <div>
+    <div class='textContent'>
       <h1>{page.data.title}</h1>
       <RichText nodes={page.data.content} />
     </div>

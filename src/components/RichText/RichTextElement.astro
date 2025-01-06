@@ -59,6 +59,8 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
             <slot />
           </h2>
         );
+      case 'horizontal-separator':
+        return <div class='w-full my-3 h-[1px] bg-black' />;
       case 'list-item':
         return (
           <li class='indent-4' style={style} {...attributes}>

@@ -61,7 +61,7 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
               vttURLs={captionSets}
               initialFile={file}
             />
-            <>
+            <div class='textContent'>
               {!start &&
               !end &&
               Object.keys(event.data.audiovisual_files).length > 1 ? (
@@ -79,7 +79,7 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
                     )}
                 </>
               )}
-            </>
+            </div>
           </div>
         )}
         {includes.includes('annotations') && (

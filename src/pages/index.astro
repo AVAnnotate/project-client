@@ -21,7 +21,7 @@ if (homePageQuery.length > 0) {
 ---
 
 <Layout title={project.title}>
-  <Container className='py-12 flex flex-col gap-6'>
+  <Container className='py-12 flex flex-col gap-6 textContent'>
     {homePage
       ? (
         <RichText nodes={homePage.data.content} />
