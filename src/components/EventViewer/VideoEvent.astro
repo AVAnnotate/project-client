@@ -101,3 +101,6 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
     )
   }
 </ConditionalContainer>
+<ConditionalContainer condition={event.data.citation}>
+  <p class='py-3 mb-3'>{event.data.citation}</p>
+</ConditionalContainer>
