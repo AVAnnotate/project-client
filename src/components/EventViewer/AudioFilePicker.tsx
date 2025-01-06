@@ -1,3 +1,4 @@
+import { Select } from '@headlessui/react';
 import { useStore } from '@nanostores/react';
 import type { CollectionEntry } from 'astro:content';
 import { PlayFill } from 'react-bootstrap-icons';
@@ -20,28 +21,23 @@ const AudioFilePicker: React.FC<Props> = (props) => {
     Object.keys(props.event.data.audiovisual_files)[0];
 
   return (
-    <div className='py-2'>
-      <p>{props.event.data.label}</p>
-      <ol className='flex flex-col gap-2'>
+    <div className='py-2 flex flex-row gap-3 items-center'>
+      <p>AV File</p>
+      <Select
+        name='file'
+        aria-label='AV file picker'
+        onChange={(e: any) => setAvFile(e.target.value, props.playerId)}
+        className='py-1.5 px-3 border border-black rounded-md bg-white'
+      >
         {Object.keys(props.event.data.audiovisual_files).map((uuid, idx) => {
           const avFile = props.event.data.audiovisual_files[uuid];
-          const isCurrentFile = uuid === currentFile;
-
           return (
-            <li
-              className='flex gap-2 items-center hover:cursor-pointer'
-              onClick={() => setAvFile(uuid, props.playerId)}
-              key={uuid}
-            >
-              <div className='w-4'>{isCurrentFile && <PlayFill />}</div>
-              <span className={isCurrentFile ? 'font-bold' : ''}>
-                {idx + 1}. &nbsp;
-                {avFile.label}
-              </span>
-            </li>
+            <option value={uuid} key={idx}>
+              {avFile.label}
+            </option>
           );
         })}
-      </ol>
+      </Select>
     </div>
   );
 };
