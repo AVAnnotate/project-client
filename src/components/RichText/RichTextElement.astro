@@ -139,7 +139,7 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       default:
         return (
-          <p class='py-3 leading-6' style={style} {...attributes}>
+          <p class='min-h-6 leading-6' style={style} {...attributes}>
             <slot />
           </p>
         );
