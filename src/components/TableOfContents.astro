@@ -18,13 +18,13 @@ const homePage = pages.find((p) => p.data.autogenerate.type === 'home');
 if (!homePage) {
   throw new Error('No homepage found?!?');
 }
-
-console.log(`/${baseUrl}/`, Astro.url.pathname);
 ---
 
 <div class='py-4 flex flex-col gap-2'>
   {
-    ![`/${baseUrl}/`, '/'].includes(Astro.url.pathname) && (
+    ![`index.html${baseUrl}`, `${baseUrl}`, ''].includes(
+      Astro.url.pathname.replaceAll('/', '')
+    ) && (
       <a class='underline' href={`/${baseUrl || ''}`}>
         {homePage.data.title}
       </a>
