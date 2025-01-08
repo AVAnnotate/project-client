@@ -18,8 +18,6 @@ const homePage = pages.find((p) => p.data.autogenerate.type === 'home');
 if (!homePage) {
   throw new Error('No homepage found?!?');
 }
-
-console.log(`/${baseUrl}/`, Astro.url.pathname);
 ---
 
 <div class='py-4 flex flex-col gap-2'>
