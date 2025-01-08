@@ -22,15 +22,6 @@ if (!homePage) {
 
 <div class='py-4 flex flex-col gap-2'>
   {
-    ![baseUrl.replaceAll('/', ''), ''].includes(
-      Astro.url.pathname.replaceAll('/', '')
-    ) && (
-      <a class='underline' href={`/${baseUrl || ''}`}>
-        {homePage.data.title}
-      </a>
-    )
-  }
-  {
     pages
       .filter((page) => page.id !== homePage.id)
       .map((page) => (
