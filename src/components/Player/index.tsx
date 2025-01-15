@@ -261,65 +261,71 @@ const Player: React.FC<Props> = (props) => {
         height={props.event.data.item_type === 'Video' ? '100%' : 0}
         width={props.event.data.item_type === 'Video' ? '100%' : 0}
       />
-      {props.event.data.item_type === 'Audio' && (
-        <div className='player-control-panel !bg-gray-200'>
-          <div className='content'>
-            <Button
-              className='audio-button unstyled'
-              onClick={() => {
-                $pagePlayersState.setKey(props.id, {
-                  ...playerState,
-                  isPlaying: !playerState.isPlaying,
-                });
-              }}
-            >
-              {playerState.isPlaying ? (
-                <PauseFill color='black' />
-              ) : (
-                <PlayFill color='black' />
-              )}
-            </Button>
-            <div className='position-label'>
-              <span className='timestamp position'>{formattedPosition}</span>
-              <span>&nbsp;/&nbsp;</span>
-              <span className='timestamp duration'>{formattedDuration}</span>
-            </div>
-            <div className='seek-bar'>
-              <Slider.Root
-                className='seek-bar-slider'
-                defaultValue={[props.start ? props.start / duration : 0]}
-                min={props.start ? props.start / duration : 0}
-                max={0.999999999}
-                onValueChange={(val) => {
-                  setSeeking(true);
+      {props.event.data.item_type === 'Audio' ? (
+        fileUrl ? (
+          <div className='player-control-panel !bg-gray-200'>
+            <div className='content'>
+              <Button
+                className='audio-button unstyled'
+                onClick={() => {
                   $pagePlayersState.setKey(props.id, {
                     ...playerState,
-                    position: val[0] * duration,
+                    isPlaying: !playerState.isPlaying,
                   });
                 }}
-                onValueCommit={onSeek}
-                step={0.0001}
-                value={[playerState.position / duration]}
               >
-                <Slider.Track className='seek-bar-slider-track !bg-gray-400'>
-                  <Slider.Range className='seek-bar-slider-range' />
-                </Slider.Track>
-                <Slider.Thumb className='seek-bar-slider-thumb' />
-              </Slider.Root>
+                {playerState.isPlaying ? (
+                  <PauseFill color='black' />
+                ) : (
+                  <PlayFill color='black' />
+                )}
+              </Button>
+              <div className='position-label'>
+                <span className='timestamp position'>{formattedPosition}</span>
+                <span>&nbsp;/&nbsp;</span>
+                <span className='timestamp duration'>{formattedDuration}</span>
+              </div>
+              <div className='seek-bar'>
+                <Slider.Root
+                  className='seek-bar-slider'
+                  defaultValue={[props.start ? props.start / duration : 0]}
+                  min={props.start ? props.start / duration : 0}
+                  max={0.999999999}
+                  onValueChange={(val) => {
+                    setSeeking(true);
+                    $pagePlayersState.setKey(props.id, {
+                      ...playerState,
+                      position: val[0] * duration,
+                    });
+                  }}
+                  onValueCommit={onSeek}
+                  step={0.0001}
+                  value={[playerState.position / duration]}
+                >
+                  <Slider.Track className='seek-bar-slider-track !bg-gray-400'>
+                    <Slider.Range className='seek-bar-slider-range' />
+                  </Slider.Track>
+                  <Slider.Thumb className='seek-bar-slider-thumb' />
+                </Slider.Root>
+              </div>
+              <Button
+                className='audio-button unstyled'
+                onClick={() => setMuted(!muted)}
+              >
+                {muted ? (
+                  <VolumeMuteFill color='black' />
+                ) : (
+                  <VolumeUpFill color='black' />
+                )}
+              </Button>
             </div>
-            <Button
-              className='audio-button unstyled'
-              onClick={() => setMuted(!muted)}
-            >
-              {muted ? (
-                <VolumeMuteFill color='black' />
-              ) : (
-                <VolumeUpFill color='black' />
-              )}
-            </Button>
           </div>
-        </div>
-      )}
+        ) : (
+          <p className='inline-flex italic h-[48px] items-end'>
+            <span>No media is available.</span>
+          </p>
+        )
+      ) : null}
     </div>
   );
 };

@@ -35,7 +35,7 @@ const {
 <div>
   <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
     <div class='flex flex-col gap-6 bg-gray-100 py-6 [&_p]:mb-0!'>
-      <ConditionalContainer condition={!isEmbed}>
+      <ConditionalContainer condition={!isEmbed} className='textContent'>
         <div class='flex justify-between'>
           {
             includes.includes('label') && (
@@ -111,5 +111,8 @@ const {
       type={event.data.item_type}
       initialFile={file}
     />
+  </ConditionalContainer>
+  <ConditionalContainer condition={event.data.citation}>
+    <p class='py-3 mb-3'>{event.data.citation}</p>
   </ConditionalContainer>
 </div>

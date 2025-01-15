@@ -23,6 +23,14 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
 {
   (async () => {
     const style = { textAlign: element.align };
+    const imgStyle = {
+      margin:
+        element.align == 'center'
+          ? '0 auto'
+          : element.align == 'right'
+            ? '0 0 0 auto'
+            : '0',
+    };
 
     switch (element.type) {
       case 'line-break':
@@ -35,7 +43,7 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       case 'bulleted-list':
         return (
-          <ul style={style} {...attributes}>
+          <ul class='list-disc list-inside' style={style} {...attributes}>
             <slot />
           </ul>
         );
@@ -51,22 +59,28 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
             <slot />
           </h2>
         );
+      case 'horizontal-separator':
+        return <div class='w-full my-3 h-[1px] bg-black' />;
       case 'list-item':
         return (
-          <li style={style} {...attributes}>
+          <li class='indent-4' style={style} {...attributes}>
             <slot />
           </li>
         );
       case 'numbered-list':
         return (
-          <ol style={style} {...attributes}>
+          <ol class='list-decimal list-inside' style={style} {...attributes}>
             <slot />
           </ol>
         );
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img src={element.url} class={getImageClass(element.size)} />
+            <img
+              src={element.url}
+              class={getImageClass(element.size)}
+              style={imgStyle}
+            />
             <slot />
           </div>
         );
@@ -80,10 +94,10 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
       case 'grid':
         return (
           <div
-            className='slate-grid'
             style={{
               display: 'grid',
               gridTemplateColumns: `${element.layout[0]}fr ${element.layout[1]}fr`,
+              gap: '1rem',
             }}
             {...attributes}
           >

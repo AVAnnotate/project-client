@@ -6,7 +6,12 @@ import Player from '@components/Player';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import Layout from '@layouts/Layout.astro';
 import type { DisplayedAnnotation } from '@ty/index';
-import { fromTagParam, getTagDisplay, toTagParam } from '@utils/tags';
+import {
+  compareAnnotations,
+  fromTagParam,
+  getTagDisplay,
+  toTagParam,
+} from '@utils/tags';
 import type { GetStaticPaths } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
@@ -65,7 +70,7 @@ const title = `Annotations for ${capitalizedCategory}: ${capitalizedTag}`;
 
 const annotationSets = await getCollection('annotations');
 const events = await getCollection('events');
-
+annotationSets.sort((a, b) => compareAnnotations(a, b, events));
 const categoryData = projectData.data.project.tags.tagGroups.find(
   (tg) =>
     tg.category.replaceAll('_', '').toLocaleLowerCase() ===
