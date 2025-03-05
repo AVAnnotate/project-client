@@ -243,8 +243,8 @@ export const createManifest = (
 
       writeFileSync(
         projectData.project.media_player === 'avannotate'
-          ? `./client/src/content/${manifestSlug}/manifest.json`
-          : `./client/src-aviary/content/${manifestSlug}/manifest.json`,
+          ? `./client/src/content/manifests/${manifestSlug}.json`
+          : `./client/src-aviary/content/manifests/${manifestSlug}.json`,
         JSON.stringify(output)
       );
     }
