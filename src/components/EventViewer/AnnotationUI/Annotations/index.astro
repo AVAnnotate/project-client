@@ -102,6 +102,7 @@ if (initialTag) {
             Math.floor(Number(thisNode.dataset.start))
               ? Math.floor(Number(thisNode.dataset.end))
               : undefined,
+          playerId: thisNode.dataset.playerId,
         });
         $pagePlayersState.setKey(thisNode.dataset.playerId, {
           ...($pagePlayersState.get()[thisNode.dataset.playerId] ||
@@ -140,7 +141,9 @@ if (initialTag) {
     const annotationTagNodes =
       eventContainerEl.querySelectorAll(`.annotationTags`);
 
-    const startTimes = state[changed].annotationStarts;
+    const startTimes = state[changed].annotationStarts?.filter(
+      (s) => s.playerId === changed
+    );
     const current = startTimes?.findIndex((time, idx) => {
       if (typeof time.end === 'number') {
         return (

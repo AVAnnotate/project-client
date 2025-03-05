@@ -235,7 +235,7 @@ const Player: React.FC<Props> = (props) => {
         config={tracksConfig}
         onDuration={(dur) => {
           if (props.start && props.end) {
-            setDuration(props.end - props.start);
+            setDuration(props.start + props.end - props.start);
           } else if (props.start) {
             setDuration(dur - props.start);
           } else if (props.end) {

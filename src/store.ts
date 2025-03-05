@@ -12,7 +12,7 @@ export interface AnnotationState {
   currentAnnotation?: number;
   searchQuery?: string;
   tags: Tag[];
-  annotationStarts?: { start: number; end?: number }[];
+  annotationStarts?: { start: number; end?: number; playerId: string }[];
   sets: string[];
   avFileUuid: string;
   annotations: DisplayedAnnotation[];
