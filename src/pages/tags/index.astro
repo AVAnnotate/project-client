@@ -112,7 +112,7 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
                   tag.count ? (
                     <a
                       class='[&>*]:hover:cursor-pointer'
-                      href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}/tags/detail/${toTagParam(cat)}/${toTagParam(tag.tag)}`}
+                      href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags/detail/${toTagParam(cat)}/${toTagParam(tag.tag)}`}
                     >
                       <TagPill
                         color={tagData[cat].color}
