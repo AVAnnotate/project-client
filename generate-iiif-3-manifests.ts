@@ -12,6 +12,15 @@ import { snakeCase } from 'snake-case';
 import mime from 'mime-types';
 import commandLineArgs from 'command-line-args';
 
+const stringToURL = (value: string) => {
+  return value == undefined
+    ? ''
+    : value
+        .replace(/[^a-z0-9_]+/gi, '-')
+        .replace(/^-|-$/g, '')
+        .toLowerCase();
+};
+
 export const createAnnotationPage = (
   dataPath: string,
   _pagesURL: string,
@@ -92,32 +101,6 @@ export const createManifest = (
   const projectData: ProjectFile = JSON.parse(
     fs.readFileSync(`${dataDir}/project.json`, 'utf8')
   );
-  const output: Manifest = {
-    '@context': 'http://iiif.io/api/presentation/3/context.json',
-    id: `${siteURL}/manifests/manifest.json`,
-    type: 'Manifest',
-    label: { en: [projectData.project.slug] },
-    homepage: [
-      {
-        id: siteURL,
-        type: 'Text',
-        // @ts-ignore
-        label: { en: [projectData.project.slug] },
-        format: 'text/html',
-      },
-    ],
-    metadata: [
-      {
-        label: { en: ['Description'] },
-        value: { en: [projectData.project.description || ''] },
-      },
-      {
-        label: { en: ['Language'] },
-        value: { en: ['English'] },
-      },
-    ],
-    items: [],
-  };
 
   let canvasCount = 1;
   fs.readdirSync(`${dataDir}/events/`).forEach((file) => {
@@ -125,6 +108,34 @@ export const createManifest = (
       const eventData: EventFile = JSON.parse(
         fs.readFileSync(`${dataDir}/events/${file}`, 'utf8')
       );
+
+      const manifestSlug = stringToURL(eventData.label);
+      const output: Manifest = {
+        '@context': 'http://iiif.io/api/presentation/3/context.json',
+        id: `${siteURL}/manifests/${manifestSlug}.json`,
+        type: 'Manifest',
+        label: { en: [projectData.project.slug] },
+        homepage: [
+          {
+            id: siteURL,
+            type: 'Text',
+            // @ts-ignore
+            label: { en: [projectData.project.slug] },
+            format: 'text/html',
+          },
+        ],
+        metadata: [
+          {
+            label: { en: ['Description'] },
+            value: { en: [projectData.project.description || ''] },
+          },
+          {
+            label: { en: ['Language'] },
+            value: { en: ['English'] },
+          },
+        ],
+        items: [],
+      };
 
       const eventId = `${siteURL}/${snakeCase(
         eventData.label
@@ -229,15 +240,15 @@ export const createManifest = (
         pageCount++;
       });
       canvasCount++;
+
+      writeFileSync(
+        projectData.project.media_player === 'avannotate'
+          ? `./client/src/content/${manifestSlug}/manifest.json`
+          : `./client/src-aviary/content/${manifestSlug}/manifest.json`,
+        JSON.stringify(output)
+      );
     }
   });
-
-  writeFileSync(
-    projectData.project.media_player === 'avannotate'
-      ? './client/src/content/manifests/manifest.json'
-      : './client/src-aviary/content/manifests/manifest.json',
-    JSON.stringify(output)
-  );
 };
 
 const optionDefinitions = [
