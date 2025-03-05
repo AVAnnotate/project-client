@@ -90,7 +90,9 @@ tags.forEach((t, idx) => (tagColors[t] = colors[idx % colors.length]));
   <Breadcrumbs crumbs={crumbs} />
   <Container className='py-12 flex flex-col gap-8 font-inter'>
     <div class='flex items-center gap-4'>
-      <a href={`/${baseUrl}/tags/detail`}>
+      <a
+        href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags/detail`}
+      >
         <ArrowLeft className='w-8 h-8' />
       </a>
       <h1 class='text-2xl'>{title}</h1>
