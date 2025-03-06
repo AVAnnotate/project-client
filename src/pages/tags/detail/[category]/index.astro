@@ -15,6 +15,8 @@ import {
   compareAnnotations,
   fromTagParam,
   getTagDisplay,
+  setHasCategory,
+  setsHasCategory,
   toTagParam,
 } from '@utils/tags.ts';
 
@@ -115,26 +117,31 @@ tags.forEach((t, idx) => (tagColors[t] = colors[idx % colors.length]));
         Reset
       </button>
     </div>
-    <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
-      {
-        annotationSets.map((set) => {
-          if (set.data.annotations.length > 0) {
-            const event = events.find((ev) => ev.id === set.data.event_id);
+    {
+      setsHasCategory(annotationSets, categoryData.category) && (
+        <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
+          {annotationSets.map((set) => {
+            if (set.data.annotations.length > 0) {
+              const event = events.find((ev) => ev.id === set.data.event_id);
 
-            if (event) {
-              return (
-                <AnnotationSpectrum
-                  event={event}
-                  set={set}
-                  category={categoryData}
-                  tagColors={tagColors}
-                />
-              );
+              if (
+                event &&
+                setHasCategory(set.data.annotations, categoryData.category)
+              ) {
+                return (
+                  <AnnotationSpectrum
+                    event={event}
+                    set={set}
+                    category={categoryData}
+                    tagColors={tagColors}
+                  />
+                );
+              }
             }
-          }
-        })
-      }
-    </div>
+          })}
+        </div>
+      )
+    }
   </Container>
 </Layout>
 

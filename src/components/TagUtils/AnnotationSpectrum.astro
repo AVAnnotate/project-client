@@ -63,39 +63,10 @@ if (allSets.filter((s) => s.data.source_id === set.data.source_id).length > 1) {
               category.category.toLocaleLowerCase()
           );
 
-          const foundTags = tag
-            ? ann.tags.filter(
-                (t) =>
-                  t.tag.toLocaleLowerCase() === tag.toLocaleLowerCase() &&
-                  t.category.toLocaleLowerCase() ===
-                    category.category.toLocaleLowerCase()
-              )
-            : [];
-
           const tagColor =
             tagColors && matchingTags.length > 0
               ? tagColors[matchingTags[0].tag]
               : undefined;
-
-          if (
-            (matchingTags.length === 0 && !tag) ||
-            (tag && foundTags.length === 0)
-          ) {
-            return <div />;
-          }
-
-          console.log(
-            'tag: ',
-            tag,
-            '\n',
-            'category: ',
-            category,
-            '\n',
-            'matchingTags: ',
-            matchingTags,
-            '\nfoundTags: ',
-            foundTags
-          );
           return (
             <AnnotationBand
               annotation={ann}

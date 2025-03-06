@@ -1,3 +1,5 @@
+import type { Annotation, Event } from '@ty/index.ts';
+
 export const tagColors = [
   '#ADFFD9',
   '#ADFEFF',
@@ -56,12 +58,71 @@ export const compareAnnotations = (a: any, b: any, events: any) => {
     return event_a.data.label.toLowerCase() < event_b.data.label.toLowerCase()
       ? -1
       : event_a.data.label.toLowerCase() > event_b.data.label.toLowerCase()
-        ? 1
-        : a.data.set.toLowerCase() < b.data.set.toLowerCase()
-          ? -1
-          : a.data.set.toLowerCase() > b.data.set.toLowerCase()
-            ? 1
-            : 0;
+      ? 1
+      : a.data.set.toLowerCase() < b.data.set.toLowerCase()
+      ? -1
+      : a.data.set.toLowerCase() > b.data.set.toLowerCase()
+      ? 1
+      : 0;
   }
   return 0;
-}
+};
+
+export const setHasCategory = (set: Annotation[], category: string) => {
+  let hasCategory = false;
+  const categoryCheck = fromTagParam(category);
+  for (let i = 0; i < set.length; i++) {
+    const a = set[i];
+    for (let j = 0; j < a.tags.length; j++) {
+      const t = a.tags[j];
+      if (t.category.toLocaleLowerCase() === categoryCheck) {
+        hasCategory = true;
+        break;
+      }
+    }
+  }
+
+  return hasCategory;
+};
+
+export const setsHasCategory = (sets: any[], category: string) => {
+  for (let i = 0; i < sets.length; i++) {
+    if (setHasCategory(sets[i].data.annotations, category)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+export const setHasTag = (set: Annotation[], category: string, tag: string) => {
+  let hasTag = false;
+  const tagCheck = fromTagParam(tag);
+  const categoryCheck = fromTagParam(category);
+  for (let i = 0; i < set.length; i++) {
+    const a = set[i];
+    for (let j = 0; j < a.tags.length; j++) {
+      const t = a.tags[j];
+      if (
+        t.category.toLocaleLowerCase() === categoryCheck &&
+        t.tag.toLocaleLowerCase() === tagCheck
+      ) {
+        hasTag = true;
+        //console.log('Tag found: ', t.tag.toLocaleLowerCase());
+        break;
+      }
+    }
+  }
+
+  return hasTag;
+};
+
+export const setsHasTag = (sets: any[], category: string, tag: string) => {
+  for (let i = 0; i < sets.length; i++) {
+    if (setHasTag(sets[i].set.data.annotations, category, tag)) {
+      return true;
+    }
+  }
+
+  return false;
+};
