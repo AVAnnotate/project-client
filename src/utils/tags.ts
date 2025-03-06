@@ -75,7 +75,9 @@ export const setHasCategory = (set: Annotation[], category: string) => {
     const a = set[i];
     for (let j = 0; j < a.tags.length; j++) {
       const t = a.tags[j];
-      if (t.category.toLocaleLowerCase() === categoryCheck) {
+      if (
+        t.category.toLocaleLowerCase() === categoryCheck.toLocaleLowerCase()
+      ) {
         hasCategory = true;
         break;
       }
