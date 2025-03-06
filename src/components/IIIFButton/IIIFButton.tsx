@@ -24,7 +24,7 @@ export const IIIFButton = (props: IIIFButtonProps) => {
         <DropdownMenu.Content className='dropdown-content' sideOffset={5}>
           {props.options.map((o) => {
             return (
-              <DropdownMenu.Item className='dropdown-item'>
+              <DropdownMenu.Item className='dropdown-item' key={o.label}>
                 <a href={`${BASE}/manifests/${o.url}.json`}>
                   {o.icon && o.icon}
                   {o.label}
@@ -32,7 +32,7 @@ export const IIIFButton = (props: IIIFButtonProps) => {
               </DropdownMenu.Item>
             );
           })}
-          <DropdownMenu.Item className='dropdown-item'>
+          <DropdownMenu.Item className='dropdown-item' key='collection'>
             <a href={`${BASE}/manifests/collection.json`}>
               Collection Manifest
             </a>
