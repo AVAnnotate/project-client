@@ -32,6 +32,11 @@ export const IIIFButton = (props: IIIFButtonProps) => {
               </DropdownMenu.Item>
             );
           })}
+          <DropdownMenu.Item className='dropdown-item'>
+            <a href={'${BASE}/manifests/collection.json'}>
+              Collection Manifest
+            </a>
+          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>

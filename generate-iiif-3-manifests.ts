@@ -21,6 +21,10 @@ const stringToURL = (value: string) => {
         .toLowerCase();
 };
 
+export const serializeToPlainText = (nodes: Node[]) => {
+  return nodes.map((n) => Node.string(n)).join('\n');
+};
+
 export const createAnnotationPage = (
   dataPath: string,
   _pagesURL: string,
@@ -103,6 +107,8 @@ export const createManifest = (
   );
 
   let canvasCount = 1;
+  const eventArray: { label: string; id: string }[] = [];
+
   fs.readdirSync(`${dataDir}/events/`).forEach((file) => {
     if (file.endsWith('.json')) {
       const eventData: EventFile = JSON.parse(
@@ -114,20 +120,20 @@ export const createManifest = (
         '@context': 'http://iiif.io/api/presentation/3/context.json',
         id: `${siteURL}/manifests/${manifestSlug}.json`,
         type: 'Manifest',
-        label: { en: [projectData.project.slug] },
+        label: { en: [eventData.label] },
         homepage: [
           {
             id: siteURL,
             type: 'Text',
             // @ts-ignore
-            label: { en: [projectData.project.slug] },
+            label: { en: [eventData.label] },
             format: 'text/html',
           },
         ],
         metadata: [
           {
             label: { en: ['Description'] },
-            value: { en: [projectData.project.description || ''] },
+            value: { en: [serializeToPlainText(eventData.description) || ''] },
           },
           {
             label: { en: ['Language'] },
@@ -136,6 +142,11 @@ export const createManifest = (
         ],
         items: [],
       };
+
+      eventArray.push({
+        label: eventData.label,
+        id: `${siteURL}/manifests/${manifestSlug}.json`,
+      });
 
       const eventId = `${siteURL}/${snakeCase(
         eventData.label
@@ -249,6 +260,29 @@ export const createManifest = (
       );
     }
   });
+
+  writeFileSync(
+    projectData.project.media_player === 'avannotate'
+      ? './client/src/content/manifests/collection.json'
+      : './client/src-aviary/content/manifests/collection.json',
+    JSON.stringify({
+      '@context': 'http://iiif.io/api/presentation/3/context.json',
+      id: `${siteURL}/manifests/collection.json`,
+      type: 'Collection',
+      label: {
+        en: [projectData.project.title],
+      },
+      items: eventArray.map((e) => {
+        return {
+          id: e.id,
+          type: 'Manifest',
+          label: {
+            en: [e.label],
+          },
+        };
+      }),
+    })
+  );
 };
 
 const optionDefinitions = [
