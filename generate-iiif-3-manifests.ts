@@ -22,7 +22,7 @@ const stringToURL = (value: string) => {
 };
 
 export const serializeToPlainText = (nodes: Node[]) => {
-  return nodes.map((n) => Node.string(n)).join('\n');
+  return nodes ? nodes.map((n) => Node.string(n)).join('\n') : '';
 };
 
 export const createAnnotationPage = (
