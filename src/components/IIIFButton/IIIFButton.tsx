@@ -5,6 +5,7 @@ interface IIIFButtonProps {
   options: { label: string; url: string; icon?: any }[];
 }
 
+// @ts-ignore
 const BASE = import.meta.env.BASE_URL;
 
 export const IIIFButton = (props: IIIFButtonProps) => {
@@ -20,10 +21,10 @@ export const IIIFButton = (props: IIIFButtonProps) => {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content sideOffset={5}>
+        <DropdownMenu.Content className='dropdown-content' sideOffset={5}>
           {props.options.map((o) => {
             return (
-              <DropdownMenu.Item>
+              <DropdownMenu.Item className='dropdown-item'>
                 <a href={`${BASE}/manifests/${o.url}.json`}>
                   {o.icon && o.icon}
                   {o.label}
