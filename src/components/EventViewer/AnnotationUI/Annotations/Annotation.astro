@@ -20,7 +20,7 @@ const tagGroups = projectData.data.project.tags.tagGroups;
 ---
 
 <div
-  class={`annotationNode flex flex-row justify-between gap-4 p-4 my-4 rounded-md bg-white ${ann.file === initialFile ? '' : 'hidden'}`}
+  class={`annotationNode flex flex-row justify-between gap-4 p-4 my-4 scroll-my-20 rounded-md bg-white ${ann.file === initialFile ? '' : 'hidden'}`}
   data-start={ann.start_time}
   data-end={ann.end_time}
   data-file={ann.file}
