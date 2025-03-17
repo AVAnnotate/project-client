@@ -4,6 +4,7 @@ export type EventFile = {
   audiovisual_files: {
     label: string;
     file_url: string;
+    file_type: 'Audio' | 'Video';
     duration: number;
     caption_set?: { annotation_page_id: string; speaker_category?: string }[];
   }[];
@@ -12,7 +13,7 @@ export type EventFile = {
   citation?: string;
   created_at: string;
   created_by: string;
-  item_type: 'Audio' | 'Video';
+  item_type?: 'Audio' | 'Video';
   label: string;
   updated_at: string;
   updated_by: string;
