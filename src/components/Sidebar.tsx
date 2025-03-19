@@ -74,21 +74,34 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               <XMarkIcon className='w-8 h-8' />
             </button>
           </div>
-          {props.pages.map((page) => (
-            <a href={getHref(page, props.baseUrl)} key={page.id}>
-              <div className='p-4 hover:bg-blue-hover'>
-                <p
-                  key={page.id}
-                  className={`${isSelected(page) ? 'font-bold' : ''} ${
-                    page.data.parent ? 'ml-6' : ''
-                  }`}
-                  title={page.data.title}
-                >
-                  {page.data.title}
-                </p>
-              </div>
-            </a>
-          ))}
+          {props.pages.map((page) => {
+            let count = 0;
+            let parent = page.data.parent;
+            while (parent) {
+              count++;
+              const parentObj = props.pages.find((p) => p.id === parent);
+              if (parentObj) {
+                parent = parentObj.data.parent;
+              } else {
+                // @ts-ignore
+                parent = undefined;
+              }
+            }
+            return (
+              <a href={getHref(page, props.baseUrl)} key={page.id}>
+                <div className='p-4 hover:bg-blue-hover'>
+                  <p
+                    key={page.id}
+                    className={`${isSelected(page) ? 'font-bold' : ''}`}
+                    title={page.data.title}
+                    style={{ marginLeft: count * 10 }}
+                  >
+                    {page.data.title}
+                  </p>
+                </div>
+              </a>
+            );
+          })}
           <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
             <div className='p-4 hover:bg-blue-hover'>
               <p className={isIndex ? 'font-bold' : ''}>Index</p>
