@@ -5,6 +5,7 @@ import TagPill from '@components/TagUtils/TagPill';
 import { formatTimestamp } from 'src/utils/player';
 import { getEntry } from 'astro:content';
 import type { Annotation, DisplayedAnnotation } from '@ty/index';
+import { PopupWindow } from '@components/PopupWindow';
 
 interface Props {
   ann: DisplayedAnnotation;
@@ -12,11 +13,32 @@ interface Props {
   setName?: string;
   initialFile: string;
 }
-
+const MAX_VISIBLE_TAGS = 4;
 const { ann, initialFile, playerId, setName } = Astro.props;
 
 const projectData = await getEntry('project', 'project');
 const tagGroups = projectData.data.project.tags.tagGroups;
+const visibleTags: { tag: string; color: string }[] = [];
+const hiddenTags: { tag: string; color: string }[] = [];
+
+ann.tags.forEach((tag, idx) => {
+  const group = tagGroups.find(
+    (group) => group.category.toLowerCase() == tag.category.toLowerCase()
+  );
+  if (idx < MAX_VISIBLE_TAGS) {
+    visibleTags.push({
+      tag: tag.tag,
+      color: group ? group.color : '#FFF',
+    });
+  } else {
+    hiddenTags.push({
+      tag: tag.tag,
+      color: group ? group.color : '#FFF',
+    });
+  }
+});
+
+const expansionCount = `+ ${hiddenTags.length}`;
 ---
 
 <div
@@ -54,16 +76,14 @@ const tagGroups = projectData.data.project.tags.tagGroups;
       )
     }
     <RichText nodes={ann.annotation} />
-    <div class='flex flex-row gap-4 annotationTags' data-player-id={playerId}>
-      {
-        ann.tags?.map((tag: any) => {
-          const group = tagGroups.find(
-            (group) =>
-              group.category.toLowerCase() == tag.category.toLowerCase()
-          );
-          return <TagPill tag={tag.tag} color={group ? group.color : '#FFF'} />;
-        })
-      }
+    <div
+      class='flex flex-row gap-[6px] annotationTags flex-wrap'
+      data-player-id={playerId}
+    >
+      {visibleTags.map((t) => <TagPill tag={t.tag} color={t.color} />)}
+      <PopupWindow count={hiddenTags.length} client:load>
+        {hiddenTags.map((t) => <TagPill tag={t.tag} color={t.color} />)}
+      </PopupWindow>
     </div>
   </div>
 </div>
