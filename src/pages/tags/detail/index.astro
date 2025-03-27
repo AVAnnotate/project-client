@@ -8,7 +8,12 @@ import { getCollection } from 'astro:content';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { CheckIcon } from '@heroicons/react/24/outline';
-import { compareAnnotations, getTagDisplay, toTagParam } from '@utils/tags';
+import {
+  compareAnnotations,
+  getTagDisplay,
+  toTagParam,
+  setHasCategory,
+} from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
@@ -82,7 +87,7 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
                   </h3>
                   <a
                     class='rounded-lg bg-secondary text-white flex items-center justify-center py-2 px-3 hover:scale-105 transition'
-                    href={`${baseUrl ? `/${baseUrl}` : ''}/tags/detail/${toTagParam(formattedCategoryNames[idx])}`}
+                    href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags/detail/${toTagParam(formattedCategoryNames[idx])}`}
                   >
                     View Details
                   </a>
@@ -94,7 +99,10 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
                         (ev) => ev.id === set.data.event_id
                       );
 
-                      if (event) {
+                      if (
+                        event &&
+                        setHasCategory(set.data.annotations, category.category)
+                      ) {
                         return (
                           <AnnotationSpectrum
                             set={set}

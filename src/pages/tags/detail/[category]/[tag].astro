@@ -10,6 +10,9 @@ import {
   compareAnnotations,
   fromTagParam,
   getTagDisplay,
+  setHasTag,
+  setsHasCategory,
+  setsHasTag,
   toTagParam,
 } from '@utils/tags';
 import type { GetStaticPaths } from 'astro';
@@ -113,116 +116,133 @@ for (const set of annotationSets) {
   <Breadcrumbs crumbs={crumbs} />
   <Container className='py-12 flex flex-col gap-8 font-inter'>
     <div class='flex items-center gap-4'>
-      <a href={`/${baseUrl}/tags/detail/${toTagParam(category)}`}>
+      <a
+        href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags/detail/${toTagParam(category)}`}
+      >
         <ArrowLeft className='w-8 h-8' />
       </a>
       <h1 class='text-2xl'>{title}</h1>
     </div>
-    <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
-      {
-        setData.map((sd) => {
-          return (
-            <AnnotationSpectrum
-              event={sd.event}
-              set={sd.set}
-              category={categoryData}
-              tag={tag}
-              spectrumId={sd.spectrumId}
-            />
-          );
-        })
-      }
-      {
-        setData.map((sd) => (
-          <div
-            class='set-player eventContainer mediaContainer py-4'
-            data-player-id={sd.spectrumId}
-            style={{ display: 'none' }}
-          >
-            <AnnotationNanostorePopulator
-              annotations={
-                sd.set.data.annotations
-                  .map((ann) => ({
-                    ...ann,
-                    set: sd.set.id,
-                    setName: sd.set.data.set,
-                    file: sd.set.data.source_id,
-                  }))
-                  .sort(
-                    (a: any, b: any) => a.start_time - b.start_time
-                  ) as DisplayedAnnotation[]
-              }
-              client:load
-              playerId={sd.spectrumId}
-              initialFile={sd.set.data.source_id}
-            />
-            <h3 class='text-lg py-4'>
-              {sd.event.data.audiovisual_files[sd.set.data.source_id].label}
-            </h3>
-            <Player
-              id={sd.spectrumId}
-              event={sd.event}
-              initialFile={sd.set.data.source_id}
-              client:load
-            />
-            <Annotations
-              playerId={sd.spectrumId}
-              annotationSets={[sd.set]}
-              type={sd.event.data.item_type}
-              initialFile={sd.set.data.source_id}
-              initialTag={{
-                category: fromTagParam(category),
-                tag: fromTagParam(tag),
-              }}
-            />
-          </div>
-        ))
-      }
-    </div>
+    {
+      setsHasTag(setData, category, tag) && (
+        <div class='w-full py-6 flex flex-col gap-6 divide-y divide-gray-300'>
+          {setData.map((sd) => {
+            if (setHasTag(sd.set.data.annotations, category, tag)) {
+              return (
+                <AnnotationSpectrum
+                  event={sd.event}
+                  set={sd.set}
+                  category={categoryData}
+                  tag={tag}
+                  spectrumId={sd.spectrumId}
+                />
+              );
+            } else {
+              return <div />;
+            }
+          })}
+          {setData.map((sd) => {
+            if (setHasTag(sd.set.data.annotations, category, tag)) {
+              return (
+                <div
+                  class='set-player eventContainer mediaContainer py-4'
+                  data-player-id={sd.spectrumId}
+                  style={{ display: 'none' }}
+                >
+                  <AnnotationNanostorePopulator
+                    annotations={
+                      sd.set.data.annotations
+                        .map((ann) => ({
+                          ...ann,
+                          set: sd.set.id,
+                          setName: sd.set.data.set,
+                          file: sd.set.data.source_id,
+                        }))
+                        .sort(
+                          (a: any, b: any) => a.start_time - b.start_time
+                        ) as DisplayedAnnotation[]
+                    }
+                    client:load
+                    playerId={sd.spectrumId}
+                    initialFile={sd.set.data.source_id}
+                  />
+                  <h3 class='text-lg py-4'>
+                    {
+                      sd.event.data.audiovisual_files[sd.set.data.source_id]
+                        .label
+                    }
+                  </h3>
+                  <Player
+                    id={sd.spectrumId}
+                    event={sd.event}
+                    initialFile={sd.set.data.source_id}
+                    client:load
+                  />
+                  <Annotations
+                    playerId={sd.spectrumId}
+                    annotationSets={[sd.set]}
+                    type={sd.event.data.item_type}
+                    initialFile={sd.set.data.source_id}
+                    initialTag={{
+                      category: fromTagParam(category),
+                      tag: fromTagParam(tag),
+                    }}
+                  />
+                </div>
+              );
+            } else {
+              return <div />;
+            }
+          })}
+        </div>
+      )
+    }
   </Container>
-</Layout>
 
-<script>
-  const spectrums = document.querySelectorAll(
-    '[data-spectrum-id]'
-  ) as NodeListOf<HTMLDivElement>;
-  const spectrumButtons = document.querySelectorAll(
-    '[data-spectrum-button-id]'
-  ) as NodeListOf<HTMLButtonElement>;
-  const setPlayers = document.querySelectorAll(
-    '.set-player[data-player-id]'
-  ) as NodeListOf<HTMLDivElement>;
+  <script>
+    const spectrums = document.querySelectorAll(
+      '[data-spectrum-id]'
+    ) as NodeListOf<HTMLDivElement>;
+    const spectrumButtons = document.querySelectorAll(
+      '[data-spectrum-button-id]'
+    ) as NodeListOf<HTMLButtonElement>;
+    const setPlayers = document.querySelectorAll(
+      '.set-player[data-player-id]'
+    ) as NodeListOf<HTMLDivElement>;
 
-  const updateSpectrum = (newSpectrum: string) => {
-    for (const spectrum of spectrums) {
-      const spectrumId = spectrum.getAttribute('data-spectrum-id');
+    const updateSpectrum = (newSpectrum: string) => {
+      for (const spectrum of spectrums) {
+        const spectrumId = spectrum.getAttribute('data-spectrum-id');
 
-      if (spectrumId === newSpectrum) {
-        spectrum.style.backgroundColor = '#D9E6ED';
-      } else {
-        spectrum.style.backgroundColor = 'initial';
+        if (spectrumId === newSpectrum) {
+          spectrum.style.backgroundColor = '#D9E6ED';
+        } else {
+          spectrum.style.backgroundColor = 'initial';
+        }
       }
-    }
 
-    for (const setPlayer of setPlayers) {
-      const spectrumId = setPlayer.getAttribute('data-player-id');
+      for (const setPlayer of setPlayers) {
+        const spectrumId = setPlayer.getAttribute('data-player-id');
 
-      if (spectrumId === newSpectrum) {
-        setPlayer.style.display = 'initial';
-      } else {
-        setPlayer.style.display = 'none';
-      }
-    }
-  };
-
-  // set up onclick handlers
-  for (const spectrumButton of spectrumButtons) {
-    spectrumButton.onclick = () => {
-      const spectrumId = spectrumButton.getAttribute('data-spectrum-button-id');
-
-      if (spectrumId) {
-        updateSpectrum(spectrumId);
+        if (spectrumId === newSpectrum) {
+          setPlayer.style.display = 'initial';
+        } else {
+          setPlayer.style.display = 'none';
+        }
       }
     };
-  }
-</script>
+
+    // set up onclick handlers
+    for (const spectrumButton of spectrumButtons) {
+      spectrumButton.onclick = () => {
+        const spectrumId = spectrumButton.getAttribute(
+          'data-spectrum-button-id'
+        );
+
+        if (spectrumId) {
+          updateSpectrum(spectrumId);
+        }
+      };
+    }
+  </script>
+</Layout>
