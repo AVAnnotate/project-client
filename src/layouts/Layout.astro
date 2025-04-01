@@ -59,7 +59,9 @@ const manifests = eventData.map((e) => {
     transition:animate='initial'
   >
     <Header />
-    <main class=`min-h-[calc(100dvh_-160px)] text-black bg-${background}`>
+    <main
+      class=`min-h-[calc(100dvh_-160px)] text-black bg-${background} pb-[80px]`
+    >
       <slot />
     </main>
     <Footer projectBy={projectBy} manifests={manifests} />
