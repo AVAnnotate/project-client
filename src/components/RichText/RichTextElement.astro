@@ -33,6 +33,12 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
     };
 
     switch (element.type) {
+      case 'link':
+        return (
+          <a style={style} href={element.url}>
+            <slot />
+          </a>
+        );
       case 'line-break':
         return <br />;
       case 'block-quote':
