@@ -31,11 +31,14 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
             ? '0 0 0 auto'
             : '0',
     };
+    const linkStyle = {
+      color: '#0969c3',
+    };
 
     switch (element.type) {
       case 'link':
         return (
-          <a href={element.url}>
+          <a style={linkStyle} href={element.url}>
             <slot />
           </a>
         );
