@@ -94,24 +94,32 @@ const {
           )
         }
       </div>
-      <ConditionalContainer condition={!isEmbed}>
-        <AnnotationHeader
-          playerId={playerId}
-          annotationSets={annotationSets}
-          isComparison={isComparison}
-          type={event.data.item_type}
-        />
-      </ConditionalContainer>
+      {
+        includes.includes('annotations') && (
+          <ConditionalContainer condition={!isEmbed}>
+            <AnnotationHeader
+              playerId={playerId}
+              annotationSets={annotationSets}
+              isComparison={isComparison}
+              type={event.data.item_type}
+            />
+          </ConditionalContainer>
+        )
+      }
     </div>
   </div>
-  <ConditionalContainer condition={!isEmbed}>
-    <Annotations
-      annotationSets={annotationSets}
-      playerId={playerId}
-      type={event.data.item_type}
-      initialFile={file}
-    />
-  </ConditionalContainer>
+  {
+    includes.includes('annotations') && (
+      <ConditionalContainer condition={!isEmbed}>
+        <Annotations
+          annotationSets={annotationSets}
+          playerId={playerId}
+          type={event.data.item_type}
+          initialFile={file}
+        />
+      </ConditionalContainer>
+    )
+  }
   <ConditionalContainer condition={!!event.data.citation}>
     <p class='py-3 mb-3'>{event.data.citation}</p>
   </ConditionalContainer>
