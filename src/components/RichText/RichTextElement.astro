@@ -3,7 +3,6 @@ import EventComparison from '@components/EventViewer/EventComparison.astro';
 import EventViewer from '@components/EventViewer/index.astro';
 import TableOfContents from '@components/TableOfContents.astro';
 import { randomUUID } from 'crypto';
-import { Children } from 'react';
 
 const { attributes, element } = Astro.props;
 
@@ -71,6 +70,7 @@ const getTextSize = (textSize: string) => {
     element.type;
     const style = {
       textAlign: element.align,
+
       ...textStyle,
     };
     const imgStyle = {
@@ -112,36 +112,6 @@ const getTextSize = (textSize: string) => {
             <slot />
           </ul>
         );
-      case 'small-text':
-        return (
-          <small style={style} {...attributes}>
-            <slot />
-          </small>
-        );
-      case 'heading-one':
-        return (
-          <h1 style={style} {...attributes}>
-            <slot />
-          </h1>
-        );
-      case 'heading-two':
-        return (
-          <h2 style={style} {...attributes}>
-            <slot />
-          </h2>
-        );
-      case 'heading-three':
-        return (
-          <h3 style={style} {...attributes}>
-            <slot />
-          </h3>
-        );
-      case 'heading-four':
-        return (
-          <h4 style={style} {...attributes}>
-            <slot />
-          </h4>
-        );
 
       case 'horizontal-separator':
         return <div class='w-full my-3 h-[1px] bg-black' />;
@@ -160,12 +130,17 @@ const getTextSize = (textSize: string) => {
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img
-              src={element.url}
-              class={getImageClass(element.size)}
-              style={imgStyle}
-              alt={element.altText}
-            />
+            <figure style={{ display: 'table' }}>
+              <img
+                src={element.url}
+                class={getImageClass(element.size)}
+                style={imgStyle}
+                alt={`Caption: ${element.caption}`}
+              />
+              <figcaption style={{ textAlign: 'center' }}>
+                {element.caption}
+              </figcaption>
+            </figure>
             <slot />
           </div>
         );
