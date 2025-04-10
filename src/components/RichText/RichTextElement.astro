@@ -18,11 +18,61 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
       return 'max-w-full';
   }
 };
+
+const getTextSize = (textSize: string) => {
+  switch (textSize) {
+    case 'small-text':
+      return {
+        fontSize: '14px',
+        fontWeight: 'normal',
+        lineHeight: '150%',
+      };
+    case 'heading-one':
+      return {
+        fontSize: '32px',
+        fontWeight: 'bold',
+        lineHeight: 'auto',
+      };
+    case 'heading-two':
+      return {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        lineHeight: 'auto',
+      };
+    case 'heading-three':
+      return {
+        fontSize: '18px',
+        fontWeight: 'bold',
+        lineHeight: 'auto',
+      };
+    case 'heading-four':
+      return {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        lineHeight: 'auto',
+      };
+    default:
+      return {
+        fontSize: '16px',
+        fontWeight: 'normal',
+        lineHeight: '150%',
+      };
+  }
+};
 ---
 
 {
   (async () => {
-    const style = { textAlign: element.align };
+    let textStyle = {};
+    if (element.type === 'paragraph' && element.children.length > 0) {
+      textStyle = getTextSize(element.children[0].textSize);
+    }
+    element.type;
+    const style = {
+      textAlign: element.align,
+
+      ...textStyle,
+    };
     const imgStyle = {
       margin:
         element.align == 'center'
@@ -33,6 +83,12 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
     };
     const linkStyle = {
       color: '#0969c3',
+    };
+    const columnStyle = {
+      paddingLeft: element.left ? `${element.left}%` : 0,
+      paddingRight: element.right ? `${element.right}%` : 0,
+      paddingTop: element.top ? `${element.top}%` : 0,
+      paddingBottom: element.bottom ? `${element.bottom}%` : 0,
     };
 
     switch (element.type) {
@@ -56,18 +112,7 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
             <slot />
           </ul>
         );
-      case 'heading-one':
-        return (
-          <h1 style={style} {...attributes}>
-            <slot />
-          </h1>
-        );
-      case 'heading-two':
-        return (
-          <h2 style={style} {...attributes}>
-            <slot />
-          </h2>
-        );
+
       case 'horizontal-separator':
         return <div class='w-full my-3 h-[1px] bg-black' />;
       case 'list-item':
@@ -85,11 +130,17 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
       case 'image':
         return (
           <div {...attributes} style={style}>
-            <img
-              src={element.url}
-              class={getImageClass(element.size)}
-              style={imgStyle}
-            />
+            <figure style={{ display: 'table' }}>
+              <img
+                src={element.url}
+                class={getImageClass(element.size)}
+                style={imgStyle}
+                alt={`Caption: ${element.caption}`}
+              />
+              <figcaption style={{ textAlign: 'center' }}>
+                {element.caption}
+              </figcaption>
+            </figure>
             <slot />
           </div>
         );
@@ -115,7 +166,7 @@ const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
         );
       case 'column':
         return (
-          <div className='slate-column' {...attributes}>
+          <div className='slate-column' {...attributes} style={columnStyle}>
             <slot />
           </div>
         );

@@ -3,19 +3,24 @@
 @tailwind utilities;
 
 @layer base {
-    h1 {
-        @apply text-secondary;
-        @apply font-bold;
-        @apply text-[32px];
-    }
-    h3 {
-        @apply font-semibold;
-    }
+  h1 {
+    @apply text-secondary;
+    @apply font-bold;
+    @apply text-[32px];
+  }
+  h3 {
+    @apply font-semibold;
+  }
 }
 
 @layer components {
-    .textContent p {
-        @apply min-h-0;
-        @apply py-3;
-    }
+  .textContent p {
+    @apply min-h-0;
+    @apply py-3;
+  }
+}
+
+figcaption {
+  text-align: center;
+  font-style: italic;
 }
