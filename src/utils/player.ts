@@ -18,7 +18,7 @@ export const formatTimestamp = (seconds: number, includeMs = false) => {
 export const defaultState = {
   annotations: [],
   annotationStarts: [],
-  autoScroll: true,
+  autoScroll: false,
   avFileUuid: '',
   currentAnnotation: 0,
   id: '',
