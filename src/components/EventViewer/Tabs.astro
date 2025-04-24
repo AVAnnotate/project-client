@@ -1,0 +1,65 @@
+---
+import './Tabs.css';
+
+interface Tab {
+  title: string;
+  uuid: string;
+}
+
+interface Props {
+  playerId: string;
+  renderIcon?: (tab: Tab) => any;
+  tabs: Tab[];
+}
+
+const props = Astro.props;
+---
+
+<div class='event-detail-tabs-container'>
+  {
+    props.tabs.map((tab: Tab) => (
+      <Fragment key={tab.uuid}>
+        <button
+          class='event-detail-tab-button'
+          data-player-id={props.playerId}
+          id={`av-tab-${tab.uuid}`}
+          type='button'
+        >
+          {props.renderIcon && props.renderIcon(tab)}
+          {tab.title}
+        </button>
+      </Fragment>
+    ))
+  }
+</div>
+
+<script>
+  import { $pagePlayersState } from 'src/store.ts';
+  const tabButtons = document.querySelectorAll('.event-detail-tab-button');
+
+  tabButtons.forEach((button) => {
+    const uuid = button.id.replace('av-tab-', '');
+    const playerId = button.getAttribute('data-player-id') as string;
+
+    button.addEventListener('click', () =>
+      $pagePlayersState.setKey(`${playerId}.avFileUuid`, uuid)
+    );
+  });
+
+  $pagePlayersState.listen((changed) => {
+    if (!changed) {
+      return null;
+    }
+
+    tabButtons.forEach((button) => {
+      const uuid = button.id.replace('av-tab-', '');
+      const playerId = button.getAttribute('data-player-id') as string;
+
+      if ($pagePlayersState.get()[playerId].avFileUuid === uuid) {
+        button.classList.add('event-detail-selected-tab');
+      } else {
+        button.classList.remove('event-detail-selected-tab');
+      }
+    });
+  });
+</script>

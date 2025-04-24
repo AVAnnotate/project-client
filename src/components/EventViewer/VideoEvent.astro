@@ -6,8 +6,8 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
-import VideoFilePicker from './VideoFilePicker';
-import { getCaptionSets } from 'src/utils/events';
+import { getCaptionSets, getTabEntries } from 'src/utils/events';
+import Tabs from './Tabs.astro';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -65,12 +65,7 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
               {!start &&
               !end &&
               Object.keys(event.data.audiovisual_files).length > 1 ? (
-                <VideoFilePicker event={event} playerId={playerId} client:load>
-                  {includes.includes('description') &&
-                    event.data.description && (
-                      <RichText nodes={event.data.description} />
-                    )}
-                </VideoFilePicker>
+                <Tabs playerId={playerId} tabs={getTabEntries(event)} />
               ) : (
                 <>
                   {includes.includes('description') &&
