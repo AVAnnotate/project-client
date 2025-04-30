@@ -49,22 +49,14 @@ const Player: React.FC<Props> = (props) => {
   const playerState = pagePlayers[props.id] || { ...defaultState };
 
   const fileUrl = useMemo(() => {
-    // initial value for SSR
-    if (!playerState.avFileUuid) {
-      return (
-        props.event.data.audiovisual_files[props.initialFile].file_url ||
-        undefined
-      );
-    }
-
-    const avFile = props.event.data.audiovisual_files[playerState.avFileUuid];
+    const avFile = props.event.data.audiovisual_files[props.initialFile];
 
     if (avFile) {
       return avFile.file_url || undefined;
     }
 
     return undefined;
-  }, [props.event, playerState]);
+  }, [props.event]);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
