@@ -35,67 +35,71 @@ const {
 } = Astro.props;
 
 const captionSets = await getCaptionSets(event, file, annotationSets);
+
+console.log(file);
 ---
 
-<ConditionalContainer
-  condition={!isEmbed}
-  className='flex flex-col gap-6 bg-gray-100 py-6'
->
-  {
-    (includes.includes('annotations') || includes.includes('media')) && (
-      <div
-        class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
-        data-player-id={playerId}
-      >
-        {includes.includes('media') && (
-          <div>
-            {includes.includes('label') && (
-              <h1 class='py-4'>{event.data.label}</h1>
-            )}
-            <Player
-              id={playerId}
-              client:load
-              event={event}
-              start={start}
-              end={end}
-              vttURLs={captionSets}
-              initialFile={file}
-            />
-            <div class='textContent'>
-              {!start &&
-              !end &&
-              Object.keys(event.data.audiovisual_files).length > 1 ? (
-                <Tabs playerId={playerId} tabs={getTabEntries(event)} />
-              ) : (
-                <>
-                  {includes.includes('description') &&
-                    event.data.description && (
-                      <RichText nodes={event.data.description} />
-                    )}
-                </>
+<div class='av-file' data-file-id={file}>
+  <ConditionalContainer
+    condition={!isEmbed}
+    className='flex flex-col gap-6 bg-gray-100 py-6'
+  >
+    {
+      (includes.includes('annotations') || includes.includes('media')) && (
+        <div
+          class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
+          data-player-id={playerId}
+        >
+          {includes.includes('media') && (
+            <div>
+              {includes.includes('label') && (
+                <h1 class='py-4'>{event.data.label}</h1>
               )}
+              <Player
+                id={playerId}
+                client:load
+                event={event}
+                start={start}
+                end={end}
+                vttURLs={captionSets}
+                initialFile={file}
+              />
+              <div class='textContent'>
+                {!start &&
+                !end &&
+                Object.keys(event.data.audiovisual_files).length > 1 ? (
+                  <Tabs playerId={playerId} tabs={getTabEntries(event)} />
+                ) : (
+                  <>
+                    {includes.includes('description') &&
+                      event.data.description && (
+                        <RichText nodes={event.data.description} />
+                      )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        {includes.includes('annotations') && (
-          <div class='py-4'>
-            <AnnotationHeader
-              playerId={playerId}
-              annotationSets={annotationSets}
-              type={event.data.item_type}
-            />
-            <Annotations
-              playerId={playerId}
-              annotationSets={annotationSets}
-              initialFile={file}
-              type={event.data.item_type}
-            />
-          </div>
-        )}
-      </div>
-    )
-  }
-</ConditionalContainer>
-<ConditionalContainer condition={!!event.data.citation}>
-  <p class='py-3 mb-3'>{event.data.citation}</p>
-</ConditionalContainer>
+          )}
+          {includes.includes('annotations') && (
+            <div class='py-4'>
+              <AnnotationHeader
+                playerId={playerId}
+                annotationSets={annotationSets}
+                type={event.data.item_type}
+              />
+              <Annotations
+                playerId={playerId}
+                annotationSets={annotationSets}
+                initialFile={file}
+                type={event.data.item_type}
+              />
+            </div>
+          )}
+        </div>
+      )
+    }
+  </ConditionalContainer>
+  <ConditionalContainer condition={!!event.data.citation}>
+    <p class='py-3 mb-3'>{event.data.citation}</p>
+  </ConditionalContainer>
+</div>

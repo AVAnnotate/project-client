@@ -33,7 +33,7 @@ const {
 } = Astro.props;
 ---
 
-<div>
+<div class='av-file' data-file-id={file}>
   <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
     <div class='flex flex-col gap-6 bg-gray-100 py-6 [&_p]:mb-0!'>
       <ConditionalContainer condition={!isEmbed} className='textContent'>

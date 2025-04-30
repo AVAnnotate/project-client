@@ -5,7 +5,6 @@ import AudioEvent from './AudioEvent.astro';
 import VideoEvent from './VideoEvent.astro';
 import { getEntry } from 'astro:content';
 import PlayerStateNanostorePopulator from './PlayerStateNanostorePopulator';
-import AvFile from './AvFile';
 
 export interface Props extends Omit<SlateEventNodeProps, 'uuid' | 'includes'> {
   end?: number;
@@ -58,14 +57,37 @@ const childProps = {
     initialFile={defaultFile}
     client:only='react'
   />
-  <AvFile
-    audioComponent={AudioEvent}
-    playerId={playerId}
-    event={event}
-    componentProps={childProps}
-    videoComponent={VideoEvent}
-  >
-    <AudioEvent {...childProps} />
-    <VideoEvent {...childProps} />
-  </AvFile>
+  {
+    Object.keys(event.data.audiovisual_files).map((uuid) => {
+      const avFile = event.data.audiovisual_files[uuid];
+
+      const type = avFile.file_type || event.data.item_type;
+
+      const Component = type === 'Audio' ? AudioEvent : VideoEvent;
+
+      return <Component {...childProps} file={uuid} />;
+    })
+  }
 </div>
+
+<script>
+  import { $pagePlayersState } from 'src/store.ts';
+
+  const avFileDivs = document.querySelectorAll('.av-file');
+
+  $pagePlayersState.listen((state, oldState, changed) => {
+    if (!changed || !state[changed]) {
+      return null;
+    }
+
+    avFileDivs.forEach((div) => {
+      const fileUuid = div.getAttribute('data-file-id');
+
+      if (state[changed].avFileUuid === fileUuid) {
+        div.classList.remove('hidden');
+      } else {
+        div.classList.add('hidden');
+      }
+    });
+  });
+</script>
