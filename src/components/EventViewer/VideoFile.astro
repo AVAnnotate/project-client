@@ -35,6 +35,8 @@ const {
 } = Astro.props;
 
 const captionSets = await getCaptionSets(event, file, annotationSets);
+
+const fileUrl = event.data.audiovisual_files[file].file_url;
 ---
 
 <div class='av-file' data-file-id={file}>
@@ -43,9 +45,14 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
     className='flex flex-col gap-6 bg-gray-100 py-6'
   >
     {
+      Object.keys(event.data.audiovisual_files).length > 1 && (
+        <Tabs playerId={playerId} tabs={getTabEntries(event)} />
+      )
+    }
+    {
       (includes.includes('annotations') || includes.includes('media')) && (
         <div
-          class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} ${event.data.item_type === 'Audio' ? 'flex flex-col' : 'grid grid-cols-[2fr,1fr] lg:gap-x-4'}`}
+          class={`mediaContainer gap-4 ${sticky ? 'sticky top-0' : ''} grid grid-cols-[2fr,1fr] lg:gap-x-4`}
           data-player-id={playerId}
         >
           {includes.includes('media') && (
@@ -56,18 +63,14 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
               <Player
                 id={playerId}
                 client:load
-                event={event}
                 start={start}
                 end={end}
                 vttURLs={captionSets}
-                initialFile={file}
+                url={fileUrl}
+                type='Video'
               />
               <div class='textContent'>
-                {!start &&
-                !end &&
-                Object.keys(event.data.audiovisual_files).length > 1 ? (
-                  <Tabs playerId={playerId} tabs={getTabEntries(event)} />
-                ) : (
+                {!start && !end && (
                   <>
                     {includes.includes('description') &&
                       event.data.description && (
@@ -88,7 +91,7 @@ const captionSets = await getCaptionSets(event, file, annotationSets);
               <Annotations
                 playerId={playerId}
                 annotationSets={annotationSets}
-                initialFile={file}
+                file={file}
                 type={event.data.item_type}
               />
             </div>

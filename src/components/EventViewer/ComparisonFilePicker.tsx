@@ -8,7 +8,7 @@ import { defaultState } from '@utils/player.ts';
 interface Props {
   event: CollectionEntry<'events'>;
   playerId: string;
-  initialFile: string;
+  file: string;
 }
 
 const ComparisonFilePicker: React.FC<Props> = (props) => {
@@ -16,7 +16,7 @@ const ComparisonFilePicker: React.FC<Props> = (props) => {
 
   const playerState = store[props.playerId] || { ...defaultState };
 
-  const avFileUuid = playerState.avFileUuid || props.initialFile;
+  const avFileUuid = playerState.avFileUuid || props.file;
 
   return (
     <Select.Root

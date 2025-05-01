@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import type { Includes, SlateEventNodeProps } from '@ty/slate';
-import AudioEvent from './AudioEvent.astro';
-import VideoEvent from './VideoEvent.astro';
+import AudioFile from './AudioFile.astro';
+import VideoFile from './VideoFile.astro';
 import { getEntry } from 'astro:content';
 import PlayerStateNanostorePopulator from './PlayerStateNanostorePopulator';
 
@@ -63,7 +63,7 @@ const childProps = {
 
       const type = avFile.file_type || event.data.item_type;
 
-      const Component = type === 'Audio' ? AudioEvent : VideoEvent;
+      const Component = type === 'Audio' ? AudioFile : VideoFile;
 
       return <Component {...childProps} file={uuid} />;
     })
@@ -75,7 +75,7 @@ const childProps = {
 
   const avFileDivs = document.querySelectorAll('.av-file');
 
-  $pagePlayersState.listen((state, oldState, changed) => {
+  $pagePlayersState.listen((state, _oldState, changed) => {
     if (!changed || !state[changed]) {
       return null;
     }

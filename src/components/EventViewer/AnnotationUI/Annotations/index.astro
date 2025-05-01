@@ -8,11 +8,11 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  initialFile: string;
+  file: string;
   initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, initialTag, playerId, type } = Astro.props;
+const { annotationSets, file, initialTag, playerId, type } = Astro.props;
 
 let sortedAnnotations = annotationSets
   .map((set) =>
@@ -24,6 +24,7 @@ let sortedAnnotations = annotationSets
     }))
   )
   .flat()
+  .filter((ann) => ann.file === file)
   .sort(
     (a: any, b: any) => a.start_time - b.start_time
   ) as DisplayedAnnotation[];
@@ -46,7 +47,7 @@ if (initialTag) {
   <AnnotationNanostorePopulator
     annotations={sortedAnnotations}
     playerId={playerId}
-    initialFile={initialFile}
+    file={file}
     client:load
   />
   <div
@@ -59,7 +60,7 @@ if (initialTag) {
         return (
           <Annotation
             ann={ann}
-            initialFile={initialFile}
+            file={file}
             playerId={playerId}
             setName={annotationSets.length > 1 ? ann.setName : undefined}
           />
@@ -141,12 +142,14 @@ if (initialTag) {
 
     const annotationNodes =
       eventContainerEl.querySelectorAll(`.annotationNode`);
+
     const annotationTagNodes =
       eventContainerEl.querySelectorAll(`.annotationTags`);
 
     const startTimes = playerState.annotationStarts?.filter(
       (s) => s.playerId === changed
     );
+
     const current = startTimes?.findIndex((time, idx) => {
       if (typeof time.end === 'number') {
         return (

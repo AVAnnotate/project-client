@@ -45,7 +45,7 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
         <ComparisonFilePicker
           event={event}
           playerId={playerId}
-          initialFile={defaultFile}
+          file={defaultFile}
           client:load
         />
       )
@@ -62,11 +62,11 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
         <Player
           id={playerId}
           client:load
-          event={event}
           start={start}
           end={end}
-          initialFile={defaultFile}
           vttURLs={captionSets}
+          type='Video'
+          url={event.data.audiovisual_files[defaultFile].file_url}
         />
       </>
     )
@@ -78,13 +78,13 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
           playerId={playerId}
           annotationSets={annotationSets}
           isComparison
-          type={event.data.item_type}
+          type='Video'
         />
         <Annotations
           playerId={playerId}
           annotationSets={annotationSets}
-          initialFile={defaultFile}
-          type={event.data.item_type}
+          file={defaultFile}
+          type='Video'
         />
       </div>
     )

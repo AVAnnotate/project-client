@@ -18,15 +18,14 @@ import {
 import { useStore } from '@nanostores/react';
 import { defaultState, formatTimestamp } from '../../utils/player.ts';
 import type { OnProgressProps } from 'react-player/base';
-import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   end?: number;
   id: string;
   start?: number;
   vttURLs?: { url: string; label: string }[];
-  initialFile: string;
-  event: CollectionEntry<'events'>;
+  url?: string | null;
+  type: 'Audio' | 'Video';
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -47,16 +46,6 @@ const Player: React.FC<Props> = (props) => {
 
   const pagePlayers = useStore($pagePlayersState);
   const playerState = pagePlayers[props.id] || { ...defaultState };
-
-  const fileUrl = useMemo(() => {
-    const avFile = props.event.data.audiovisual_files[props.initialFile];
-
-    if (avFile) {
-      return avFile.file_url || undefined;
-    }
-
-    return undefined;
-  }, [props.event]);
 
   const segments = useMemo(() => {
     if (playerState.snapToAnnotations) {
@@ -221,7 +210,7 @@ const Player: React.FC<Props> = (props) => {
   return (
     <div className='player'>
       <ReactPlayer
-        controls={props.event.data.item_type === 'Video'}
+        controls={props.type === 'Video'}
         playing={playerState.isPlaying}
         muted={muted}
         config={tracksConfig}
@@ -249,12 +238,12 @@ const Player: React.FC<Props> = (props) => {
         }}
         progressInterval={250}
         ref={player}
-        url={fileUrl}
-        height={props.event.data.item_type === 'Video' ? '100%' : 0}
-        width={props.event.data.item_type === 'Video' ? '100%' : 0}
+        url={props.url}
+        height={props.type === 'Video' ? '100%' : 0}
+        width={props.type === 'Video' ? '100%' : 0}
       />
-      {props.event.data.item_type === 'Audio' ? (
-        fileUrl ? (
+      {props.type === 'Audio' ? (
+        props.url ? (
           <div className='player-control-panel !bg-gray-200'>
             <div className='content'>
               <Button

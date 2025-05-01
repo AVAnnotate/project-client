@@ -41,9 +41,9 @@ const props = Astro.props;
     const uuid = button.id.replace('av-tab-', '');
     const playerId = button.getAttribute('data-player-id') as string;
 
-    button.addEventListener('click', () =>
-      $pagePlayersState.setKey(`${playerId}.avFileUuid`, uuid)
-    );
+    button.addEventListener('click', () => {
+      $pagePlayersState.setKey(`${playerId}.avFileUuid`, uuid);
+    });
   });
 
   $pagePlayersState.listen((changed) => {

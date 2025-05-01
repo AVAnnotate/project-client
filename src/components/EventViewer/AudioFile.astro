@@ -31,6 +31,8 @@ const {
   isComparison,
   playerId,
 } = Astro.props;
+
+const fileUrl = event.data.audiovisual_files[file].file_url;
 ---
 
 <div class='av-file' data-file-id={file}>
@@ -53,7 +55,7 @@ const {
                 <ComparisonFilePicker
                   event={event}
                   playerId={playerId}
-                  initialFile={file}
+                  file={file}
                   client:load
                 />
               )
@@ -82,10 +84,10 @@ const {
               <Player
                 id={playerId}
                 client:load
-                event={event}
                 start={start}
-                initialFile={file}
                 end={end}
+                url={fileUrl}
+                type='Audio'
               />
             </ConditionalContainer>
           )
@@ -112,7 +114,7 @@ const {
           annotationSets={annotationSets}
           playerId={playerId}
           type={event.data.item_type}
-          initialFile={file}
+          file={file}
         />
       </ConditionalContainer>
     )
