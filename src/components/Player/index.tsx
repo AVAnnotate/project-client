@@ -25,7 +25,7 @@ interface Props {
   start?: number;
   vttURLs?: { url: string; label: string }[];
   url?: string | null;
-  type: 'Audio' | 'Video';
+  type: string;
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
