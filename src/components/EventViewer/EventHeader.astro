@@ -1,0 +1,53 @@
+---
+import ComparisonFilePicker from './ComparisonFilePicker';
+import ConditionalContainer from './ConditionalContainer.astro';
+import RichText from '@components/RichText/index.astro';
+import Tabs from './Tabs.astro';
+import { getTabEntries } from '@utilsevents';
+
+const props = Astro.props;
+---
+
+<ConditionalContainer condition={!props.isEmbed} className='textContent'>
+  <div class='flex justify-between'>
+    {
+      props.includes.includes('label') && (
+        <h1
+          class={`font-bold ${props.isComparison ? 'text-2xl' : 'text-[32px]'}`}
+        >
+          {props.event.data.label}
+        </h1>
+      )
+    }
+    {
+      props.isComparison &&
+        Object.keys(props.event.data.audiovisual_files).length > 1 && (
+          <ComparisonFilePicker
+            event={props.event}
+            playerId={props.playerId}
+            file={props.file}
+            client:load
+          />
+        )
+    }
+  </div>
+  {
+    props.includes.includes('description') && props.event.data.description && (
+      <RichText nodes={props.event.data.description} />
+    )
+  }
+  {
+    /* only show the tabs if
+                  1. there's more than AV file
+                  2. this is not an embed of a single AV file
+                  3. this is not a comparison (we use a separate picker for that :/) */
+  }
+  {
+    !props.start &&
+      !props.end &&
+      Object.keys(props.event.data.audiovisual_files).length > 1 &&
+      !props.isComparison && (
+        <Tabs playerId={props.playerId} tabs={getTabEntries(props.event)} />
+      )
+  }
+</ConditionalContainer>

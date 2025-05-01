@@ -1,14 +1,11 @@
 ---
 import type { SlateEventNodeProps } from '@ty/slate';
 import type { CollectionEntry } from 'astro:content';
-import RichText from '@components/RichText/index.astro';
 import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
-import ComparisonFilePicker from './ComparisonFilePicker';
-import Tabs from './Tabs.astro';
-import { getTabEntries } from '@utilsevents';
+import EventHeader from './EventHeader.astro';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -37,50 +34,15 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
 
 <div class='av-file' data-file-id={file}>
   <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
-    <div class='flex flex-col gap-6 bg-gray-100 py-6 [&_p]:mb-0!'>
-      <ConditionalContainer condition={!isEmbed} className='textContent'>
-        <div class='flex justify-between'>
-          {
-            includes.includes('label') && (
-              <h1
-                class={`font-bold ${isComparison ? 'text-2xl' : 'text-[32px]'}`}
-              >
-                {event.data.label}
-              </h1>
-            )
-          }
-          {
-            isComparison &&
-              Object.keys(event.data.audiovisual_files).length > 1 && (
-                <ComparisonFilePicker
-                  event={event}
-                  playerId={playerId}
-                  file={file}
-                  client:load
-                />
-              )
-          }
-        </div>
-        {
-          includes.includes('description') && event.data.description && (
-            <RichText nodes={event.data.description} />
-          )
-        }
-      </ConditionalContainer>
-      <div class='mediaContainer gap-4 flex flex-col' data-player-id={playerId}>
+    <div class='flex flex-col gap-6 bg-white py-6 [&_p]:mb-0!'>
+      <EventHeader {...Astro.props} />
+      <div
+        class='mediaContainer bg-gray-100 gap-4 flex flex-col'
+        data-player-id={playerId}
+      >
         {
           includes.includes('media') && (
             <ConditionalContainer condition={!isEmbed}>
-              {/* only show the tabs if
-                  1. there's more than AV file
-                  2. this is not an embed of a single AV file
-                  3. this is not a comparison (we use a separate picker for that :/) */}
-              {!start &&
-                !end &&
-                Object.keys(event.data.audiovisual_files).length > 1 &&
-                !isComparison && (
-                  <Tabs playerId={playerId} tabs={getTabEntries(event)} />
-                )}
               <Player
                 id={playerId}
                 client:load
@@ -95,12 +57,12 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
       </div>
       {
         includes.includes('annotations') && (
-          <ConditionalContainer condition={!isEmbed}>
+          <ConditionalContainer condition={!isEmbed} className='bg-gray-100'>
             <AnnotationHeader
               playerId={playerId}
               annotationSets={annotationSets}
               isComparison={isComparison}
-              type={event.data.item_type}
+              type='Audio'
             />
           </ConditionalContainer>
         )
@@ -109,17 +71,20 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
   </div>
   {
     includes.includes('annotations') && (
-      <ConditionalContainer condition={!isEmbed}>
+      <ConditionalContainer condition={!isEmbed} className='bg-gray-100'>
         <Annotations
           annotationSets={annotationSets}
           playerId={playerId}
-          type={event.data.item_type}
+          type='Audio'
           file={file}
         />
       </ConditionalContainer>
     )
   }
-  <ConditionalContainer condition={!!event.data.citation}>
+  <ConditionalContainer
+    condition={!!event.data.citation}
+    className='bg-gray-100'
+  >
     <p class='py-3 mb-3'>{event.data.citation}</p>
   </ConditionalContainer>
 </div>

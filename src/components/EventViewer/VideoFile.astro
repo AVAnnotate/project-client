@@ -6,8 +6,8 @@ import Player from '@components/Player';
 import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
-import { getCaptionSets, getTabEntries } from 'src/utils/events';
-import Tabs from './Tabs.astro';
+import { getCaptionSets } from 'src/utils/events';
+import EventHeader from './EventHeader.astro';
 
 export interface Props {
   event: CollectionEntry<'events'>;
@@ -42,13 +42,9 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
 <div class='av-file' data-file-id={file}>
   <ConditionalContainer
     condition={!isEmbed}
-    className='flex flex-col gap-6 bg-gray-100 py-6'
+    className='flex flex-col gap-6 bg-white py-6'
   >
-    {
-      Object.keys(event.data.audiovisual_files).length > 1 && (
-        <Tabs playerId={playerId} tabs={getTabEntries(event)} />
-      )
-    }
+    <EventHeader {...Astro.props} />
     {
       (includes.includes('annotations') || includes.includes('media')) && (
         <div
@@ -57,9 +53,6 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
         >
           {includes.includes('media') && (
             <div>
-              {includes.includes('label') && (
-                <h1 class='py-4'>{event.data.label}</h1>
-              )}
               <Player
                 id={playerId}
                 client:load
@@ -86,13 +79,13 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
               <AnnotationHeader
                 playerId={playerId}
                 annotationSets={annotationSets}
-                type={event.data.item_type}
+                type='Video'
               />
               <Annotations
                 playerId={playerId}
                 annotationSets={annotationSets}
                 file={file}
-                type={event.data.item_type}
+                type='Video'
               />
             </div>
           )}
