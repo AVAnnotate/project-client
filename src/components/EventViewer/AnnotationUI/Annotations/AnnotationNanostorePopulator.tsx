@@ -1,7 +1,6 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
-import { defaultState } from '@utils/player.ts';
 import { useStore } from '@nanostores/react';
 
 // This component's only purpose is to populate the
@@ -18,7 +17,7 @@ const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
   const playerState = store[props.playerId];
 
   useEffect(() => {
-    if (playerState.avFileUuid === props.file) {
+    if (playerState?.avFileUuid === props.file) {
       $pagePlayersState.setKey(props.playerId, {
         ...playerState,
         annotations: [...props.annotations],
@@ -30,7 +29,7 @@ const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
         avFileUuid: props.file,
       });
     }
-  }, [props.annotations, props.playerId, props.file, playerState.avFileUuid]);
+  }, [props.annotations, props.playerId, props.file, playerState?.avFileUuid]);
 
   return <></>;
 };
