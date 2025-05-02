@@ -42,7 +42,7 @@ if (initialTag) {
 ---
 
 <div
-  class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+  class=`overflow-y-visible w-full ${type === 'Audio' ? 'sticky top-[300px] py-2' : ''}`
 >
   <AnnotationNanostorePopulator
     annotations={sortedAnnotations}
@@ -51,7 +51,7 @@ if (initialTag) {
     client:load
   />
   <div
-    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
+    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[400px] video videoAnnotationContainer' : ''}`}
     id={playerId}
     data-player-id={playerId}
   >

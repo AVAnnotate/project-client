@@ -6,6 +6,7 @@ import Annotations from './AnnotationUI/Annotations/index.astro';
 import AnnotationHeader from './AnnotationUI/AnnotationHeader.astro';
 import ConditionalContainer from './ConditionalContainer.astro';
 import EventHeader from './EventHeader.astro';
+import { discriminatedUnion } from 'astro:schema';
 
 interface Props extends SlateEventNodeProps {
   annotationSets: CollectionEntry<'annotations'>[];
@@ -29,17 +30,25 @@ const {
   playerId,
 } = Astro.props;
 
-const fileUrl = event.data.audiovisual_files[file].file_url;
+const fileObj = event.data.audiovisual_files[file];
+const fileIndex = Object.keys(event.data.audiovisual_files).indexOf(file);
+const title =
+  Object.keys(event.data.audiovisual_files).length === 1
+    ? fileObj.label
+    : `${fileIndex + 1}. ${fileObj.label}`;
 ---
 
 <div class='av-file' data-file-id={file}>
   <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
-    <div class='flex flex-col gap-6 bg-white py-6 [&_p]:mb-0!'>
+    <div class='flex flex-col [&_p]:mb-0! z-20 bg-white'>
       <EventHeader {...Astro.props} />
       <div
-        class='mediaContainer bg-gray-100 gap-4 flex flex-col'
+        class='mediaContainer bg-gray-100 gap-4 flex flex-col pt-[24px]'
         data-player-id={playerId}
       >
+        <ConditionalContainer condition={!isEmbed}>
+          <h2 class='text-secondary text-[18px] font-semibold'>{title}</h2>
+        </ConditionalContainer>
         {
           includes.includes('media') && (
             <ConditionalContainer condition={!isEmbed}>
@@ -48,7 +57,7 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
                 client:load
                 start={start}
                 end={end}
-                url={fileUrl}
+                url={fileObj.file_url}
                 type='Audio'
               />
             </ConditionalContainer>
@@ -57,34 +66,35 @@ const fileUrl = event.data.audiovisual_files[file].file_url;
       </div>
       {
         includes.includes('annotations') && (
-          <ConditionalContainer condition={!isEmbed} className='bg-gray-100'>
-            <AnnotationHeader
-              playerId={playerId}
-              annotationSets={annotationSets}
-              isComparison={isComparison}
-              type='Audio'
-            />
-          </ConditionalContainer>
+          <div class='bg-gray-100'>
+            <ConditionalContainer condition={!isEmbed}>
+              <AnnotationHeader
+                playerId={playerId}
+                annotationSets={annotationSets}
+                isComparison={isComparison}
+                type='Audio'
+              />
+            </ConditionalContainer>
+          </div>
         )
       }
     </div>
   </div>
   {
     includes.includes('annotations') && (
-      <ConditionalContainer condition={!isEmbed} className='bg-gray-100'>
-        <Annotations
-          annotationSets={annotationSets}
-          playerId={playerId}
-          type='Audio'
-          file={file}
-        />
-      </ConditionalContainer>
+      <div class='bg-gray-100'>
+        <ConditionalContainer condition={!isEmbed}>
+          <Annotations
+            annotationSets={annotationSets}
+            playerId={playerId}
+            type='Audio'
+            file={file}
+          />
+        </ConditionalContainer>
+      </div>
     )
   }
-  <ConditionalContainer
-    condition={!!event.data.citation}
-    className='bg-gray-100'
-  >
+  <ConditionalContainer condition={!!event.data.citation}>
     <p class='py-3 mb-3'>{event.data.citation}</p>
   </ConditionalContainer>
 </div>
