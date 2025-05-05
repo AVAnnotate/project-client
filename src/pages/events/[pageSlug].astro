@@ -42,7 +42,7 @@ const eventUuids = Array.isArray(page.data.autogenerate.type_id)
   : [page.data.autogenerate.type_id];
 ---
 
-<Layout title={page.data.title} background='gray-100'>
+<Layout title={page.data.title} background='white'>
   <div class='eventContainer' data-player-id={playerId}>
     {eventUuids.map((uuid) => <EventViewer playerId={playerId} uuid={uuid} />)}
   </div>

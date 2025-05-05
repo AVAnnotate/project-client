@@ -30,3 +30,10 @@ export const getCaptionSets = async (
 
   return captionSets;
 };
+
+export const getTabEntries = (event: CollectionEntry<'events'>) => {
+  return Object.keys(event.data.audiovisual_files).map((uuid) => ({
+    title: event.data.audiovisual_files[uuid].label,
+    uuid,
+  }));
+};

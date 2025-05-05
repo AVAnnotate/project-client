@@ -34,6 +34,7 @@ const eventCollection = defineCollection({
         label: z.string(),
         is_offline: z.boolean().nullish(),
         file_url: z.string().nullish(),
+        file_type: z.string().nullish(),
         duration: z.number(),
         caption_set: z
           .array(
