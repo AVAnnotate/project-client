@@ -25,6 +25,7 @@ const baseUrl = import.meta.env.PROD
       pages={pages}
       slug={pageSlug}
       url={Astro.url}
+      project={projectData}
     />
     <a href={`${baseUrl ? `/${baseUrl}` : '/'}`} class='text-lg'
       >{projectData.data.project.title}</a

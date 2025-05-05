@@ -1,11 +1,15 @@
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useMemo, useState } from 'react';
 import { Transition } from '@headlessui/react';
-import type { PageCollectionEntry } from 'src/utils/pages.ts';
+import type {
+  PageCollectionEntry,
+  ProjectCollectionEntry,
+} from 'src/utils/pages.ts';
 
 interface SidebarProps {
   baseUrl: string | undefined;
   pages: PageCollectionEntry[];
+  project: ProjectCollectionEntry;
   slug?: string;
   url: URL;
 }
@@ -89,11 +93,14 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </div>
             </a>
           ))}
-          <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
-            <div className='p-4 hover:bg-blue-hover'>
-              <p className={isIndex ? 'font-bold' : ''}>Index</p>
-            </div>
-          </a>
+          {props.project.data.project.tags &&
+            props.project.data.project.tags.tags.length > 0 && (
+              <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
+                <div className='p-4 hover:bg-blue-hover'>
+                  <p className={isIndex ? 'font-bold' : ''}>Index</p>
+                </div>
+              </a>
+            )}
         </div>
       </Transition>
     </>
