@@ -238,7 +238,13 @@ export const createManifest = (
               motivation: 'painting',
               body: {
                 id: avFile.file_url,
-                type: eventData.item_type === 'Audio' ? 'Sound' : 'Video',
+                type: avFile.file_type
+                  ? avFile.file_type === 'Audio'
+                    ? 'Sound'
+                    : 'Video'
+                  : eventData.item_type === 'Audio'
+                  ? 'Sound'
+                  : 'Video',
                 format: type ? type : 'unknown',
                 duration: avFile.duration,
               },

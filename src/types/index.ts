@@ -71,6 +71,7 @@ export type Event = {
     file_url: string;
     duration: number;
     caption_set?: { annotation_page_id: string; speaker_category?: string }[];
+    file_type: 'Audio' | 'Video';
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
