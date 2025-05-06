@@ -13,13 +13,6 @@
   }
 }
 
-@layer components {
-  .textContent p {
-    @apply min-h-0;
-    @apply py-3;
-  }
-}
-
 figcaption {
   text-align: center;
   font-style: italic;
