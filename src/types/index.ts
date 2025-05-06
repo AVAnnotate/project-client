@@ -77,7 +77,7 @@ export type Event = {
   citation?: string;
   created_at: string;
   created_by: string;
-  item_type: 'Audio' | 'Video';
+  item_type?: 'Audio' | 'Video';
   label: string;
   updated_at: string;
   updated_by: string;
