@@ -34,12 +34,15 @@ const { includes, event1, event2 } = Astro.props;
         return <p>Event not found!</p>;
       }
 
+      const type =
+        eventObj.data.audiovisual_files[event.file as string].file_type ||
+        eventObj.data.item_type;
       return (
         <div
           class='bg-gray-100 px-4 pb-4 max-h-[700px] overflow-y-auto eventContainer'
           data-player-id={playerId}
         >
-          {eventObj.data.item_type === 'Audio' ? (
+          {type === 'Audio' ? (
             <EventViewer
               end={event.end}
               start={event.start}
