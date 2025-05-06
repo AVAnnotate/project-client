@@ -6,7 +6,13 @@ import { randomUUID } from 'crypto';
 
 const { attributes, element } = Astro.props;
 
-const getImageClass = (size: 'thumbnail' | 'medium' | 'large' | 'full') => {
+const getImageClass = (
+  scale: number,
+  size: 'thumbnail' | 'medium' | 'large' | 'full'
+) => {
+  if (scale) {
+    return `w-[${scale}%]`;
+  }
   switch (size) {
     case 'thumbnail':
       return 'max-w-40';
@@ -133,7 +139,7 @@ const getTextSize = (textSize: string) => {
             <figure style={{ display: 'table' }}>
               <img
                 src={element.url}
-                class={getImageClass(element.size)}
+                class={getImageClass(element.scale, element.size)}
                 style={imgStyle}
                 alt={`Caption: ${element.caption}`}
               />
