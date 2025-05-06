@@ -8,11 +8,11 @@ export interface Props {
   playerId: string;
   annotationSets: CollectionEntry<'annotations'>[];
   type: 'Audio' | 'Video';
-  initialFile: string;
+  file: string;
   initialTag?: Tag;
 }
 
-const { annotationSets, initialFile, initialTag, playerId, type } = Astro.props;
+const { annotationSets, file, initialTag, playerId, type } = Astro.props;
 
 let sortedAnnotations = annotationSets
   .map((set) =>
@@ -24,6 +24,7 @@ let sortedAnnotations = annotationSets
     }))
   )
   .flat()
+  .filter((ann) => ann.file === file)
   .sort(
     (a: any, b: any) => a.start_time - b.start_time
   ) as DisplayedAnnotation[];
@@ -41,16 +42,16 @@ if (initialTag) {
 ---
 
 <div
-  class=`top-[300px] overflow-y-visible w-full ${type === 'Audio' ? 'sticky' : ''}`
+  class=`overflow-y-visible w-full ${type === 'Audio' ? 'sticky top-[300px] py-2' : ''}`
 >
   <AnnotationNanostorePopulator
     annotations={sortedAnnotations}
     playerId={playerId}
-    initialFile={initialFile}
+    file={file}
     client:load
   />
   <div
-    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[510px] video videoAnnotationContainer' : ''}`}
+    class={`${type === 'Video' ? 'overflow-y-scroll max-h-[400px] video videoAnnotationContainer' : ''}`}
     id={playerId}
     data-player-id={playerId}
   >
@@ -59,7 +60,7 @@ if (initialTag) {
         return (
           <Annotation
             ann={ann}
-            initialFile={initialFile}
+            file={file}
             playerId={playerId}
             setName={annotationSets.length > 1 ? ann.setName : undefined}
           />
@@ -127,8 +128,11 @@ if (initialTag) {
       return null;
     }
 
+    const playerId = changed.split('.')[0];
+    const playerState = state[playerId];
+
     const eventContainerEl = document.querySelector(
-      `.eventContainer[data-player-id="${changed}"]`
+      `.eventContainer[data-player-id="${playerId}"]`
     );
 
     if (!eventContainerEl) {
@@ -138,32 +142,33 @@ if (initialTag) {
 
     const annotationNodes =
       eventContainerEl.querySelectorAll(`.annotationNode`);
+
     const annotationTagNodes =
       eventContainerEl.querySelectorAll(`.annotationTags`);
 
-    const startTimes = state[changed].annotationStarts?.filter(
+    const startTimes = playerState.annotationStarts?.filter(
       (s) => s.playerId === changed
     );
+
     const current = startTimes?.findIndex((time, idx) => {
       if (typeof time.end === 'number') {
         return (
-          time.start <= state[changed].position &&
-          time.end > state[changed].position
+          time.start <= playerState.position && time.end > playerState.position
         );
       }
       return idx < startTimes.length - 1
-        ? time.start <= state[changed].position &&
-            startTimes[idx + 1].start > state[changed].position
-        : time.start <= state[changed].position;
+        ? time.start <= playerState.position &&
+            startTimes[idx + 1].start > playerState.position
+        : time.start <= playerState.position;
     });
 
     if (typeof current === 'number' && current >= 0) {
       const activeNode = annotationNodes[current] as HTMLElement;
 
       if (activeNode) {
-        if (state[changed].autoScroll) {
+        if (playerState.autoScroll) {
           // scroll the parent element if we're in an embed
-          if (state[changed].isEmbed) {
+          if (playerState.isEmbed) {
             const videoContainerEl = document.querySelector(
               `.videoAnnotationContainer[data-player-id="${changed}"]`
             );
@@ -197,8 +202,8 @@ if (initialTag) {
     }
 
     // show or hide tags if necessary
-    if (state[changed].showTags !== oldState[changed]?.showTags) {
-      if (state[changed].showTags) {
+    if (playerState.showTags !== oldState[playerId]?.showTags) {
+      if (playerState.showTags) {
         for (let i = 0; i < annotationTagNodes.length; i++) {
           showNode(annotationTagNodes[i]);
         }
@@ -213,7 +218,7 @@ if (initialTag) {
     for (const node of annotationNodes) {
       const uuid = node.getAttribute('data-uuid');
 
-      if (uuid && state[changed].filteredAnnotations.includes(uuid)) {
+      if (uuid && playerState.filteredAnnotations.includes(uuid)) {
         showNode(node);
       } else {
         hideNode(node);

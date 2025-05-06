@@ -1,7 +1,7 @@
 import type { DisplayedAnnotation } from '@ty/index.ts';
 import { $pagePlayersState } from 'src/store.ts';
 import { useEffect } from 'react';
-import { defaultState } from '@utils/player.ts';
+import { useStore } from '@nanostores/react';
 
 // This component's only purpose is to populate the
 // list of annotations in the nanostore.
@@ -9,24 +9,27 @@ import { defaultState } from '@utils/player.ts';
 interface Props {
   annotations: DisplayedAnnotation[];
   playerId: string;
-  initialFile: string;
+  file: string;
 }
 
 const AnnotationNanostorePopulator: React.FC<Props> = (props) => {
-  useEffect(() => {
-    const state = $pagePlayersState.get()[props.playerId] || defaultState;
+  const store = useStore($pagePlayersState);
+  const playerState = store[props.playerId];
 
-    $pagePlayersState.setKey(props.playerId, {
-      ...state,
-      annotations: [...props.annotations],
-      filteredAnnotations: [
-        ...props.annotations
-          .filter((ann) => ann.file === props.initialFile)
-          .map((ann) => ann.uuid),
-      ],
-      avFileUuid: props.initialFile,
-    });
-  }, [props.annotations, props.playerId]);
+  useEffect(() => {
+    if (playerState?.avFileUuid === props.file) {
+      $pagePlayersState.setKey(props.playerId, {
+        ...playerState,
+        annotations: [...props.annotations],
+        filteredAnnotations: [
+          ...props.annotations
+            .filter((ann) => ann.file === props.file)
+            .map((ann) => ann.uuid),
+        ],
+        avFileUuid: props.file,
+      });
+    }
+  }, [props.annotations, props.playerId, props.file, playerState?.avFileUuid]);
 
   return <></>;
 };

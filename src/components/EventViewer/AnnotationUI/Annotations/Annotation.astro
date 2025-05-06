@@ -11,10 +11,11 @@ interface Props {
   ann: DisplayedAnnotation;
   playerId: string;
   setName?: string;
-  initialFile: string;
+  file: string;
 }
+
 const MAX_VISIBLE_TAGS = 4;
-const { ann, initialFile, playerId, setName } = Astro.props;
+const { ann, file, playerId, setName } = Astro.props;
 
 const projectData = await getEntry('project', 'project');
 const tagGroups = projectData.data.project.tags.tagGroups;
@@ -37,12 +38,10 @@ ann.tags.forEach((tag, idx) => {
     });
   }
 });
-
-const expansionCount = `+ ${hiddenTags.length}`;
 ---
 
 <div
-  class={`annotationNode flex flex-row justify-between gap-4 p-4 my-4 scroll-my-20 rounded-md bg-white ${ann.file === initialFile ? '' : 'hidden'}`}
+  class={`annotationNode flex flex-row justify-between gap-4 p-4 my-4 scroll-my-20 rounded-md bg-white ${ann.file === file ? '' : 'hidden'}`}
   data-start={ann.start_time}
   data-end={ann.end_time}
   data-file={ann.file}
