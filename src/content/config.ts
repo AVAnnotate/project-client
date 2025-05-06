@@ -51,7 +51,7 @@ const eventCollection = defineCollection({
     citation: z.string().nullish(),
     created_at: z.string(),
     created_by: z.string(),
-    item_type: z.enum(['Audio', 'Video']),
+    item_type: z.enum(['Audio', 'Video']).nullish(),
     label: z.string(),
     updated_at: z.string(),
     updated_by: z.string(),
