@@ -5,6 +5,8 @@ import { getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
 
+const projectFileData = await getEntry('project', 'project');
+
 const baseUrl = import.meta.env.PROD
   ? projectData.data.publish.publish_pages_app
     ? projectData.data.project.slug
@@ -57,8 +59,14 @@ pages
         );
       })
   }
-  <a
-    class='underline'
-    href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}>Index</a
-  >
+  {
+    projectFileData.data.project.tags.tags.length > 0 && (
+      <a
+        class='underline'
+        href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}
+      >
+        Index
+      </a>
+    )
+  }
 </div>

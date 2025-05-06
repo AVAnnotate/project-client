@@ -1,4 +1,4 @@
-import type { EventFile, Page } from '@ty/index.ts';
+import type { EventFile, Page, ProjectFile } from '@ty/index.ts';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 
 // These util functions are necessary to avoid a bunch of TypeScript complaints.
@@ -20,6 +20,11 @@ export interface OrderCollectionEntry
 export interface EventCollectionEntry
   extends Omit<CollectionEntry<'events'>, 'data'> {
   data: EventFile;
+}
+
+export interface ProjectCollectionEntry
+  extends Omit<CollectionEntry<'project'>, 'data'> {
+  data: ProjectFile;
 }
 
 // fetch all pages, skipping order.json and also applying any extra filter passed
