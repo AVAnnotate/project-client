@@ -37,6 +37,19 @@ const props = Astro.props;
     )
   }
   {
+    props.event.data.rights_statement && (
+      <div class='mt-[12px] mb-[12px]'>
+        <a
+          class='text-blue-400 underline'
+          href={props.event.data.rights_statement}
+          target='_blank'
+        >
+          {`Rights: ${props.event.data.rights_statement}`}
+        </a>
+      </div>
+    )
+  }
+  {
     /* only show the tabs if
                     1. there's more than AV file
                     2. this is not an embed of a single AV file

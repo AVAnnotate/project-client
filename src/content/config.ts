@@ -55,6 +55,7 @@ const eventCollection = defineCollection({
     label: z.string(),
     updated_at: z.string(),
     updated_by: z.string(),
+    rights_statement: z.string().nullish(),
   }),
 });
 

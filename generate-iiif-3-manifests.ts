@@ -143,6 +143,10 @@ export const createManifest = (
         items: [],
       };
 
+      if (eventData.rights_statement) {
+        output.rights = eventData.rights_statement;
+      }
+
       eventArray.push({
         label: eventData.label,
         id: `${siteURL}/manifests/${manifestSlug}.json`,
