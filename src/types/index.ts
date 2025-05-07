@@ -17,6 +17,7 @@ export type EventFile = {
   label: string;
   updated_at: string;
   updated_by: string;
+  rights_statement?: string;
 };
 
 export type Tag = {
@@ -81,6 +82,7 @@ export type Event = {
   label: string;
   updated_at: string;
   updated_by: string;
+  rights_statement?: string;
 };
 
 export type ProjectFile = {
