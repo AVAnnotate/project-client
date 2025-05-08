@@ -73,21 +73,26 @@ const childProps = {
 <script>
   import { $pagePlayersState } from 'src/store.ts';
 
-  const avFileDivs = document.querySelectorAll('.av-file');
+  const avFileDivs = Array.from(document.querySelectorAll('.av-file'));
 
   $pagePlayersState.listen((state, _oldState, changed) => {
     if (!changed || !state[changed]) {
       return null;
     }
 
-    avFileDivs.forEach((div) => {
-      const fileUuid = div.getAttribute('data-file-id');
+    avFileDivs
+      .filter((div) => {
+        const playerId = div.getAttribute('data-player-id');
+        return playerId === changed;
+      })
+      .forEach((div) => {
+        const fileUuid = div.getAttribute('data-file-id');
 
-      if (state[changed].avFileUuid === fileUuid) {
-        div.classList.remove('hidden');
-      } else {
-        div.classList.add('hidden');
-      }
-    });
+        if (state[changed].avFileUuid === fileUuid) {
+          div.classList.remove('hidden');
+        } else {
+          div.classList.add('hidden');
+        }
+      });
   });
 </script>

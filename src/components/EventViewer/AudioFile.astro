@@ -38,7 +38,7 @@ const title =
     : `${fileIndex + 1}. ${fileObj.label}`;
 ---
 
-<div class='av-file' data-file-id={file}>
+<div class='av-file' data-file-id={file} data-player-id={playerId}>
   <div class={`sticky top-0 z-10 ${!isEmbed ? 'shadow' : ''}`}>
     <div class='flex flex-col [&_p]:mb-0! z-20 bg-white'>
       <EventHeader {...Astro.props} />
