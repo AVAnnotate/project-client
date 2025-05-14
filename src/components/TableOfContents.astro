@@ -5,6 +5,8 @@ import { getPages } from 'src/utils/pages';
 
 const projectData = await getEntry('project', 'project');
 
+const projectFileData = await getEntry('project', 'project');
+
 const baseUrl = import.meta.env.PROD
   ? projectData.data.publish.publish_pages_app
     ? projectData.data.project.slug
@@ -14,10 +16,6 @@ const baseUrl = import.meta.env.PROD
 const pages = await getPages();
 
 const homePage = pages.find((p) => p.data.autogenerate.type === 'home');
-
-if (!homePage) {
-  throw new Error('No homepage found?!?');
-}
 
 let counts: { [key: string]: number } = {};
 pages
@@ -57,8 +55,14 @@ pages
         );
       })
   }
-  <a
-    class='underline'
-    href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}>Index</a
-  >
+  {
+    projectFileData.data.project.tags.tags.length > 0 && (
+      <a
+        class='underline'
+        href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}
+      >
+        Index
+      </a>
+    )
+  }
 </div>

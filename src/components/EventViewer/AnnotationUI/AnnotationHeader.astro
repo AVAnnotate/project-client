@@ -17,7 +17,7 @@ const projectData = await getEntry('project', 'project');
 const { annotationSets, isComparison, playerId, type } = Astro.props;
 ---
 
-<div>
+<div class='bg-gray-100 py-2'>
   <div
     class={`flex flex-row w-full justify-between items-center ${type === 'Video' ? 'flex-col gap-3' : 'flex-row items-center'}`}
   >

@@ -34,6 +34,7 @@ const eventCollection = defineCollection({
         label: z.string(),
         is_offline: z.boolean().nullish(),
         file_url: z.string().nullish(),
+        file_type: z.string().nullish(),
         duration: z.number(),
         caption_set: z
           .array(
@@ -50,10 +51,11 @@ const eventCollection = defineCollection({
     citation: z.string().nullish(),
     created_at: z.string(),
     created_by: z.string(),
-    item_type: z.enum(['Audio', 'Video']),
+    item_type: z.enum(['Audio', 'Video']).nullish(),
     label: z.string(),
     updated_at: z.string(),
     updated_by: z.string(),
+    rights_statement: z.string().nullish(),
   }),
 });
 

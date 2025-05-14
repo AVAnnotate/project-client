@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import type { Includes, SlateEventNodeProps } from '@ty/slate';
-import AudioEvent from './AudioEvent.astro';
-import VideoEvent from './VideoEvent.astro';
+import AudioFile from './AudioFile.astro';
+import VideoFile from './VideoFile.astro';
 import { getEntry } from 'astro:content';
 import PlayerStateNanostorePopulator from './PlayerStateNanostorePopulator';
 
@@ -45,6 +45,8 @@ const childProps = {
     'description',
   ],
   file: defaultFile,
+  event,
+  annotationSets,
 };
 ---
 
@@ -53,23 +55,44 @@ const childProps = {
     playerId={playerId}
     isEmbed={isEmbed}
     initialFile={defaultFile}
+    client:only='react'
   />
   {
-    event.data.item_type === 'Audio' && (
-      <AudioEvent
-        annotationSets={annotationSets}
-        event={event}
-        {...childProps}
-      />
-    )
-  }
-  {
-    event.data.item_type === 'Video' && (
-      <VideoEvent
-        annotationSets={annotationSets}
-        event={event}
-        {...childProps}
-      />
-    )
+    Object.keys(event.data.audiovisual_files).map((uuid) => {
+      const avFile = event.data.audiovisual_files[uuid];
+
+      const type = avFile.file_type || event.data.item_type;
+
+      const Component = type === 'Audio' ? AudioFile : VideoFile;
+
+      return <Component {...childProps} file={uuid} />;
+    })
   }
 </div>
+
+<script>
+  import { $pagePlayersState } from 'src/store.ts';
+
+  const avFileDivs = Array.from(document.querySelectorAll('.av-file'));
+
+  $pagePlayersState.listen((state, _oldState, changed) => {
+    if (!changed || !state[changed]) {
+      return null;
+    }
+
+    avFileDivs
+      .filter((div) => {
+        const playerId = div.getAttribute('data-player-id');
+        return playerId === changed;
+      })
+      .forEach((div) => {
+        const fileUuid = div.getAttribute('data-file-id');
+
+        if (state[changed].avFileUuid === fileUuid) {
+          div.classList.remove('hidden');
+        } else {
+          div.classList.add('hidden');
+        }
+      });
+  });
+</script>

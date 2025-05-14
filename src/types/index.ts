@@ -6,16 +6,18 @@ export type EventFile = {
     file_url: string;
     duration: number;
     caption_set?: { annotation_page_id: string; speaker_category?: string }[];
+    file_type: 'Audio' | 'Video';
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
   citation?: string;
   created_at: string;
   created_by: string;
-  item_type: 'Audio' | 'Video';
+  item_type?: 'Audio' | 'Video';
   label: string;
   updated_at: string;
   updated_by: string;
+  rights_statement?: string;
 };
 
 export type Tag = {
@@ -70,16 +72,18 @@ export type Event = {
     file_url: string;
     duration: number;
     caption_set?: { annotation_page_id: string; speaker_category?: string }[];
+    file_type: 'Audio' | 'Video';
   }[];
   auto_generate_web_page: boolean;
   description: Node[];
   citation?: string;
   created_at: string;
   created_by: string;
-  item_type: 'Audio' | 'Video';
+  item_type?: 'Audio' | 'Video';
   label: string;
   updated_at: string;
   updated_by: string;
+  rights_statement?: string;
 };
 
 export type ProjectFile = {
