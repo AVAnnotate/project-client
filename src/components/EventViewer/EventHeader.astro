@@ -1,7 +1,7 @@
 ---
 import ComparisonFilePicker from './ComparisonFilePicker';
 import ConditionalContainer from './ConditionalContainer.astro';
-import RichText from '@components/RichText/index.astro';
+import RichTextExpanding from '@components/RichText/RichTextExpanding.astro';
 import Tabs from './Tabs.astro';
 import { getTabEntries } from '@utilsevents';
 
@@ -33,7 +33,7 @@ const props = Astro.props;
   </div>
   {
     props.includes.includes('description') && props.event.data.description && (
-      <RichText nodes={props.event.data.description} />
+      <RichTextExpanding nodes={props.event.data.description} lines={2} />
     )
   }
   {

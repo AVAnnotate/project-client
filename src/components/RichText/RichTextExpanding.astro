@@ -1,0 +1,102 @@
+---
+import { Node, Text } from 'slate';
+import RichTextElement from './RichTextElement.astro';
+import RichTextLeaf from './RichTextLeaf.astro';
+
+const { nodes, lines } = Astro.props;
+---
+
+<style define:vars={{ lines: lines }}>
+  .text-clip {
+    display: -webkit-box;
+    -webkit-line-clamp: var(--lines);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .see-more-link {
+    text-decoration: underline;
+    color: blue;
+  }
+
+  .see-more:after {
+    content: 'See More';
+  }
+
+  .see-less:after {
+    content: 'See Less';
+  }
+</style>
+<script>
+  setTimeout(() => {
+    const text = document.getElementById('rte-text');
+    const expandLink = document.getElementById('expand-link');
+    const content = document.getElementById('rte-content');
+
+    expandLink?.addEventListener('click', (event) => {
+      if (expandLink.classList.contains('see-more')) {
+        expandLink.classList.remove('see-more');
+        expandLink.classList.add('see-less');
+        text?.classList.remove('text-clip');
+      } else {
+        expandLink.classList.remove('see-less');
+        expandLink.classList.add('see-more');
+        text?.classList.add('text-clip');
+      }
+    });
+
+    if (text && content && expandLink) {
+      if (text.scrollHeight > content.offsetHeight) {
+        expandLink.style.display = 'block';
+      } else {
+        expandLink.style.display = 'none';
+      }
+    }
+  }, 2000);
+</script>
+
+<div>
+  {
+    (() => {
+      const serialize = (node: Node) => {
+        if (Text.isText(node)) {
+          return (
+            <RichTextLeaf attributes={{ ...node }} leaf={node}>
+              {node.text}
+            </RichTextLeaf>
+          );
+        }
+
+        if (node.children) {
+          const children = node.children.map((n) => serialize(n));
+          return (
+            <RichTextLeaf leaf={node}>
+              <RichTextElement element={node}>{children}</RichTextElement>
+            </RichTextLeaf>
+          );
+        } else {
+          return (
+            <RichTextLeaf leaf={node}>
+              <RichTextElement element={node} />
+            </RichTextLeaf>
+          );
+        }
+      };
+
+      return (
+        <div>
+          <div id='rte-content'>
+            <div id='rte-text' class='text-clip'>
+              {nodes.map((node: Node) => serialize(node))}
+            </div>
+          </div>
+          <a href='#' id='expand-link' class='see-more-link see-more' />
+        </div>
+      );
+    })()
+  }
+</div>
