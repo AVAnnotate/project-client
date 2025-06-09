@@ -6,7 +6,7 @@ export interface AnnotationState {
   id: string;
   position: number;
   seekTo?: number;
-  isPlaying: boolean;
+  isPlaying?: string;
   autoScroll: boolean;
   showTags: boolean;
   currentAnnotation?: number;

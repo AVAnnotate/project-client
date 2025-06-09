@@ -67,6 +67,7 @@ const captionSets = await getCaptionSets(event, defaultFile, annotationSets);
           vttURLs={captionSets}
           type='Video'
           url={event.data.audiovisual_files[defaultFile].file_url}
+          fileUuid={defaultFile}
         />
       </>
     )

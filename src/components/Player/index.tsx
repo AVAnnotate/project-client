@@ -26,6 +26,7 @@ interface Props {
   vttURLs?: { url: string; label: string }[];
   url?: string | null;
   type: string;
+  fileUuid: string;
 }
 
 const getSegments = (playerState: AnnotationState): [number, number][] => {
@@ -171,7 +172,7 @@ const Player: React.FC<Props> = (props) => {
       if (data.playedSeconds >= duration) {
         $pagePlayersState.setKey(props.id, {
           ...playerState,
-          isPlaying: false,
+          isPlaying: undefined,
           position: data.playedSeconds,
         });
       } else if (
@@ -183,7 +184,7 @@ const Player: React.FC<Props> = (props) => {
 
         $pagePlayersState.setKey(props.id, {
           ...playerState,
-          isPlaying: false,
+          isPlaying: undefined,
         });
 
         // if there's no next segment, leave the player paused (i.e. we've reached the end)
@@ -194,7 +195,7 @@ const Player: React.FC<Props> = (props) => {
               ...playerState,
               seekTo: nextSegment[0],
               position: nextSegment[0],
-              isPlaying: true,
+              isPlaying: props.fileUuid,
             });
           }, 500);
         }
@@ -211,7 +212,7 @@ const Player: React.FC<Props> = (props) => {
     <div className='player'>
       <ReactPlayer
         controls={props.type === 'Video'}
-        playing={playerState.isPlaying}
+        playing={playerState.isPlaying === props.fileUuid}
         muted={muted}
         config={tracksConfig}
         onDuration={(dur) => {
@@ -251,11 +252,13 @@ const Player: React.FC<Props> = (props) => {
                 onClick={() => {
                   $pagePlayersState.setKey(props.id, {
                     ...playerState,
-                    isPlaying: !playerState.isPlaying,
+                    isPlaying: playerState.isPlaying
+                      ? undefined
+                      : props.fileUuid,
                   });
                 }}
               >
-                {playerState.isPlaying ? (
+                {playerState.isPlaying === props.fileUuid ? (
                   <PauseFill color='black' />
                 ) : (
                   <PlayFill color='black' />

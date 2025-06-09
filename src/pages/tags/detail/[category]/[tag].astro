@@ -163,6 +163,7 @@ for (const set of annotationSets) {
                       fileObj.file_type || sd.event.data.item_type || 'Audio'
                     }
                     client:load
+                    fileUuid={sd.set.data.source_id}
                   />
                   <Annotations
                     playerId={sd.spectrumId}
