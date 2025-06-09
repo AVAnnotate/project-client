@@ -28,7 +28,6 @@ export const defaultState = {
   avFileUuid: '',
   currentAnnotation: 0,
   id: '',
-  isPlaying: false,
   filteredAnnotations: [],
   position: 0,
   searchQuery: '',
