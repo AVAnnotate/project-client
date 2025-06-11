@@ -6,8 +6,9 @@ import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
-import { manifest } from 'astro:ssr-manifest';
+import LoadingIndicator from 'astro-loading-indicator/component';
 import { getCollection } from 'astro:content';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   background?: string;
@@ -19,17 +20,17 @@ const projectData = await getEntry('project', 'project');
 const eventData = await getCollection('events');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData?.data.project.slug
   : dynamicConfig.base;
 
 const {
   background,
   class: className,
-  title = projectData.data.project.title,
+  title = projectData?.data.project.title,
 } = Astro.props;
 
 const projectBy =
-  projectData.data.project.authors || projectData.data.project.creator;
+  projectData?.data.project.authors || projectData?.data.project.creator;
 
 const manifests = eventData.map((e) => {
   return e.data.label;
@@ -53,6 +54,8 @@ const manifests = eventData.map((e) => {
       rel='stylesheet'
     />
     <title>{title}</title>
+    <ClientRouter />
+    <LoadingIndicator color='#303f4a' />
   </head>
   <body
     class={`flex h-full flex-col mx-auto ${className}`}
@@ -64,7 +67,7 @@ const manifests = eventData.map((e) => {
     >
       <slot />
     </main>
-    <Footer projectBy={projectBy} manifests={manifests} />
+    <Footer projectBy={projectBy || ''} manifests={manifests} />
   </body>
 </html>
 
