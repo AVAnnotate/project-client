@@ -6,7 +6,6 @@ import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { getEntry } from 'astro:content';
 import { dynamicConfig } from 'dynamic-astro-config';
-import { manifest } from 'astro:ssr-manifest';
 import { getCollection } from 'astro:content';
 
 interface Props {
@@ -19,17 +18,17 @@ const projectData = await getEntry('project', 'project');
 const eventData = await getCollection('events');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData?.data.project.slug
   : dynamicConfig.base;
 
 const {
   background,
   class: className,
-  title = projectData.data.project.title,
+  title = projectData?.data.project.title,
 } = Astro.props;
 
 const projectBy =
-  projectData.data.project.authors || projectData.data.project.creator;
+  projectData?.data.project.authors || projectData?.data.project.creator;
 
 const manifests = eventData.map((e) => {
   return e.data.label;
@@ -64,23 +63,25 @@ const manifests = eventData.map((e) => {
     >
       <slot />
     </main>
-    <Footer projectBy={projectBy} manifests={manifests} />
+    <Footer projectBy={projectBy || ''} manifests={manifests} />
   </body>
 </html>
 
 <script>
   import { defaultState } from '@utils/player.ts';
   import { $pagePlayersState } from 'src/store.ts';
-  // initially, reset the loaded players to none
-  $pagePlayersState.set({});
-  const players = document.getElementsByClassName('mediaContainer');
-  for (let i = 0; i < players.length; i++) {
-    const thisNode = players[i];
-    if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
-      $pagePlayersState.setKey(thisNode.dataset.playerId, {
-        ...defaultState,
-        id: thisNode.dataset.playerUrl || '',
-      });
+  document.addEventListener('astro:page-load', () => {
+    // initially, reset the loaded players to none
+    $pagePlayersState.set({});
+    const players = document.getElementsByClassName('mediaContainer');
+    for (let i = 0; i < players.length; i++) {
+      const thisNode = players[i];
+      if (thisNode instanceof HTMLElement && thisNode.dataset.playerId) {
+        $pagePlayersState.setKey(thisNode.dataset.playerId, {
+          ...defaultState,
+          id: thisNode.dataset.playerUrl || '',
+        });
+      }
     }
-  }
+  });
 </script>
