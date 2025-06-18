@@ -8,18 +8,20 @@ const projectData = await getEntry('project', 'project');
 const projectFileData = await getEntry('project', 'project');
 
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.publish.publish_pages_app
-    ? projectData.data.project.slug
+  ? projectData?.data.publish.publish_pages_app
+    ? projectData?.data.project.slug
     : undefined
   : dynamicConfig.base;
 
 const pages = await getPages();
 
+const { isHomePage } = Astro.props;
+
 const homePage = pages.find((p) => p.data.autogenerate.type === 'home');
 
 let counts: { [key: string]: number } = {};
 pages
-  .filter((page) => page.id !== homePage.id)
+  .filter((page) => page.id !== homePage?.id)
   .forEach((page) => {
     let count = 0;
     let parent = page.data.parent;
@@ -42,7 +44,7 @@ pages
 <div class='py-4 flex flex-col gap-2'>
   {
     pages
-      .filter((page) => page.id !== homePage.id)
+      .filter((page) => (isHomePage ? page.id !== homePage?.id : true))
       .map((page) => {
         return (
           <a
@@ -56,7 +58,7 @@ pages
       })
   }
   {
-    projectFileData.data.project.tags.tags.length > 0 && (
+    projectFileData!.data.project.tags.tags.length > 0 && (
       <a
         class='underline'
         href={`${baseUrl ? '/' : ''}${baseUrl ? `${baseUrl}/` : '/'}tags`}

@@ -1,17 +1,14 @@
 ---
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import Container from '@components/Container.astro';
-import AnnotationNanostorePopulator from '@components/EventViewer/AnnotationUI/Annotations/AnnotationNanostorePopulator';
 import Player from '@components/Player';
 import AnnotationSpectrum from '@components/TagUtils/AnnotationSpectrum.astro';
 import Layout from '@layouts/Layout.astro';
-import type { DisplayedAnnotation } from '@ty/index';
 import {
   compareAnnotations,
   fromTagParam,
   getTagDisplay,
   setHasTag,
-  setsHasCategory,
   setsHasTag,
   toTagParam,
 } from '@utils/tags';
@@ -23,6 +20,9 @@ import { randomUUID } from 'crypto';
 import { dynamicConfig } from 'dynamic-astro-config';
 import { ArrowLeft } from 'react-bootstrap-icons';
 import Annotations from '@components/EventViewer/AnnotationUI/Annotations/index.astro';
+import AnnotationNanostorePopulator from '@components/EventViewer/AnnotationUI/Annotations/AnnotationNanostorePopulator';
+import type { DisplayedAnnotation } from '@ty/index';
+import PlayerStateNanostorePopulator from '@components/EventViewer/PlayerStateNanostorePopulator';
 
 const projectData = await getEntry('project', 'project');
 
@@ -150,24 +150,12 @@ for (const set of annotationSets) {
                   data-player-id={sd.spectrumId}
                   style={{ display: 'none' }}
                 >
-                  <AnnotationNanostorePopulator
-                    annotations={
-                      sd.set.data.annotations
-                        .map((ann) => ({
-                          ...ann,
-                          set: sd.set.id,
-                          setName: sd.set.data.set,
-                          file: sd.set.data.source_id,
-                        }))
-                        .sort(
-                          (a: any, b: any) => a.start_time - b.start_time
-                        ) as DisplayedAnnotation[]
-                    }
-                    client:load
-                    playerId={sd.spectrumId}
-                    file={sd.set.data.source_id}
-                  />
                   <h3 class='text-lg py-4'>{fileObj.label}</h3>
+                  <PlayerStateNanostorePopulator
+                    playerId={sd.spectrumId}
+                    initialFile={sd.set.data.source_id}
+                    client:load
+                  />
                   <Player
                     id={sd.spectrumId}
                     url={fileObj.file_url}
@@ -175,6 +163,7 @@ for (const set of annotationSets) {
                       fileObj.file_type || sd.event.data.item_type || 'Audio'
                     }
                     client:load
+                    fileUuid={sd.set.data.source_id}
                   />
                   <Annotations
                     playerId={sd.spectrumId}

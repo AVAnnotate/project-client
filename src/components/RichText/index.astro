@@ -3,7 +3,7 @@ import { Node, Text } from 'slate';
 import RichTextElement from './RichTextElement.astro';
 import RichTextLeaf from './RichTextLeaf.astro';
 
-const { nodes } = Astro.props;
+const { nodes, isHomePage } = Astro.props;
 ---
 
 <div>
@@ -22,13 +22,15 @@ const { nodes } = Astro.props;
           const children = node.children.map((n) => serialize(n));
           return (
             <RichTextLeaf leaf={node}>
-              <RichTextElement element={node}>{children}</RichTextElement>
+              <RichTextElement element={node} isHomePage={isHomePage}>
+                {children}
+              </RichTextElement>
             </RichTextLeaf>
           );
         } else {
           return (
             <RichTextLeaf leaf={node}>
-              <RichTextElement element={node} />
+              <RichTextElement element={node} isHomePage={isHomePage} />
             </RichTextLeaf>
           );
         }

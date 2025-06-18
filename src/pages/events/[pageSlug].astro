@@ -11,7 +11,7 @@ const projectData = await getEntry('project', 'project');
 
 // @ts-ignore
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData?.data.project.slug
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {

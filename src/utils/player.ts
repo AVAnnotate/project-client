@@ -12,6 +12,12 @@ export const formatTimestamp = (seconds: number, includeMs = false) => {
     str = `${str}:${ms}`;
   }
 
+  if (str.startsWith('00:')) {
+    str = str.slice(3);
+  } else if (str.startsWith('0')) {
+    str = str.slice(1);
+  }
+
   return str;
 };
 
@@ -22,7 +28,6 @@ export const defaultState = {
   avFileUuid: '',
   currentAnnotation: 0,
   id: '',
-  isPlaying: false,
   filteredAnnotations: [],
   position: 0,
   searchQuery: '',

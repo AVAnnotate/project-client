@@ -113,11 +113,13 @@ if (initialTag) {
       }
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
+        const fileId = thisNode.dataset.file;
+
         $pagePlayersState.setKey(playerId, {
           ...($pagePlayersState.get()[playerId] || defaultState),
           position: Number(thisNode.dataset.start),
           seekTo: Number(thisNode.dataset.start),
-          isPlaying: true,
+          isPlaying: fileId,
         });
       });
     }

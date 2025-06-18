@@ -68,6 +68,7 @@ const title =
                     vttURLs={captionSets}
                     url={fileObj.file_url}
                     type='Video'
+                    fileUuid={file}
                   />
                   <div class='textContent'>
                     {!start && !end && (
@@ -104,5 +105,20 @@ const title =
   </div>
   <ConditionalContainer condition={!!event.data.citation}>
     <p class='py-3 mb-3'>{event.data.citation}</p>
+  </ConditionalContainer>
+  <ConditionalContainer condition={!!event.data.rights_statement}>
+    {
+      event.data.rights_statement && (
+        <div class='mt-[12px] mb-[12px]'>
+          <a
+            class='text-blue-400 underline'
+            href={event.data.rights_statement}
+            target='_blank'
+          >
+            Rights
+          </a>
+        </div>
+      )
+    }
   </ConditionalContainer>
 </div>
