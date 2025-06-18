@@ -8,7 +8,7 @@ import RichText from '@components/RichText/index.astro'
 
 const projectData = await getEntry('project', 'project');
 
-const project = projectData.data.project;
+const project = projectData?.data.project;
 
 const homePageQuery = await getPages(
   (p) => p.data.autogenerate.type === 'home' && !p.data.autogenerate.enabled
@@ -20,16 +20,16 @@ if (homePageQuery.length > 0) {
 }
 ---
 
-<Layout title={project.title}>
+<Layout title={project?.title}>
   <Container className='py-12 flex flex-col gap-6 textContent'>
     {homePage
       ? (
-        <RichText nodes={homePage.data.content} />
+        <RichText nodes={homePage.data.content} isHomePage={true} />
       )
       : (
-        <h1>{project.title}</h1>
-        <h2>{project.description}</h2>
-        <TableOfContents />
+        <h1>{project?.title}</h1>
+        <h2>{project?.description}</h2>
+        <TableOfContents isHomePage={true}/>
       )}
   </Container>
 </Layout>

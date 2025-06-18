@@ -11,7 +11,7 @@ const projectData = await getEntry('project', 'project');
 
 // @ts-ignore
 const baseUrl = import.meta.env.PROD
-  ? projectData.data.project.slug
+  ? projectData?.data.project.slug
   : dynamicConfig.base;
 
 export const getStaticPaths = (async () => {
@@ -35,7 +35,10 @@ const page = await getPage(pageSlug);
   <Container className='py-16'>
     <div class='textContent'>
       <h1>{page.data.title}</h1>
-      <RichText nodes={page.data.content} />
+      <RichText
+        nodes={page.data.content}
+        isHomePage={page.data.autogenerate.type === 'home'}
+      />
     </div>
   </Container>
 </Layout>

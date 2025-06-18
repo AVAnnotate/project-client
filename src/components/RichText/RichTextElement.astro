@@ -4,7 +4,7 @@ import EventViewer from '@components/EventViewer/index.astro';
 import TableOfContents from '@components/TableOfContents.astro';
 import { randomUUID } from 'crypto';
 
-const { attributes, element } = Astro.props;
+const { attributes, element, isHomePage } = Astro.props;
 
 const getImageClass = (
   scale: number,
@@ -153,7 +153,7 @@ const getTextSize = (textSize: string) => {
       case 'table-of-contents':
         return (
           <div {...attributes} style={style}>
-            <TableOfContents />
+            <TableOfContents isHomePage={isHomePage} />
             <slot />
           </div>
         );
