@@ -22,13 +22,15 @@ const { nodes, isHomePage } = Astro.props;
           const children = node.children.map((n) => serialize(n));
           return (
             <RichTextLeaf leaf={node}>
-              <RichTextElement element={node}>{children}</RichTextElement>
+              <RichTextElement element={node} isHomePage={isHomePage}>
+                {children}
+              </RichTextElement>
             </RichTextLeaf>
           );
         } else {
           return (
             <RichTextLeaf leaf={node}>
-              <RichTextElement element={node} />
+              <RichTextElement element={node} isHomePage={isHomePage} />
             </RichTextLeaf>
           );
         }
