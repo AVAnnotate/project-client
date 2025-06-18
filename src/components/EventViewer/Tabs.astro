@@ -46,7 +46,7 @@ const props = Astro.props;
   });
 
   $pagePlayersState.listen((changed) => {
-    if (!changed) {
+    if (!changed || Object.keys(changed).length === 0) {
       return null;
     }
 
