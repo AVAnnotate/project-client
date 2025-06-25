@@ -220,7 +220,34 @@ if (initialTag) {
     for (const node of annotationNodes) {
       const uuid = node.getAttribute('data-uuid');
 
-      if (uuid && playerState.filteredAnnotations.includes(uuid)) {
+      let status = 'show';
+
+      if (!uuid || !playerState.filteredAnnotations.includes(uuid)) {
+        status = 'hide';
+      }
+
+      if (playerState.clip) {
+        const annStart = node.getAttribute('data-start');
+        const annEnd = node.getAttribute('data-end');
+
+        if (annStart && annEnd) {
+          const annStartInt = parseInt(annStart);
+          const annEndInt = parseInt(annEnd);
+
+          const startFits =
+            annStartInt > playerState.clip.start &&
+            annStartInt < playerState.clip.end;
+          const endFits =
+            annEndInt > playerState.clip.start &&
+            annEndInt < playerState.clip.end;
+
+          if (!startFits || !endFits) {
+            status = 'hide';
+          }
+        }
+      }
+
+      if (status === 'show') {
         showNode(node);
       } else {
         hideNode(node);

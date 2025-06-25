@@ -18,7 +18,7 @@ export interface Props extends Omit<SlateEventNodeProps, 'uuid' | 'includes'> {
   isComparison?: boolean;
 }
 
-const { isEmbed, file, uuid, playerId } = Astro.props;
+const { isEmbed, file, uuid, playerId, start, end } = Astro.props;
 
 const event = await getEntry('events', uuid);
 
@@ -55,6 +55,12 @@ const childProps = {
     playerId={playerId}
     isEmbed={isEmbed}
     initialFile={defaultFile}
+    clip={start && end
+      ? {
+          start,
+          end,
+        }
+      : undefined}
     client:only='react'
   />
   {
