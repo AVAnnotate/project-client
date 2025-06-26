@@ -9,6 +9,10 @@ interface Props {
   playerId: string;
   isEmbed?: boolean;
   initialFile: string;
+  clip?: {
+    start: number;
+    end: number;
+  };
 }
 
 const PlayerStateNanostorePopulator: React.FC<Props> = (props) => {
@@ -19,6 +23,7 @@ const PlayerStateNanostorePopulator: React.FC<Props> = (props) => {
       ...state,
       isEmbed: props.isEmbed,
       avFileUuid: props.initialFile,
+      clip: props.clip,
     });
   }, [props.playerId, props.isEmbed]);
 
