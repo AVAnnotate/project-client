@@ -88,29 +88,25 @@ if (initialTag) {
 
   const annotationPlayNodes = document.querySelectorAll(`.playAnnotation`);
 
+  const annotationStarts = [];
+
   for (let i = 0; i < annotationPlayNodes.length; i++) {
     const thisNode = annotationPlayNodes[i] as HTMLElement;
 
     if (thisNode.dataset.start && thisNode.dataset.playerId) {
-      const annotationStartsNew =
-        $pagePlayersState.get()[thisNode.dataset.playerId]?.annotationStarts;
-
-      if (annotationStartsNew) {
-        annotationStartsNew.push({
-          start: Math.floor(Number(thisNode.dataset.start)),
-          end:
-            Math.floor(Number(thisNode.dataset.end)) >
-            Math.floor(Number(thisNode.dataset.start))
-              ? Math.floor(Number(thisNode.dataset.end))
-              : undefined,
-          playerId: thisNode.dataset.playerId,
-        });
-        $pagePlayersState.setKey(thisNode.dataset.playerId, {
-          ...($pagePlayersState.get()[thisNode.dataset.playerId] ||
-            defaultState),
-          annotationStarts: annotationStartsNew,
-        });
-      }
+      annotationStarts.push({
+        start: Math.floor(Number(thisNode.dataset.start)),
+        end:
+          Math.floor(Number(thisNode.dataset.end)) >
+          Math.floor(Number(thisNode.dataset.start))
+            ? Math.floor(Number(thisNode.dataset.end))
+            : undefined,
+        playerId: thisNode.dataset.playerId,
+      });
+      $pagePlayersState.setKey(thisNode.dataset.playerId, {
+        ...($pagePlayersState.get()[thisNode.dataset.playerId] || defaultState),
+        annotationStarts,
+      });
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
         const fileId = thisNode.dataset.file;
