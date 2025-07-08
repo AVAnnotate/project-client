@@ -34,10 +34,22 @@ const { includes, event1, event2 } = Astro.props;
         return <p>Event not found!</p>;
       }
 
-      const type = event.file
-        ? eventObj.data.audiovisual_files[event.file as string].file_type ||
-          eventObj.data.item_type
-        : 'Audio';
+      let type = 'Audio';
+
+      if (event.file) {
+        const fileType =
+          eventObj.data.audiovisual_files[event.file as string].file_type;
+        if (fileType) {
+          type = fileType;
+        }
+      } else if (eventObj.data.item_type) {
+        type = eventObj.data.item_type;
+      } else if (Object.keys(eventObj.data.audiovisual_files).length > 0) {
+        type = eventObj.data.audiovisual_files[
+          Object.keys(eventObj.data.audiovisual_files)[0]
+        ].file_type as string;
+      }
+
       return (
         <div
           class='bg-gray-100 px-4 pb-4 max-h-[700px] overflow-y-auto eventContainer'
