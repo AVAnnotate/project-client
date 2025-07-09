@@ -12,7 +12,12 @@ export interface AnnotationState {
   currentAnnotation?: number;
   searchQuery?: string;
   tags: Tag[];
-  annotationStarts?: { start: number; end?: number; playerId: string }[];
+  annotationStarts?: {
+    start: number;
+    end?: number;
+    playerId: string;
+    uuid: string;
+  }[];
   sets: string[];
   avFileUuid: string;
   annotations: DisplayedAnnotation[];
@@ -114,6 +119,7 @@ const getFilteredAnnotations = (
     start: ann.start_time,
     end: ann.end_time || undefined,
     playerId: playerId,
+    uuid: ann.uuid,
   }));
 
   return {

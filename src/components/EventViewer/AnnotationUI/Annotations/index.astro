@@ -94,6 +94,7 @@ if (initialTag) {
     const thisNode = annotationPlayNodes[i] as HTMLElement;
 
     if (thisNode.dataset.start && thisNode.dataset.playerId) {
+      const parent = thisNode.closest('.annotationNode') as HTMLElement;
       annotationStarts.push({
         start: Math.floor(Number(thisNode.dataset.start)),
         end:
@@ -102,6 +103,7 @@ if (initialTag) {
             ? Math.floor(Number(thisNode.dataset.end))
             : undefined,
         playerId: thisNode.dataset.playerId,
+        uuid: parent.dataset.uuid!,
       });
 
       $pagePlayersState.setKey(thisNode.dataset.playerId, {
@@ -143,10 +145,6 @@ if (initialTag) {
     const annotationNodes =
       eventContainerEl.querySelectorAll(`.annotationNode`);
 
-    const annotationNodesForScrolling = eventContainerEl.querySelectorAll(
-      `.annotationNode:not(.hidden)`
-    );
-
     const annotationTagNodes =
       eventContainerEl.querySelectorAll(`.annotationTags`);
 
@@ -154,7 +152,7 @@ if (initialTag) {
       (s) => s.playerId === changed
     );
 
-    const current = startTimes?.findIndex((time, idx) => {
+    const current = startTimes?.find((time, idx) => {
       if (typeof time.end === 'number') {
         return (
           time.start <= playerState.position && time.end > playerState.position
@@ -166,8 +164,10 @@ if (initialTag) {
         : time.start <= playerState.position;
     });
 
-    if (typeof current === 'number' && current >= 0) {
-      const activeNode = annotationNodesForScrolling[current] as HTMLElement;
+    if (current) {
+      const activeNode = eventContainerEl.querySelector(
+        `.annotationNode[data-uuid="${current.uuid}"]`
+      ) as HTMLElement | null;
 
       if (activeNode) {
         if (playerState.autoScroll) {
@@ -195,12 +195,13 @@ if (initialTag) {
             activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
         }
+
         activeNode.classList.add(activeBackground);
       }
 
-      for (let i = 0; i < annotationNodes.length; i++) {
-        if (i !== current) {
-          annotationNodes[i].classList.remove(activeBackground);
+      for (const a of annotationNodes) {
+        if ((a as HTMLElement).dataset.uuid !== current.uuid) {
+          a.classList.remove(activeBackground);
         }
       }
     }
