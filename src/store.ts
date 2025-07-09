@@ -30,84 +30,97 @@ export const $pagePlayersState = deepMap<{ [key: string]: AnnotationState }>(
   {}
 );
 
-const getFilteredAnnotations = (newState: AnnotationState) =>
-  newState.annotations
-    .filter((ann) => {
-      // hide if its AV file is hidden
-      if (newState.avFileUuid && ann.file !== newState.avFileUuid) {
+const getFilteredAnnotations = (
+  newState: AnnotationState,
+  playerId: string
+) => {
+  const result = newState.annotations.filter((ann) => {
+    // hide if its AV file is hidden
+    if (newState.avFileUuid && ann.file !== newState.avFileUuid) {
+      return false;
+    }
+
+    // hide if its set is hidden
+    if (newState.sets.length > 0) {
+      const setFiltersEmpty = newState.sets.length === 0;
+
+      if (ann.set && !setFiltersEmpty && !newState.sets.includes(ann.set)) {
         return false;
       }
+    }
 
-      // hide if its set is hidden
-      if (newState.sets.length > 0) {
-        const setFiltersEmpty = newState.sets.length === 0;
+    // hide if its tags are hidden
+    if (newState.tags.length > 0) {
+      let match = false;
 
-        if (ann.set && !setFiltersEmpty && !newState.sets.includes(ann.set)) {
-          return false;
+      for (let i = 0; i < ann.tags.length; i++) {
+        const tag = ann.tags[i];
+        if (
+          newState.tags.find(
+            (tf) =>
+              tf.category.toLowerCase() === tag.category.toLowerCase() &&
+              tf.tag.toLowerCase() === tag.tag.toLowerCase()
+          )
+        ) {
+          match = true;
+          break;
         }
       }
 
-      // hide if its tags are hidden
-      if (newState.tags.length > 0) {
-        let match = false;
+      if (!match) {
+        return false;
+      }
+    }
 
-        for (let i = 0; i < ann.tags.length; i++) {
-          const tag = ann.tags[i];
-          if (
-            newState.tags.find(
-              (tf) =>
-                tf.category.toLowerCase() === tag.category.toLowerCase() &&
-                tf.tag.toLowerCase() === tag.tag.toLowerCase()
-            )
-          ) {
-            match = true;
-            break;
-          }
-        }
+    // hide if it's not in the selected clip
+    if (newState.clip) {
+      // should show if any part of the annotation overlaps with the selected clip,
+      // even if it's partly outside the clip
+      const startTimeMatch =
+        ann.start_time >= newState.clip.start &&
+        ann.start_time <= newState.clip.end;
+      const endTimeMatch =
+        ann.end_time >= newState.clip.start &&
+        ann.end_time <= newState.clip.end;
+
+      if (!startTimeMatch && !endTimeMatch) {
+        return false;
+      }
+    }
+
+    // hide if the search query doesn't include any of its text
+    if (newState.searchQuery) {
+      const text = ann.annotation
+        .map((n) => Node.string(n))
+        .join('\n')
+        .toLowerCase();
+
+      if (text) {
+        const match = text
+          .toLowerCase()
+          .includes(newState.searchQuery!.toLowerCase());
 
         if (!match) {
           return false;
         }
       }
+    }
 
-      // hide if it's not in the selected clip
-      if (newState.clip) {
-        // should show if any part of the annotation overlaps with the selected clip,
-        // even if it's partly outside the clip
-        const startTimeMatch =
-          ann.start_time >= newState.clip.start &&
-          ann.start_time <= newState.clip.end;
-        const endTimeMatch =
-          ann.end_time >= newState.clip.start &&
-          ann.end_time <= newState.clip.end;
+    // display the annotation if it passed all the above checks
+    return true;
+  });
 
-        if (!startTimeMatch && !endTimeMatch) {
-          return false;
-        }
-      }
+  const annotationStarts = result.map((ann) => ({
+    start: ann.start_time,
+    end: ann.end_time || undefined,
+    playerId: playerId,
+  }));
 
-      // hide if the search query doesn't include any of its text
-      if (newState.searchQuery) {
-        const text = ann.annotation
-          .map((n) => Node.string(n))
-          .join('\n')
-          .toLowerCase();
-
-        if (text) {
-          const match = text
-            .toLowerCase()
-            .includes(newState.searchQuery!.toLowerCase());
-
-          if (!match) {
-            return false;
-          }
-        }
-      }
-
-      // display the annotation if it passed all the above checks
-      return true;
-    })
-    .map((ann) => ann.uuid);
+  return {
+    filteredAnnotations: result.map((r) => r.uuid),
+    annotationStarts,
+  };
+};
 
 const getNewSnapState = (
   oldState: AnnotationState,
@@ -140,7 +153,10 @@ export const toggleTagFilter = (tag: Tag, playerId: string) => {
     tags: updated,
   };
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
+
   newState.snapToAnnotations = getNewSnapState(oldState, newState);
 
   $pagePlayersState.setKey(playerId, newState);
@@ -192,7 +208,9 @@ export const toggleCategoryFilter = (
     };
   }
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
   newState.snapToAnnotations = getNewSnapState(oldState, newState);
 
   $pagePlayersState.setKey(playerId, newState);
@@ -215,7 +233,9 @@ export const toggleSetFilter = (set: string, playerId: string) => {
     };
   }
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
 
   $pagePlayersState.setKey(playerId, newState);
 };
@@ -228,7 +248,9 @@ export const setAvFile = (avFileUuid: string, playerId: string) => {
     avFileUuid,
   };
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
 
   $pagePlayersState.setKey(playerId, newState);
 };
@@ -241,7 +263,9 @@ export const setSearchFilter = (searchQuery: string, playerId: string) => {
     searchQuery,
   };
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
 
   $pagePlayersState.setKey(playerId, newState);
 };
@@ -254,7 +278,9 @@ export const clearFilter = (type: 'sets' | 'tags', playerId: string) => {
     [type]: [],
   };
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
 
   if (type === 'tags') {
     newState.snapToAnnotations = false;
@@ -271,7 +297,9 @@ export const setClip = (
 
   const newState = { ...oldState, clip };
 
-  newState.filteredAnnotations = getFilteredAnnotations(newState);
+  const filtered = getFilteredAnnotations(newState, playerId);
+  newState.filteredAnnotations = filtered.filteredAnnotations;
+  newState.annotationStarts = filtered.annotationStarts;
 
   $pagePlayersState.setKey(playerId, newState);
 };

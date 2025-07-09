@@ -103,10 +103,12 @@ if (initialTag) {
             : undefined,
         playerId: thisNode.dataset.playerId,
       });
+
       $pagePlayersState.setKey(thisNode.dataset.playerId, {
         ...($pagePlayersState.get()[thisNode.dataset.playerId] || defaultState),
         annotationStarts,
       });
+
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
         const fileId = thisNode.dataset.file;
@@ -141,6 +143,10 @@ if (initialTag) {
     const annotationNodes =
       eventContainerEl.querySelectorAll(`.annotationNode`);
 
+    const annotationNodesForScrolling = eventContainerEl.querySelectorAll(
+      `.annotationNode:not(.hidden)`
+    );
+
     const annotationTagNodes =
       eventContainerEl.querySelectorAll(`.annotationTags`);
 
@@ -161,7 +167,7 @@ if (initialTag) {
     });
 
     if (typeof current === 'number' && current >= 0) {
-      const activeNode = annotationNodes[current] as HTMLElement;
+      const activeNode = annotationNodesForScrolling[current] as HTMLElement;
 
       if (activeNode) {
         if (playerState.autoScroll) {
