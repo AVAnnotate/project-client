@@ -88,29 +88,29 @@ if (initialTag) {
 
   const annotationPlayNodes = document.querySelectorAll(`.playAnnotation`);
 
+  const annotationStarts = [];
+
   for (let i = 0; i < annotationPlayNodes.length; i++) {
     const thisNode = annotationPlayNodes[i] as HTMLElement;
 
     if (thisNode.dataset.start && thisNode.dataset.playerId) {
-      const annotationStartsNew =
-        $pagePlayersState.get()[thisNode.dataset.playerId]?.annotationStarts;
+      const parent = thisNode.closest('.annotationNode') as HTMLElement;
+      annotationStarts.push({
+        start: Math.floor(Number(thisNode.dataset.start)),
+        end:
+          Math.floor(Number(thisNode.dataset.end)) >
+          Math.floor(Number(thisNode.dataset.start))
+            ? Math.floor(Number(thisNode.dataset.end))
+            : undefined,
+        playerId: thisNode.dataset.playerId,
+        uuid: parent.dataset.uuid!,
+      });
 
-      if (annotationStartsNew) {
-        annotationStartsNew.push({
-          start: Math.floor(Number(thisNode.dataset.start)),
-          end:
-            Math.floor(Number(thisNode.dataset.end)) >
-            Math.floor(Number(thisNode.dataset.start))
-              ? Math.floor(Number(thisNode.dataset.end))
-              : undefined,
-          playerId: thisNode.dataset.playerId,
-        });
-        $pagePlayersState.setKey(thisNode.dataset.playerId, {
-          ...($pagePlayersState.get()[thisNode.dataset.playerId] ||
-            defaultState),
-          annotationStarts: annotationStartsNew,
-        });
-      }
+      $pagePlayersState.setKey(thisNode.dataset.playerId, {
+        ...($pagePlayersState.get()[thisNode.dataset.playerId] || defaultState),
+        annotationStarts,
+      });
+
       thisNode.addEventListener('click', () => {
         const playerId = thisNode.dataset.playerId || 'null';
         const fileId = thisNode.dataset.file;
@@ -152,7 +152,7 @@ if (initialTag) {
       (s) => s.playerId === changed
     );
 
-    const current = startTimes?.findIndex((time, idx) => {
+    const current = startTimes?.find((time, idx) => {
       if (typeof time.end === 'number') {
         return (
           time.start <= playerState.position && time.end > playerState.position
@@ -164,8 +164,10 @@ if (initialTag) {
         : time.start <= playerState.position;
     });
 
-    if (typeof current === 'number' && current >= 0) {
-      const activeNode = annotationNodes[current] as HTMLElement;
+    if (current) {
+      const activeNode = eventContainerEl.querySelector(
+        `.annotationNode[data-uuid="${current.uuid}"]`
+      ) as HTMLElement | null;
 
       if (activeNode) {
         if (playerState.autoScroll) {
@@ -193,12 +195,13 @@ if (initialTag) {
             activeNode.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
         }
+
         activeNode.classList.add(activeBackground);
       }
 
-      for (let i = 0; i < annotationNodes.length; i++) {
-        if (i !== current) {
-          annotationNodes[i].classList.remove(activeBackground);
+      for (const a of annotationNodes) {
+        if ((a as HTMLElement).dataset.uuid !== current.uuid) {
+          a.classList.remove(activeBackground);
         }
       }
     }
@@ -220,7 +223,34 @@ if (initialTag) {
     for (const node of annotationNodes) {
       const uuid = node.getAttribute('data-uuid');
 
-      if (uuid && playerState.filteredAnnotations.includes(uuid)) {
+      let status = 'show';
+
+      if (!uuid || !playerState.filteredAnnotations.includes(uuid)) {
+        status = 'hide';
+      }
+
+      if (playerState.clip) {
+        const annStart = node.getAttribute('data-start');
+        const annEnd = node.getAttribute('data-end');
+
+        if (annStart && annEnd) {
+          const annStartInt = parseInt(annStart);
+          const annEndInt = parseInt(annEnd);
+
+          const startFits =
+            annStartInt > playerState.clip.start &&
+            annStartInt < playerState.clip.end;
+          const endFits =
+            annEndInt > playerState.clip.start &&
+            annEndInt < playerState.clip.end;
+
+          if (!startFits || !endFits) {
+            status = 'hide';
+          }
+        }
+      }
+
+      if (status === 'show') {
         showNode(node);
       } else {
         hideNode(node);
