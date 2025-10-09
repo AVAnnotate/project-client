@@ -62,7 +62,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   return (
     <>
       <button onClick={() => setShow(!show)} type='button'>
-        <Bars3Icon className='w-8 h-8' />
+        <Bars3Icon
+          className='w-8 h-8'
+          aria-label='expand contract table of contents'
+        />
       </button>
       {/* adds the ability to hide the sidebar by clicking outside it */}
       {show && (
