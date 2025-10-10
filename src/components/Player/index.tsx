@@ -239,7 +239,7 @@ const Player: React.FC<Props> = (props) => {
         }}
         progressInterval={250}
         ref={player}
-        url={props.url}
+        src={props.url}
         height={props.type === 'Video' ? '100%' : 0}
         width={props.type === 'Video' ? '100%' : 0}
       />
