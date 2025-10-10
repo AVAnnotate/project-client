@@ -92,7 +92,8 @@
 
 /* YouTube embeds are contained in iframes instead of video elements */
 .player iframe {
-  height: 500px;
+  height: 100%;
+  width: 100%;
 }
 
 .player div {
