@@ -31,33 +31,6 @@ const { nodes, lines } = Astro.props;
     content: 'See Less';
   }
 </style>
-<script>
-  setTimeout(() => {
-    const text = document.getElementById('rte-text');
-    const expandLink = document.getElementById('expand-link');
-    const content = document.getElementById('rte-content');
-
-    expandLink?.addEventListener('click', (event) => {
-      if (expandLink.classList.contains('see-more')) {
-        expandLink.classList.remove('see-more');
-        expandLink.classList.add('see-less');
-        text?.classList.remove('text-clip');
-      } else {
-        expandLink.classList.remove('see-less');
-        expandLink.classList.add('see-more');
-        text?.classList.add('text-clip');
-      }
-    });
-
-    if (text && content && expandLink) {
-      if (text.scrollHeight > content.offsetHeight) {
-        expandLink.style.display = 'block';
-      } else {
-        expandLink.style.display = 'none';
-      }
-    }
-  }, 2000);
-</script>
 
 <div>
   {
@@ -88,15 +61,54 @@ const { nodes, lines } = Astro.props;
       };
 
       return (
-        <div>
+        <div class='rte-container'>
           <div id='rte-content'>
             <div id='rte-text' class='text-clip'>
               {nodes.map((node: Node) => serialize(node))}
             </div>
           </div>
-          <a href='#' id='expand-link' class='see-more-link see-more' />
+          <a href='#' id='expand-link' class='see-more-link see-more hidden' />
         </div>
       );
     })()
   }
 </div>
+
+<script>
+  window.document.addEventListener('DOMContentLoaded', () => {
+    const containers = document.querySelectorAll('.rte-container');
+    for (const container of containers) {
+      const text = container.querySelector('#rte-text') as HTMLElement;
+      const expandLink = container.querySelector('#expand-link') as HTMLElement;
+      const content = container.querySelector('#rte-content') as HTMLElement;
+
+      expandLink?.addEventListener('click', (event) => {
+        if (expandLink.classList.contains('see-more')) {
+          expandLink.classList.remove('see-more');
+          expandLink.classList.add('see-less');
+          text?.classList.remove('text-clip');
+        } else {
+          expandLink.classList.remove('see-less');
+          expandLink.classList.add('see-more');
+          text?.classList.add('text-clip');
+        }
+      });
+
+      if (text && content && expandLink) {
+        const determineShowMore = () => {
+          if (text.scrollHeight === 0) {
+            setTimeout(() => {
+              determineShowMore();
+            }, 20);
+          } else if (text.scrollHeight > content.offsetHeight) {
+            expandLink.style.display = 'block';
+          } else {
+            expandLink.style.display = 'none';
+          }
+        };
+
+        determineShowMore();
+      }
+    }
+  });
+</script>
