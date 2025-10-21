@@ -2,6 +2,7 @@
 import { Node, Text } from 'slate';
 import RichTextElement from './RichTextElement.astro';
 import RichTextLeaf from './RichTextLeaf.astro';
+import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const { nodes, lines } = Astro.props;
 ---
@@ -16,19 +17,6 @@ const { nodes, lines } = Astro.props;
     white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
-  }
-
-  .see-more-link {
-    text-decoration: underline;
-    color: blue;
-  }
-
-  .see-more:after {
-    content: 'See More';
-  }
-
-  .see-less:after {
-    content: 'See Less';
   }
 </style>
 
@@ -67,7 +55,24 @@ const { nodes, lines } = Astro.props;
               {nodes.map((node: Node) => serialize(node))}
             </div>
           </div>
-          <a href='#' id='expand-link' class='see-more-link see-more hidden' />
+          <button
+            id='expand-link'
+            class='see-more-link see-more hidden tag-pill rounded-full text-xl flex-row justify-center px-3 py-1.5 gap-1 cursor-pointer bg-secondary/80 hover:bg-secondary text-white mt-1.5 mb-3'
+          >
+            <PlusIcon
+              height={16}
+              width={16}
+              id='plus-icon'
+              aria-label='See More'
+            />
+            <MinusIcon
+              height={16}
+              width={16}
+              className='hidden'
+              id='minus-icon'
+              aria-label='See Less'
+            />
+          </button>
         </div>
       );
     })()
@@ -81,16 +86,22 @@ const { nodes, lines } = Astro.props;
       const text = container.querySelector('#rte-text') as HTMLElement;
       const expandLink = container.querySelector('#expand-link') as HTMLElement;
       const content = container.querySelector('#rte-content') as HTMLElement;
+      const plus = container.querySelector('#plus-icon');
+      const minus = container.querySelector('#minus-icon');
 
       expandLink?.addEventListener('click', (event) => {
         if (expandLink.classList.contains('see-more')) {
           expandLink.classList.remove('see-more');
           expandLink.classList.add('see-less');
+          plus?.classList.add('hidden');
+          minus?.classList.remove('hidden');
           text?.classList.remove('text-clip');
         } else {
           expandLink.classList.remove('see-less');
           expandLink.classList.add('see-more');
           text?.classList.add('text-clip');
+          minus?.classList.add('hidden');
+          plus?.classList.remove('hidden');
         }
       });
 
@@ -101,7 +112,7 @@ const { nodes, lines } = Astro.props;
               determineShowMore();
             }, 20);
           } else if (text.scrollHeight > content.offsetHeight) {
-            expandLink.style.display = 'block';
+            expandLink.style.display = 'flex';
           } else {
             expandLink.style.display = 'none';
           }
