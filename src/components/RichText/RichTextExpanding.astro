@@ -18,11 +18,6 @@ const { nodes, lines } = Astro.props;
     overflow-wrap: break-word;
   }
 
-  .see-more-link {
-    text-decoration: underline;
-    color: blue;
-  }
-
   .see-more:after {
     content: 'See More';
   }
@@ -67,7 +62,10 @@ const { nodes, lines } = Astro.props;
               {nodes.map((node: Node) => serialize(node))}
             </div>
           </div>
-          <a href='#' id='expand-link' class='see-more-link see-more hidden' />
+          <button
+            id='expand-link'
+            class='see-more-link see-more hidden tag-pill rounded-full text-xs flex-row justify-center px-3 py-1.5 gap-1 cursor-pointer bg-gray-200 my-2'
+          />
         </div>
       );
     })()
@@ -101,7 +99,7 @@ const { nodes, lines } = Astro.props;
               determineShowMore();
             }, 20);
           } else if (text.scrollHeight > content.offsetHeight) {
-            expandLink.style.display = 'block';
+            expandLink.style.display = 'flex';
           } else {
             expandLink.style.display = 'none';
           }
