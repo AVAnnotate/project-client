@@ -33,7 +33,7 @@ const props = Astro.props;
 </div>
 
 <script>
-  import { $pagePlayersState } from 'src/store.ts';
+  import { $pagePlayersState, clearFilter } from 'src/store.ts';
   const tabButtons = document.querySelectorAll('.event-detail-tab-button');
 
   tabButtons.forEach((button) => {
@@ -42,6 +42,8 @@ const props = Astro.props;
 
     button.addEventListener('click', () => {
       $pagePlayersState.setKey(`${playerId}.avFileUuid`, uuid);
+      clearFilter('sets', playerId);
+      clearFilter('tags', playerId);
     });
   });
 
