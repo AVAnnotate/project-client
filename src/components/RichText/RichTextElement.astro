@@ -81,9 +81,6 @@ const getTextSize = (textSize: string) => {
             ? '0 0 0 auto'
             : '0',
     };
-    const linkStyle = {
-      color: '#0969c3',
-    };
     const columnStyle = {
       paddingLeft: element.left ? `${element.left}%` : 0,
       paddingRight: element.right ? `${element.right}%` : 0,
@@ -94,7 +91,7 @@ const getTextSize = (textSize: string) => {
     switch (element.type) {
       case 'link':
         return (
-          <a style={linkStyle} href={element.url}>
+          <a class='text-blue-link' href={element.url}>
             <slot />
           </a>
         );
