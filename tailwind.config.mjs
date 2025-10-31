@@ -17,6 +17,7 @@ export default {
         },
         black: '#0A0A0A',
         'blue-hover': '#D9E6ED',
+        'blue-link': '#0969c3'
       },
       screens: {
         '3xl': '1800px',

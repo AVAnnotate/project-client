@@ -1,8 +1,5 @@
 ---
 const { leaf } = Astro.props;
-const linkStyle = {
-  color: '#0969c3',
-};
 ---
 
 {
@@ -11,7 +8,7 @@ const linkStyle = {
       href={leaf.link}
       target='_blank'
       rel='noopener noreferrer'
-      style={linkStyle}
+      class='text-blue-link'
     >
       <slot />
     </a>
