@@ -217,7 +217,7 @@ const Player: React.FC<Props> = (props) => {
       ...playerState,
       isPlaying: props.fileUuid,
     });
-  }, [props.id, props.fileUuid]);
+  }, [props.id, props.fileUuid, playerState]);
 
   //Callback function for hitting pause on the default controls
   const onPressPause = useCallback(() => {
@@ -225,7 +225,7 @@ const Player: React.FC<Props> = (props) => {
       ...playerState,
       isPlaying: undefined,
     });
-  }, [props.id]);
+  }, [props.id, playerState]);
 
   return (
     <div className='player'>
