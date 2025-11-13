@@ -169,7 +169,10 @@ const Player: React.FC<Props> = (props) => {
     // don't move the point if the user is currently dragging it
     if (!seeking) {
       // stop playing if we've reached the end of a clip
-      if (data.playedSeconds >= duration) {
+      if (
+        data.playedSeconds >= duration &&
+        data.playedSeconds < duration + 0.5
+      ) {
         $pagePlayersState.setKey(props.id, {
           ...playerState,
           isPlaying: undefined,
@@ -208,6 +211,22 @@ const Player: React.FC<Props> = (props) => {
     }
   };
 
+  //Callback function for hitting play on the default controls
+  const onPressPlay = useCallback(() => {
+    $pagePlayersState.setKey(props.id, {
+      ...playerState,
+      isPlaying: props.fileUuid,
+    });
+  }, [props.id, props.fileUuid, playerState]);
+
+  //Callback function for hitting pause on the default controls
+  const onPressPause = useCallback(() => {
+    $pagePlayersState.setKey(props.id, {
+      ...playerState,
+      isPlaying: undefined,
+    });
+  }, [props.id, playerState]);
+
   return (
     <div className='player'>
       <ReactPlayer
@@ -226,6 +245,8 @@ const Player: React.FC<Props> = (props) => {
             setDuration(dur);
           }
         }}
+        onPause={onPressPause}
+        onPlay={onPressPlay}
         onProgress={onProgress}
         onReady={() => {
           if (player.current && props.start) {

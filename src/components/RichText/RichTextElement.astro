@@ -32,18 +32,21 @@ const getTextSize = (textSize: string) => {
         fontSize: '32px',
         fontWeight: 'bold',
         lineHeight: '1.5',
+        minHeight: '48px',
       };
     case 'heading-two':
       return {
         fontSize: '24px',
         fontWeight: 'bold',
         lineHeight: '1.2',
+        minHeight: '36px',
       };
     case 'heading-three':
       return {
         fontSize: '18px',
         fontWeight: 'bold',
         lineHeight: 'auto',
+        minHeight: '27px',
       };
     case 'heading-four':
       return {
@@ -81,9 +84,6 @@ const getTextSize = (textSize: string) => {
             ? '0 0 0 auto'
             : '0',
     };
-    const linkStyle = {
-      color: '#0969c3',
-    };
     const columnStyle = {
       paddingLeft: element.left ? `${element.left}%` : 0,
       paddingRight: element.right ? `${element.right}%` : 0,
@@ -94,7 +94,7 @@ const getTextSize = (textSize: string) => {
     switch (element.type) {
       case 'link':
         return (
-          <a style={linkStyle} href={element.url}>
+          <a class='text-blue-link' href={element.url}>
             <slot />
           </a>
         );
@@ -108,7 +108,7 @@ const getTextSize = (textSize: string) => {
         );
       case 'bulleted-list':
         return (
-          <ul class='list-disc list-inside' style={style} {...attributes}>
+          <ul class='list-disc list-inside my-4' style={style} {...attributes}>
             <slot />
           </ul>
         );
