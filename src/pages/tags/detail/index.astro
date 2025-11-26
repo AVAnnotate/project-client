@@ -59,13 +59,22 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
     <h1 class='text-2xl'>Tag Groups used in Events</h1>
     <div class='tag-list flex flex-row gap-2'>
       {
-        projectData.data.project.tags.tagGroups.map((tg, idx) => (
-          <TagPill
-            color={tg.color}
-            tag={formattedCategoryNames[idx]}
-            icon={CheckIcon}
-          />
-        ))
+        projectData.data.project.tags.tagGroups.map((tg, idx) => {
+          const groupTags = projectData?.data.project.tags.tags.filter(
+            (t) => t.category === tg.category
+          );
+          if (groupTags?.length) {
+            return (
+              <TagPill
+                color={tg.color}
+                tag={formattedCategoryNames[idx]}
+                icon={CheckIcon}
+              />
+            );
+          } else {
+            return null;
+          }
+        })
       }
     </div>
     {
