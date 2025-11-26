@@ -56,6 +56,7 @@ const eventCollection = defineCollection({
     updated_at: z.string(),
     updated_by: z.string(),
     rights_statement: z.string().nullish(),
+    av_file_order: z.array(z.string()).nullish(),
   }),
 });
 
