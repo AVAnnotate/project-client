@@ -60,10 +60,11 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
     <div class='tag-list flex flex-row gap-2'>
       {
         projectData.data.project.tags.tagGroups.map((tg, idx) => {
-          const groupTags = projectData?.data.project.tags.tags.filter(
-            (t) => t.category === tg.category
-          );
-          if (groupTags?.length) {
+          if (
+            projectData?.data.project.tags.tags.some(
+              (t) => t.category === tg.category
+            )
+          ) {
             return (
               <TagPill
                 color={tg.color}
