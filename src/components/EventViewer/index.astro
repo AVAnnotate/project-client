@@ -32,9 +32,13 @@ const annotationSets = annotationData.filter(
   (an) => an.data.event_id === event.id
 );
 
+//use av_file_order for ordering if it exists
+const av_file_ids =
+  event.data?.av_file_order || Object.keys(event.data?.audiovisual_files);
+
 // allow a default file to be configured via props
 // otherwise, use the first file in the list
-const defaultFile = file || Object.keys(event.data.audiovisual_files)[0];
+const defaultFile = file || av_file_ids[0];
 
 const childProps = {
   ...Astro.props,
@@ -64,7 +68,7 @@ const childProps = {
     client:only='react'
   />
   {
-    Object.keys(event.data.audiovisual_files).map((uuid) => {
+    av_file_ids?.map((uuid) => {
       const avFile = event.data.audiovisual_files[uuid];
 
       const type = avFile.file_type || event.data.item_type;

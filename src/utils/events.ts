@@ -9,7 +9,7 @@ export const getCaptionSets = async (
   const projectData = await getEntry('project', 'project');
 
   const baseUrl = import.meta.env.PROD
-    ? projectData.data.project.slug
+    ? projectData?.data.project.slug
     : dynamicConfig.base;
 
   let captionSets: { url: string; label: string }[];
@@ -32,7 +32,10 @@ export const getCaptionSets = async (
 };
 
 export const getTabEntries = (event: CollectionEntry<'events'>) => {
-  return Object.keys(event.data.audiovisual_files).map((uuid) => ({
+  const av_file_ids =
+    event.data?.av_file_order || Object.keys(event.data?.audiovisual_files);
+
+  return av_file_ids.map((uuid) => ({
     title: event.data.audiovisual_files[uuid].label,
     uuid,
   }));
