@@ -76,10 +76,13 @@ tags.tagGroups.forEach((group: { category: string; color: string }) => {
 });
 tags.tags.forEach((tag: { tag: string; category: string }) => {
   const count = getTagCount(tag);
-  tagData[tag.category].tags.push({
-    tag: tag.tag,
-    count: count,
-  });
+  // only include tags that are actually used in annotations
+  if (count) {
+    tagData[tag.category].tags.push({
+      tag: tag.tag,
+      count: count,
+    });
+  }
 });
 ---
 
