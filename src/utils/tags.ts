@@ -37,7 +37,9 @@ export const getTagDisplay = (str: string) => {
   const split = str.split(' ');
 
   return split
-    .map((str) => `${str[0].toLocaleUpperCase()}${str.slice(1)}`)
+    .map((str) =>
+      str?.length ? `${str[0].toLocaleUpperCase()}${str.slice(1)}` : ''
+    )
     .join(' ');
 };
 
