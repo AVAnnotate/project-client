@@ -6,7 +6,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import { toTagParam } from '@utils/tags';
+import { toTagParam, sortTags } from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
@@ -111,7 +111,7 @@ tags.tags.forEach((tag: { tag: string; category: string }) => {
               <h3 class='px-6 capitalize'>{cat.replaceAll('_', '')}</h3>
               <div class='h-[1px] bg-gray-200 w-full' />
               <div class='px-6 flex flex-row flex-wrap gap-2'>
-                {tagData[cat].tags.map((tag) =>
+                {tagData[cat].tags.sort(sortTags).map((tag) =>
                   tag.count ? (
                     <a
                       class='[&>*]:hover:cursor-pointer'
