@@ -6,7 +6,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import TagPill from '@components/TagUtils/TagPill';
 import { getEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import { toTagParam } from '@utils/tags';
+import { toTagParam, sortTags } from '@utils/tags';
 
 const projectData = await getEntry('project', 'project');
 
@@ -74,7 +74,7 @@ tags.tagGroups.forEach((group: { category: string; color: string }) => {
     tags: [],
   };
 });
-tags.tags.forEach((tag: { tag: string; category: string }) => {
+tags.tags.sort(sortTags).forEach((tag: { tag: string; category: string }) => {
   const count = getTagCount(tag);
   // only include tags that are actually used in annotations
   if (count) {

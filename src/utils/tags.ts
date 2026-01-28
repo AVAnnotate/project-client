@@ -1,4 +1,4 @@
-import type { Annotation, Event } from '@ty/index.ts';
+import type { Annotation, Event, Tag } from '@ty/index.ts';
 
 export const tagColors = [
   '#ADFFD9',
@@ -130,3 +130,6 @@ export const setsHasTag = (sets: any[], category: string, tag: string) => {
 
   return false;
 };
+
+export const sortTags = (a: Tag, b: Tag) =>
+  a.tag > b.tag ? 1 : a.tag < b.tag ? -1 : 0;

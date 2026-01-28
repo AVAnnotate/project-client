@@ -17,6 +17,7 @@ import {
   getTagDisplay,
   setHasCategory,
   setsHasCategory,
+  sortTags,
   toTagParam,
 } from '@utils/tags.ts';
 
@@ -78,6 +79,7 @@ const tags = projectData.data.project.tags.tags
       t.category.toLocaleLowerCase() ===
       fromTagParam(category).toLocaleLowerCase()
   )
+  .sort(sortTags)
   .map((t) => t.tag);
 
 // generate a random color for each tag on this page
