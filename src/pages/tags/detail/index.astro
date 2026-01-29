@@ -49,6 +49,10 @@ if (annotationSets.length === 0) {
 const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
   (cat) => getTagDisplay(cat.category)
 );
+
+const sortedTagGroups = projectData.data.project.tags.tagGroups.sort((a, b) =>
+  a.category > b.category ? 1 : a.category < b.category ? -1 : 0
+);
 ---
 
 <Layout
@@ -60,7 +64,7 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
     <h1 class='text-2xl'>Tag Groups used in Events</h1>
     <div class='tag-list flex flex-row gap-2'>
       {
-        projectData.data.project.tags.tagGroups.map((tg, idx) => {
+        sortedTagGroups.map((tg, idx) => {
           if (
             projectData?.data.project.tags.tags.some(
               (t) => t.category === tg.category
@@ -81,7 +85,7 @@ const formattedCategoryNames = projectData.data.project.tags.tagGroups.map(
       }
     </div>
     {
-      projectData.data.project.tags.tagGroups.map((category, idx) => {
+      sortedTagGroups.map((category, idx) => {
         const tags = projectData.data.project.tags.tags.filter(
           (t) => t.category === category.category
         );
