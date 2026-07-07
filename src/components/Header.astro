@@ -11,6 +11,7 @@ const pages = await getPages();
 const { pageSlug } = Astro.params;
 
 const basePath = normalizeBasePath(import.meta.env.BASE_URL);
+const homePath = basePath === '' ? '/' : `${basePath}/`;
 ---
 
 <div class='bg-secondary text-white w-full h-[80px] py-6 sticky top-0 z-20'>
@@ -23,7 +24,7 @@ const basePath = normalizeBasePath(import.meta.env.BASE_URL);
       url={Astro.url}
       project={projectData}
     />
-    <a href={basePath || '/'} class='text-lg'
+    <a href={homePath} class='text-lg'
       >{projectData.data.project.title}</a
     >
   </Container>

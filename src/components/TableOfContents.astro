@@ -7,7 +7,7 @@ const projectData = await getEntry('project', 'project');
 
 const projectFileData = await getEntry('project', 'project');
 
-const normalizedBasePath = normalizeBasePath(import.meta.env.BASE_URL);
+const basePath = normalizeBasePath(import.meta.env.BASE_URL);
 
 const pages = await getPages();
 
@@ -45,7 +45,7 @@ pages
         return (
           <a
             class='underline'
-            href={`${normalizedBasePath}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
+            href={`${basePath}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
             style={{ marginLeft: `${counts[page.id] * 10}px` }}
           >
             <p>{page.data.title}</p>
@@ -57,7 +57,7 @@ pages
     projectFileData!.data.project.tags.tags.length > 0 && (
       <a
         class='underline'
-        href={`${normalizedBasePath}/tags`}
+        href={`${basePath}/tags`}
       >
         Index
       </a>
