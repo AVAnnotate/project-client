@@ -15,11 +15,9 @@ interface SidebarProps {
   url: URL;
 }
 
-const getHref = (page: PageCollectionEntry, basePath: string) => {
-  const normalizedBasePath = normalizeBasePath(basePath);
-
+const getHref = (page: PageCollectionEntry, normalizedBasePath: string) => {
   if (page.data.autogenerate.type === 'home') {
-    return normalizedBasePath || '/';
+    return normalizedBasePath === '' ? '/' : normalizedBasePath;
   }
 
   if (page.data.autogenerate.enabled) {
