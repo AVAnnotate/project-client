@@ -10,6 +10,7 @@ const basePath =
   import.meta.env.BASE_URL === '/'
     ? ''
     : import.meta.env.BASE_URL.replace(/\/$/, '');
+const normalizedBasePath = basePath === '/' ? '' : basePath.replace(/\/$/, '');
 
 const pages = await getPages();
 
@@ -47,7 +48,7 @@ pages
         return (
           <a
             class='underline'
-            href={`${basePath}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
+            href={`${normalizedBasePath}/${page.data.autogenerate.enabled ? 'events' : 'pages'}/${page.data.slug || page.id}`}
             style={{ marginLeft: `${counts[page.id] * 10}px` }}
           >
             <p>{page.data.title}</p>
@@ -59,7 +60,7 @@ pages
     projectFileData!.data.project.tags.tags.length > 0 && (
       <a
         class='underline'
-        href={`${basePath}/tags`}
+        href={`${normalizedBasePath}/tags`}
       >
         Index
       </a>

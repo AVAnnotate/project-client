@@ -14,20 +14,29 @@ interface SidebarProps {
   url: URL;
 }
 
+const normalizeBasePath = (basePath: string) =>
+  basePath === '/' ? '' : basePath.replace(/\/$/, '');
+
 const getHref = (page: PageCollectionEntry, basePath: string) => {
+  const normalizedBasePath = normalizeBasePath(basePath);
+
   if (page.data.autogenerate.type === 'home') {
-    return basePath === '' ? '/' : basePath;
+    return normalizedBasePath || '/';
   }
 
   if (page.data.autogenerate.enabled) {
-    return `${basePath}/events/${page.data.slug || page.id}`;
+    return `${normalizedBasePath}/events/${page.data.slug || page.id}`;
   }
 
-  return `${basePath}/pages/${page.data.slug || page.id}`;
+  return `${normalizedBasePath}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const [show, setShow] = useState(false);
+  const basePath = useMemo(
+    () => normalizeBasePath(props.basePath),
+    [props.basePath]
+  );
 
   const homeUuid = useMemo(
     () => props.pages.find((p) => p.data.autogenerate.type === 'home')?.id,
@@ -35,8 +44,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   );
 
   const isIndex = useMemo(
-    () => `${props.basePath}/tags` === props.url.pathname,
-    [props.basePath, props.url]
+    () => `${basePath}/tags` === props.url.pathname,
+    [basePath, props.url]
   );
 
   // highlight the current page
@@ -79,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             </button>
           </div>
           {props.pages.map((page) => (
-            <a href={getHref(page, props.basePath)} key={page.id}>
+            <a href={getHref(page, basePath)} key={page.id}>
               <div className='p-4 hover:bg-blue-hover'>
                 <p
                   key={page.id}
@@ -95,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           ))}
           {props.project.data.project.tags &&
             props.project.data.project.tags.tags.length > 0 && (
-              <a href={`${props.basePath}/tags`}>
+              <a href={`${basePath}/tags`}>
                 <div className='p-4 hover:bg-blue-hover'>
                   <p className={isIndex ? 'font-bold' : ''}>Index</p>
                 </div>
