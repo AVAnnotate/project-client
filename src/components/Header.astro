@@ -4,13 +4,14 @@ import Container from './Container.astro';
 import Sidebar from './Sidebar';
 import { getPages } from 'src/utils/pages';
 import { normalizeBasePath } from 'src/utils/basePath';
+import { dynamicConfig } from 'dynamic-astro-config';
 
 const projectData = await getEntry('project', 'project');
 const pages = await getPages();
 
 const { pageSlug } = Astro.params;
 
-const basePath = normalizeBasePath(import.meta.env.BASE_URL);
+const basePath = normalizeBasePath(dynamicConfig.base);
 const homePath = basePath === '' ? '/' : `${basePath}/`;
 ---
 
