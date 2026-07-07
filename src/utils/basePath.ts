@@ -5,6 +5,6 @@ export const normalizeBasePath = (basePath: string) => {
     return '';
   }
 
-  const noTrailingSlash = trimmedBasePath.replace(/\/+$/, '');
+  const noTrailingSlash = trimmedBasePath.replace(/\/$/, '');
   return noTrailingSlash.startsWith('/') ? noTrailingSlash : `/${noTrailingSlash}`;
 };
