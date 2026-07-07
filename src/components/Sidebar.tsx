@@ -5,6 +5,7 @@ import type {
   PageCollectionEntry,
   ProjectCollectionEntry,
 } from 'src/utils/pages.ts';
+import { normalizeBasePath } from 'src/utils/basePath';
 
 interface SidebarProps {
   basePath: string;
@@ -13,9 +14,6 @@ interface SidebarProps {
   slug?: string;
   url: URL;
 }
-
-const normalizeBasePath = (basePath: string) =>
-  basePath === '/' ? '' : basePath.replace(/\/$/, '');
 
 const getHref = (page: PageCollectionEntry, basePath: string) => {
   const normalizedBasePath = normalizeBasePath(basePath);
@@ -33,10 +31,7 @@ const getHref = (page: PageCollectionEntry, basePath: string) => {
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const [show, setShow] = useState(false);
-  const basePath = useMemo(
-    () => normalizeBasePath(props.basePath),
-    [props.basePath]
-  );
+  const basePath = normalizeBasePath(props.basePath);
 
   const homeUuid = useMemo(
     () => props.pages.find((p) => p.data.autogenerate.type === 'home')?.id,
