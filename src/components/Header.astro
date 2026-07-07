@@ -1,6 +1,5 @@
 ---
 import { getEntry } from 'astro:content';
-import { dynamicConfig } from 'dynamic-astro-config';
 import Container from './Container.astro';
 import Sidebar from './Sidebar';
 import { getPages } from 'src/utils/pages';
@@ -10,24 +9,23 @@ const pages = await getPages();
 
 const { pageSlug } = Astro.params;
 
-const baseUrl = import.meta.env.PROD
-  ? projectData.data.publish.publish_pages_app
-    ? projectData.data.project.slug
-    : undefined
-  : dynamicConfig.base;
+const basePath =
+  import.meta.env.BASE_URL === '/'
+    ? ''
+    : import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <div class='bg-secondary text-white w-full h-[80px] py-6 sticky top-0 z-20'>
   <Container className='flex flex-row items-center gap-[52px]'>
     <Sidebar
-      baseUrl={baseUrl}
+      basePath={basePath}
       client:load
       pages={pages}
       slug={pageSlug}
       url={Astro.url}
       project={projectData}
     />
-    <a href={`${baseUrl ? `/${baseUrl}` : '/'}`} class='text-lg'
+    <a href={basePath || '/'} class='text-lg'
       >{projectData.data.project.title}</a
     >
   </Container>

@@ -7,25 +7,23 @@ import type {
 } from 'src/utils/pages.ts';
 
 interface SidebarProps {
-  baseUrl: string | undefined;
+  basePath: string;
   pages: PageCollectionEntry[];
   project: ProjectCollectionEntry;
   slug?: string;
   url: URL;
 }
 
-const getHref = (page: PageCollectionEntry, baseUrl: string | undefined) => {
+const getHref = (page: PageCollectionEntry, basePath: string) => {
   if (page.data.autogenerate.type === 'home') {
-    return baseUrl ? `/${baseUrl}` : '/';
+    return basePath || '/';
   }
 
   if (page.data.autogenerate.enabled) {
-    return `${baseUrl ? `/${baseUrl}` : ''}/events/${
-      page.data.slug || page.id
-    }`;
+    return `${basePath}/events/${page.data.slug || page.id}`;
   }
 
-  return `${baseUrl ? `/${baseUrl}` : ''}/pages/${page.data.slug || page.id}`;
+  return `${basePath}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -37,9 +35,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   );
 
   const isIndex = useMemo(
-    () =>
-      `${props.baseUrl ? `/${props.baseUrl}` : ''}/tags` === props.url.pathname,
-    [props.baseUrl, props.url]
+    () => `${props.basePath}/tags` === props.url.pathname,
+    [props.basePath, props.url]
   );
 
   // highlight the current page
@@ -82,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             </button>
           </div>
           {props.pages.map((page) => (
-            <a href={getHref(page, props.baseUrl)} key={page.id}>
+            <a href={getHref(page, props.basePath)} key={page.id}>
               <div className='p-4 hover:bg-blue-hover'>
                 <p
                   key={page.id}
@@ -98,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           ))}
           {props.project.data.project.tags &&
             props.project.data.project.tags.tags.length > 0 && (
-              <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
+              <a href={`${props.basePath}/tags`}>
                 <div className='p-4 hover:bg-blue-hover'>
                   <p className={isIndex ? 'font-bold' : ''}>Index</p>
                 </div>
