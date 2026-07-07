@@ -16,7 +16,7 @@ interface SidebarProps {
 
 const getHref = (page: PageCollectionEntry, basePath: string) => {
   if (page.data.autogenerate.type === 'home') {
-    return basePath || '/';
+    return basePath === '' ? '/' : basePath;
   }
 
   if (page.data.autogenerate.enabled) {
