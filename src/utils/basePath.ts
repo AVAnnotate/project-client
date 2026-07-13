@@ -14,7 +14,7 @@ export const joinBasePath = (basePath: string, segment = '') => {
   const normalizedSegment = segment.trim().replace(/^\/+|\/+$/g, '');
 
   if (normalizedSegment === '') {
-    return normalizedBasePath === '' ? '/' : `${normalizedBasePath}/`;
+    return normalizedBasePath === '' ? '/' : normalizedBasePath;
   }
 
   return `${normalizedBasePath}/${normalizedSegment}`;
