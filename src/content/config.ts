@@ -129,6 +129,7 @@ const projectCollection = defineCollection({
     }),
     publish: z.object({
       publish_pages_app: z.boolean(),
+      include_slug_in_base: z.boolean().nullish(),
       publish_sha: z.string(),
       publish_iso_date: z.string(),
     }),
