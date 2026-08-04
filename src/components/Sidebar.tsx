@@ -5,31 +5,31 @@ import type {
   PageCollectionEntry,
   ProjectCollectionEntry,
 } from 'src/utils/pages.ts';
+import { normalizeBasePath } from 'src/utils/basePath';
 
 interface SidebarProps {
-  baseUrl: string | undefined;
+  basePath: string;
   pages: PageCollectionEntry[];
   project: ProjectCollectionEntry;
   slug?: string;
   url: URL;
 }
 
-const getHref = (page: PageCollectionEntry, baseUrl: string | undefined) => {
+const getHref = (page: PageCollectionEntry, normalizedBasePath: string) => {
   if (page.data.autogenerate.type === 'home') {
-    return baseUrl ? `/${baseUrl}` : '/';
+    return normalizedBasePath === '' ? '/' : `${normalizedBasePath}/`;
   }
 
   if (page.data.autogenerate.enabled) {
-    return `${baseUrl ? `/${baseUrl}` : ''}/events/${
-      page.data.slug || page.id
-    }`;
+    return `${normalizedBasePath}/events/${page.data.slug || page.id}`;
   }
 
-  return `${baseUrl ? `/${baseUrl}` : ''}/pages/${page.data.slug || page.id}`;
+  return `${normalizedBasePath}/pages/${page.data.slug || page.id}`;
 };
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const [show, setShow] = useState(false);
+  const basePath = normalizeBasePath(props.basePath);
 
   const homeUuid = useMemo(
     () => props.pages.find((p) => p.data.autogenerate.type === 'home')?.id,
@@ -37,9 +37,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   );
 
   const isIndex = useMemo(
-    () =>
-      `${props.baseUrl ? `/${props.baseUrl}` : ''}/tags` === props.url.pathname,
-    [props.baseUrl, props.url]
+    () => `${basePath}/tags` === props.url.pathname,
+    [basePath, props.url]
   );
 
   // highlight the current page
@@ -82,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             </button>
           </div>
           {props.pages.map((page) => (
-            <a href={getHref(page, props.baseUrl)} key={page.id}>
+            <a href={getHref(page, basePath)} key={page.id}>
               <div className='p-4 hover:bg-blue-hover'>
                 <p
                   key={page.id}
@@ -98,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           ))}
           {props.project.data.project.tags &&
             props.project.data.project.tags.tags.length > 0 && (
-              <a href={`${props.baseUrl ? `/${props.baseUrl}` : ''}/tags`}>
+              <a href={`${basePath}/tags`}>
                 <div className='p-4 hover:bg-blue-hover'>
                   <p className={isIndex ? 'font-bold' : ''}>Index</p>
                 </div>

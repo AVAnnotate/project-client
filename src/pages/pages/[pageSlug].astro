@@ -1,18 +1,10 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
 import Container from '@components/Container.astro';
-import { getEntry } from 'astro:content';
 import RichText from '../../components/RichText/index.astro';
 import { getPage, getPages } from 'src/utils/pages';
-
-const projectData = await getEntry('project', 'project');
-
-// @ts-ignore
-const baseUrl = import.meta.env.PROD
-  ? projectData?.data.project.slug
-  : dynamicConfig.base;
+import { joinBasePath } from '@utils/basePath';
 
 export const getStaticPaths = (async () => {
   const eventPages = await getPages((p) => !p.data.autogenerate.enabled);
@@ -25,7 +17,7 @@ export const getStaticPaths = (async () => {
 const { pageSlug } = Astro.params;
 
 if (!pageSlug) {
-  return Astro.redirect(`/${baseUrl}`);
+  return Astro.redirect(joinBasePath(import.meta.env.BASE_URL));
 }
 
 const page = await getPage(pageSlug);

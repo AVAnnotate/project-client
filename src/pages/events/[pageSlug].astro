@@ -1,18 +1,10 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { dynamicConfig } from 'dynamic-astro-config';
 import Layout from '@layouts/Layout.astro';
-import { getEntry } from 'astro:content';
 import EventViewer from '@components/EventViewer/index.astro';
 import { getPage, getPages } from 'src/utils/pages';
 import { randomUUID } from 'crypto';
-
-const projectData = await getEntry('project', 'project');
-
-// @ts-ignore
-const baseUrl = import.meta.env.PROD
-  ? projectData?.data.project.slug
-  : dynamicConfig.base;
+import { joinBasePath } from '@utils/basePath';
 
 export const getStaticPaths = (async () => {
   // filter out custom pages
@@ -26,13 +18,13 @@ export const getStaticPaths = (async () => {
 const { pageSlug } = Astro.params;
 
 if (!pageSlug) {
-  return Astro.redirect(`/${baseUrl}`);
+  return Astro.redirect(joinBasePath(import.meta.env.BASE_URL));
 }
 
 const page = await getPage(pageSlug);
 
 if (!page.data.autogenerate.type_id) {
-  return Astro.redirect(`/${baseUrl}`);
+  return Astro.redirect(joinBasePath(import.meta.env.BASE_URL));
 }
 
 const playerId = randomUUID();
