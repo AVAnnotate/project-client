@@ -31,14 +31,16 @@ const basePath = normalizeBasePath(import.meta.env.BASE_URL);
 export const getStaticPaths = (async () => {
   const projectData = await getEntry('project', 'project');
 
-  return projectData.data.project.tags.tags.map((t) => ({
-    params: {
+  return projectData.data.project.tags.tags
+    .map((t) => ({
       category: toTagParam(t.category),
       tag: toTagParam(t.tag),
-    },
-  }));
+    }))
+    .filter((params) => params.category && params.tag)
+    .map((params) => ({
+      params,
+    }));
 }) satisfies GetStaticPaths;
-
 const { category, tag } = Astro.params;
 const capitalizedCategory = getTagDisplay(fromTagParam(category));
 const capitalizedTag = getTagDisplay(fromTagParam(tag));
